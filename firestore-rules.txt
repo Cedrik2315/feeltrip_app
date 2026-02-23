@@ -1,0 +1,132 @@
+// Firestore Security Rules con soporte para Comentarios y Agencias
+// Copiar a Firebase Console: Firestore Database > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Función para verificar autenticación
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Función para verificar owner
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    // ===== USERS =====
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId);
+      allow update, delete: if isOwner(userId);
+    }
+
+    // ===== STORIES (Historias de Viaje) =====
+    match /stories/{storyId} {
+      // Todos pueden leer historias
+      allow read: if true;
+      
+      // Solo autenticados pueden crear
+      allow create: if isSignedIn();
+      
+      // Solo el dueño puede actualizar/eliminar
+      allow update, delete: if isOwner(resource.data.userId);
+
+      // ===== COMMENTS (Comentarios de Historias) =====
+      match /comments/{commentId} {
+        // Todos pueden leer comentarios
+        allow read: if true;
+        
+        // Autenticados pueden crear comentarios
+        allow create: if isSignedIn() && 
+          request.resource.data.userId == request.auth.uid;
+        
+        // Solo el dueño del comentario puede actualizar/eliminar
+        allow update, delete: if isOwner(resource.data.userId);
+      }
+    }
+
+    // ===== AGENCIES (Perfiles de Agencias) =====
+    match /agencies/{agencyId} {
+      // Todos pueden leer agencias
+      allow read: if true;
+      
+      // Solo admins o la agencia propietaria pueden crear
+      allow create: if isSignedIn();
+      
+      // Solo el propietario puede actualizar
+      allow update: if isOwner(resource.data.ownerId) || 
+        request.auth.token.admin == true;
+      
+      // Solo admins pueden eliminar
+      allow delete: if request.auth.token.admin == true;
+
+      // ===== AGENCY REVIEWS =====
+      match /reviews/{reviewId} {
+        allow read: if true;
+        
+        allow create: if isSignedIn();
+        
+        allow update, delete: if isOwner(resource.data.userId) || 
+          request.auth.token.admin == true;
+      }
+    }
+
+    // ===== EXPERIENCES (Experiencias) =====
+    match /experiences/{experienceId} {
+      // Todos pueden leer
+      allow read: if true;
+      
+      // Autenticados pueden crear
+      allow create: if isSignedIn();
+      
+      // Solo propietario puede actualizar
+      allow update, delete: if isOwner(resource.data.userId);
+    }
+
+    // ===== DIARY ENTRIES (Entradas de Diario) =====
+    match /diary_entries/{entryId} {
+      // Solo el propietario puede leer
+      allow read: if isOwner(resource.data.userId);
+      
+      // Autenticados pueden crear
+      allow create: if isSignedIn() && 
+        request.resource.data.userId == request.auth.uid;
+      
+      // Solo el propietario puede actualizar/eliminar
+      allow update, delete: if isOwner(resource.data.userId);
+    }
+
+    // ===== FOLLOWERS (Sistema de Seguidores) =====
+    match /followers/{followId} {
+      // Todos pueden leer (public followers)
+      allow read: if true;
+      
+      // Autenticados pueden crear
+      allow create: if isSignedIn() && 
+        request.resource.data.followerId == request.auth.uid;
+      
+      // Solo el seguidor puede eliminar su seguimiento
+      allow delete: if isOwner(resource.data.followerId);
+    }
+
+    // ===== USER PREFERENCES =====
+    match /user_preferences/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // ===== NOTIFICATIONS =====
+    match /notifications/{notificationId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if request.auth.uid != null;
+      allow update, delete: if isOwner(resource.data.userId);
+    }
+
+    // ===== DEFAULT DENY ALL =====
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
