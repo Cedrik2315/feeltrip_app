@@ -1,8 +1,10 @@
-import 'package:get/get.dart';
+﻿import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
+
+import '../core/app_logger.dart';
 import '../models/experience_model.dart';
-import '../services/story_service.dart';
 import '../services/diary_service.dart';
+import '../services/story_service.dart';
 
 class ExperienceController extends GetxController {
   final StoryService _storyService = StoryService();
@@ -21,16 +23,10 @@ class ExperienceController extends GetxController {
   // Variables
   String? userId;
 
-  @override
-  void onInit() {
-    super.onInit();
-    // El userId se debe setear después de autenticación
-    // loadAllData() será llamado cuando userId esté disponible
-  }
 
   // ============ INITIALIZATION ============
 
-  /// Inicializar con userId (llamar después de login)
+  /// Inicializar con userId (llamar despuÃ©s de login)
   Future<void> initialize(String uid) async {
     userId = uid;
     await loadAllData();
@@ -50,7 +46,7 @@ class ExperienceController extends GetxController {
       ]);
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error loading data: $e');
+      AppLogger.debug('âŒ Error loading data: $e');
     } finally {
       isLoading.value = false;
     }
@@ -58,18 +54,18 @@ class ExperienceController extends GetxController {
 
   // ============ STORIES ============
 
-  /// Cargar historias públicas
+  /// Cargar historias pÃºblicas
   Future<void> loadStories() async {
     try {
       final fetchedStories = await _storyService.getPublicStories();
       stories.assignAll(fetchedStories);
     } catch (e) {
-      print('❌ Error loading stories: $e');
+      AppLogger.debug('âŒ Error loading stories: $e');
       errorMessage.value = 'Error cargando historias';
     }
   }
 
-  /// Stream de historias públicas
+  /// Stream de historias pÃºblicas
   Stream<List<TravelerStory>> getStoriesStream() {
     return _storyService.getPublicStoriesStream();
   }
@@ -107,11 +103,11 @@ class ExperienceController extends GetxController {
       // Agregar a la lista local
       stories.insert(0, newStory);
       
-      successMessage.value = '¡Historia compartida exitosamente!';
-      print('✅ Story created: ${newStory.id}');
+      successMessage.value = 'Â¡Historia compartida exitosamente!';
+      AppLogger.debug('âœ… Story created: ${newStory.id}');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error creating story: $e');
+      AppLogger.debug('âŒ Error creating story: $e');
     } finally {
       isSavingStory.value = false;
     }
@@ -129,10 +125,10 @@ class ExperienceController extends GetxController {
         stories.refresh();
       }
       
-      print('✅ Story liked: $storyId');
+      AppLogger.debug('âœ… Story liked: $storyId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error liking story: $e');
+      AppLogger.debug('âŒ Error liking story: $e');
     }
   }
 
@@ -148,10 +144,10 @@ class ExperienceController extends GetxController {
         stories.refresh();
       }
       
-      print('✅ Story unliked: $storyId');
+      AppLogger.debug('âœ… Story unliked: $storyId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error unliking story: $e');
+      AppLogger.debug('âŒ Error unliking story: $e');
     }
   }
 
@@ -163,14 +159,14 @@ class ExperienceController extends GetxController {
       await _storyService.deleteStory(userId!, storyId);
       stories.removeWhere((s) => s.id == storyId);
       successMessage.value = 'Historia eliminada';
-      print('✅ Story deleted: $storyId');
+      AppLogger.debug('âœ… Story deleted: $storyId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error deleting story: $e');
+      AppLogger.debug('âŒ Error deleting story: $e');
     }
   }
 
-  /// Buscar historias por emoción
+  /// Buscar historias por emociÃ³n
   Future<void> searchStoriesByEmotion(String emotion) async {
     try {
       isLoading.value = true;
@@ -178,7 +174,7 @@ class ExperienceController extends GetxController {
       stories.assignAll(results);
     } catch (e) {
       errorMessage.value = 'Error buscando historias';
-      print('❌ Error searching stories: $e');
+      AppLogger.debug('âŒ Error searching stories: $e');
     } finally {
       isLoading.value = false;
     }
@@ -193,14 +189,14 @@ class ExperienceController extends GetxController {
       final entries = await _diaryService.getDiaryEntries(userId!);
       diaryEntries.assignAll(entries);
     } catch (e) {
-      print('❌ Error loading diary entries: $e');
+      AppLogger.debug('âŒ Error loading diary entries: $e');
       errorMessage.value = 'Error cargando diario';
     }
   }
 
   /// Stream de entradas del diario
   Stream<List<DiaryEntry>> getDiaryEntriesStream() {
-    if (userId == null) return Stream.empty();
+    if (userId == null) return const Stream.empty();
     return _diaryService.getDiaryEntriesStream(userId!);
   }
 
@@ -234,14 +230,14 @@ class ExperienceController extends GetxController {
       // Agregar a lista local
       diaryEntries.insert(0, entry);
       
-      // Recargar estadísticas
+      // Recargar estadÃ­sticas
       await loadDiaryStats();
       
-      successMessage.value = '¡Entrada guardada!';
-      print('✅ Diary entry created: ${entry.id}');
+      successMessage.value = 'Â¡Entrada guardada!';
+      AppLogger.debug('âœ… Diary entry created: ${entry.id}');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error creating diary entry: $e');
+      AppLogger.debug('âŒ Error creating diary entry: $e');
     } finally {
       isSavingDiary.value = false;
     }
@@ -282,14 +278,14 @@ class ExperienceController extends GetxController {
         diaryEntries.refresh();
       }
       
-      // Recargar estadísticas
+      // Recargar estadÃ­sticas
       await loadDiaryStats();
       
       successMessage.value = 'Entrada actualizada';
-      print('✅ Diary entry updated: $entryId');
+      AppLogger.debug('âœ… Diary entry updated: $entryId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error updating diary entry: $e');
+      AppLogger.debug('âŒ Error updating diary entry: $e');
     } finally {
       isSavingDiary.value = false;
     }
@@ -304,27 +300,27 @@ class ExperienceController extends GetxController {
       diaryEntries.removeWhere((e) => e.id == entryId);
       await loadDiaryStats();
       successMessage.value = 'Entrada eliminada';
-      print('✅ Diary entry deleted: $entryId');
+      AppLogger.debug('âœ… Diary entry deleted: $entryId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error deleting diary entry: $e');
+      AppLogger.debug('âŒ Error deleting diary entry: $e');
     }
   }
 
   // ============ STATISTICS ============
 
-  /// Cargar estadísticas del diario
+  /// Cargar estadÃ­sticas del diario
   Future<void> loadDiaryStats() async {
     if (userId == null) return;
     try {
       final stats = await _diaryService.getDiaryStats(userId!);
       diaryStats.assignAll(stats);
     } catch (e) {
-      print('❌ Error loading diary stats: $e');
+      AppLogger.debug('âŒ Error loading diary stats: $e');
     }
   }
 
-  /// Obtener estadísticas del diario
+  /// Obtener estadÃ­sticas del diario
   Map<String, dynamic> getDiaryStats() {
     return {
       'totalEntries': diaryStats['totalEntries'] ?? 0,
@@ -349,7 +345,7 @@ class ExperienceController extends GetxController {
     return sum / diaryEntries.length;
   }
 
-  /// Obtener emociones únicas
+  /// Obtener emociones Ãºnicas
   Set<String> getUniqueEmotions() {
     final emotions = <String>{};
     for (var entry in diaryEntries) {
@@ -371,7 +367,7 @@ class ExperienceController extends GetxController {
 
   // ============ FILTERS ============
 
-  /// Filtrar entradas por emoción
+  /// Filtrar entradas por emociÃ³n
   Future<void> filterByEmotion(String emotion) async {
     if (userId == null) return;
     try {
@@ -380,7 +376,7 @@ class ExperienceController extends GetxController {
       diaryEntries.assignAll(entries);
     } catch (e) {
       errorMessage.value = 'Error filtrando';
-      print('❌ Error filtering: $e');
+      AppLogger.debug('âŒ Error filtering: $e');
     } finally {
       isLoading.value = false;
     }
@@ -399,7 +395,7 @@ class ExperienceController extends GetxController {
       diaryEntries.assignAll(entries);
     } catch (e) {
       errorMessage.value = 'Error filtrando';
-      print('❌ Error filtering by date: $e');
+      AppLogger.debug('âŒ Error filtering by date: $e');
     } finally {
       isLoading.value = false;
     }
@@ -416,11 +412,6 @@ class ExperienceController extends GetxController {
     errorMessage.value = '';
     successMessage.value = '';
   }
-
-  /// Auto-limpiar mensajes después de 3 segundos
-  void _clearMessages() {
-    Future.delayed(const Duration(seconds: 3), () {
-      successMessage.value = '';
-    });
-  }
 }
+
+

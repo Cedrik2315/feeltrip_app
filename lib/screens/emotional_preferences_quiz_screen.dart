@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class EmotionalPreferencesQuizScreen extends StatefulWidget {
+  const EmotionalPreferencesQuizScreen({super.key});
+
   @override
   State<EmotionalPreferencesQuizScreen> createState() =>
       _EmotionalPreferencesQuizScreenState();
@@ -11,7 +13,7 @@ class _EmotionalPreferencesQuizScreenState
     extends State<EmotionalPreferencesQuizScreen> {
   final PageController _pageController = PageController();
   int _currentQuestion = 0;
-  Map<String, int> _scores = {
+  final Map<String, int> _scores = {
     'conexion': 0,
     'transformacion': 0,
     'aventura': 0,
@@ -117,14 +119,14 @@ class _EmotionalPreferencesQuizScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Descubre Tu Viajero Interior'),
+        title: const Text('Descubre Tu Viajero Interior'),
         backgroundColor: Colors.deepPurple,
       ),
       body: Column(
         children: [
           // Progress indicator
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -133,33 +135,33 @@ class _EmotionalPreferencesQuizScreenState
                   children: [
                     Text(
                       'Pregunta ${_currentQuestion + 1} de ${questions.length}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 12,
                       ),
                     ),
                     Text(
                       '${((_currentQuestion + 1) / questions.length * 100).toStringAsFixed(0)}%',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.deepPurple,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
                     value: (_currentQuestion + 1) / questions.length,
                     minHeight: 6,
                     backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(
+                    valueColor: const AlwaysStoppedAnimation<Color>(
                       Colors.deepPurple,
                     ),
                   ),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 SmoothPageIndicator(
                   controller: _pageController,
                   count: questions.length,
@@ -192,7 +194,7 @@ class _EmotionalPreferencesQuizScreenState
 
           // Navigation
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 if (_currentQuestion > 0)
@@ -200,20 +202,20 @@ class _EmotionalPreferencesQuizScreenState
                     child: OutlinedButton(
                       onPressed: () {
                         _pageController.previousPage(
-                          duration: Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                         );
                       },
-                      child: Text('Atrás'),
+                      child: const Text('Atrás'),
                     ),
                   ),
-                if (_currentQuestion > 0) SizedBox(width: 12),
+                if (_currentQuestion > 0) const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _currentQuestion < questions.length - 1
                         ? () {
                             _pageController.nextPage(
-                              duration: Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
                           }
@@ -222,13 +224,13 @@ class _EmotionalPreferencesQuizScreenState
                           },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
-                      padding: EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: Text(
                       _currentQuestion < questions.length - 1
                           ? 'Siguiente'
                           : 'Ver Resultados',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                       ),
                     ),
@@ -245,20 +247,20 @@ class _EmotionalPreferencesQuizScreenState
   Widget _buildQuestion(QuizQuestion question) {
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               question.question,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 height: 1.4,
               ),
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             Column(
               children: question.answers
                   .map((answer) => _buildAnswerButton(answer))
@@ -272,7 +274,7 @@ class _EmotionalPreferencesQuizScreenState
 
   Widget _buildAnswerButton(QuizAnswer answer) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 12),
       child: ElevatedButton(
         onPressed: () {
           setState(() {
@@ -281,7 +283,7 @@ class _EmotionalPreferencesQuizScreenState
           });
           if (_currentQuestion < questions.length - 1) {
             _pageController.nextPage(
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
             );
           } else {
@@ -290,13 +292,13 @@ class _EmotionalPreferencesQuizScreenState
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.deepPurple,
-          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           alignment: Alignment.centerLeft,
         ),
         child: Text(
           answer.text,
           textAlign: TextAlign.left,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             color: Colors.white,
             height: 1.4,
@@ -319,7 +321,7 @@ class _EmotionalPreferencesQuizScreenState
             'Buscas establecer conexiones auténticas con otras personas y culturas. Para ti, los viajes son sobre crear relaciones significativas y sentir que perteneces a comunidades alrededor del mundo.',
         'recommendation':
             'Te recomendamos experiencias de voluntariado, homestays, talleres con artesanos locales y actividades en grupo donde puedas conocer gente genuina.',
-        'color': Color(0xFFE91E63),
+        'color': const Color(0xFFE91E63),
       },
       'transformacion': {
         'title': 'El Viajero Transformado 🦋',
@@ -327,7 +329,7 @@ class _EmotionalPreferencesQuizScreenState
             'Los viajes son tu herramienta de crecimiento personal. Buscas experiencias que desafíen tu perspectiva y te ayuden a convertirte en una versión mejorada de ti mismo.',
         'recommendation':
             'Considera retiros de reflexión, viajes de autoconocimiento, meditación, talleres de desarrollo personal y experiencias que toquen tu alma profundamente.',
-        'color': Color(0xFF9C27B0),
+        'color': const Color(0xFF9C27B0),
       },
       'aventura': {
         'title': 'El Viajero Aventurero ⚡',
@@ -335,7 +337,7 @@ class _EmotionalPreferencesQuizScreenState
             'Buscas adrenalina, desafíos y hazañas que prueben tus límites. Para ti, un viaje memorable es aquel donde experimentas lo extraordinario y lo imposible.',
         'recommendation':
             'Explora expediciones de trekking, deportes extremos, montañismo, safaris y actividades que te saquen de tu zona de confort.',
-        'color': Color(0xFFFF6F00),
+        'color': const Color(0xFFFF6F00),
       },
       'reflexion': {
         'title': 'El Viajero Contemplativo 🌅',
@@ -343,7 +345,7 @@ class _EmotionalPreferencesQuizScreenState
             'Viajas para encontrar paz, claridad y conexión con la belleza del mundo. Los momentos de silencio y contemplación son tan valiosos para ti como las actividades.',
         'recommendation':
             'Opta por retiros espirituales, viajes a la naturaleza, santuarios, viajes de fotografía artística y experiencias culturales sin prisa.',
-        'color': Color(0xFF00BCD4),
+        'color': const Color(0xFF00BCD4),
       },
       'aprendizaje': {
         'title': 'El Viajero Aprendiz 📚',
@@ -351,7 +353,7 @@ class _EmotionalPreferencesQuizScreenState
             'Tienes sed de conocimiento y quieres aprender profundamente sobre las culturas, historias y tradiciones del mundo. Para ti, viajar es una educación permanente.',
         'recommendation':
             'Explora viajes académicos, visitas a museos, talleres especializados, tours con historiadores y experiencias educativas profundas.',
-        'color': Color(0xFF4CAF50),
+        'color': const Color(0xFF4CAF50),
       },
     };
 
@@ -388,7 +390,7 @@ class QuizResultsScreen extends StatelessWidget {
   final String category;
   final Map<String, dynamic> resultData;
 
-  const QuizResultsScreen({
+  const QuizResultsScreen({super.key, 
     required this.category,
     required this.resultData,
   });
@@ -397,7 +399,7 @@ class QuizResultsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tu Perfil de Viajero'),
+        title: const Text('Tu Perfil de Viajero'),
         backgroundColor: Colors.deepPurple,
       ),
       body: SingleChildScrollView(
@@ -406,21 +408,21 @@ class QuizResultsScreen extends StatelessWidget {
             // Hero section
             Container(
               color: resultData['color'],
-              padding: EdgeInsets.all(32),
+              padding: const EdgeInsets.all(32),
               width: double.infinity,
               child: Column(
                 children: [
                   Text(
                     resultData['title'],
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 24),
-                  Icon(
+                  const SizedBox(height: 24),
+                  const Icon(
                     Icons.favorite,
                     size: 64,
                     color: Colors.white,
@@ -429,22 +431,22 @@ class QuizResultsScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // Descripción
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Quién eres como viajero',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
                     resultData['description'],
                     style: TextStyle(
@@ -454,16 +456,16 @@ class QuizResultsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                  Text(
+                  const Text(
                     'Viajes perfectos para ti',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
                     resultData['recommendation'],
                     style: TextStyle(
@@ -473,7 +475,7 @@ class QuizResultsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
                   SizedBox(
                     width: double.infinity,
@@ -484,9 +486,9 @@ class QuizResultsScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Ver Viajes Recomendados',
                         style: TextStyle(
                           fontSize: 16,
@@ -496,7 +498,7 @@ class QuizResultsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),

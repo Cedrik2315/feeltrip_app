@@ -1,4 +1,4 @@
-class Trip {
+﻿class Trip {
   final String id;
   final String title;
   final String description;
@@ -119,8 +119,6 @@ class Trip {
       'transformationMessage': transformationMessage,
       'culturalConnections': culturalConnections,
       'isTransformative': isTransformative,
-      'guide': guide,
-      'isFeatured': isFeatured,
     };
   }
 }

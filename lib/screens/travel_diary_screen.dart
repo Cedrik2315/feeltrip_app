@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/experience_model.dart';
 import '../controllers/experience_controller.dart';
 
 class TravelDiaryScreen extends StatefulWidget {
+  const TravelDiaryScreen({super.key});
+
   @override
   State<TravelDiaryScreen> createState() => _TravelDiaryScreenState();
 }
@@ -13,20 +15,20 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
   bool _isAddingEntry = false;
   final _contentController = TextEditingController();
   final _locationController = TextEditingController();
-  List<String> _selectedEmotions = [];
+  final List<String> _selectedEmotions = [];
   int _reflectionDepth = 3;
 
   final List<String> _emotionOptions = [
-    'Alegría',
+    'AlegrÃ­a',
     'Asombro',
     'Gratitud',
-    'Transformación',
+    'TransformaciÃ³n',
     'Miedo',
     'Paz',
-    'Conexión',
+    'ConexiÃ³n',
     'Nostalgia',
     'Esperanza',
-    'Reflexión',
+    'ReflexiÃ³n',
   ];
 
   @override
@@ -54,7 +56,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mi Diario de Viaje'),
+        title: const Text('Mi Diario de Viaje'),
         backgroundColor: Colors.deepPurple,
       ),
       body: _isAddingEntry
@@ -69,7 +71,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                 });
               },
               backgroundColor: Colors.deepPurple,
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             )
           : null,
     );
@@ -82,11 +84,11 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
           // Header
           Container(
             color: Colors.deepPurple,
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Mi Diario Personal',
                   style: TextStyle(
                     fontSize: 28,
@@ -94,10 +96,10 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Obx(() => Text(
                   '${_controller.diaryEntries.length} reflexiones capturadas',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
                   ),
@@ -108,13 +110,13 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
 
           // Stats Cards
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Obx(() {
               final stats = _controller.diaryStats;
               return GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
                 children: [
@@ -129,7 +131,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                     Icons.trending_up,
                   ),
                   _buildStatCard(
-                    'Emociones Únicas',
+                    'Emociones Ãšnicas',
                     '${stats['uniqueEmotionCount'] ?? 0}',
                     Icons.sentiment_very_satisfied,
                   ),
@@ -146,21 +148,21 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
           // Timeline
           Obx(() {
             if (_controller.isLoading.value) {
-              return Padding(
+              return const Padding(
                 padding: EdgeInsets.all(32),
                 child: CircularProgressIndicator(),
               );
             }
 
             if (_controller.diaryEntries.isEmpty) {
-              return Padding(
+              return const Padding(
                 padding: EdgeInsets.all(24),
                 child: Column(
                   children: [
                     Icon(Icons.note_alt_outlined, size: 64, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
-                      'Aún no tienes entradas',
+                      'AÃºn no tienes entradas',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -179,7 +181,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
 
             return ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: _controller.diaryEntries.length,
               itemBuilder: (context, index) {
                 return _buildDiaryEntryCard(_controller.diaryEntries[index]);
@@ -187,7 +189,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
             );
           }),
 
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -196,20 +198,20 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
   Widget _buildStatCard(String label, String value, IconData icon) {
     return Card(
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 32, color: Colors.deepPurple),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
@@ -226,18 +228,18 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
 
   Widget _buildDiaryEntryCard(DiaryEntry entry) {
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ExpansionTile(
         title: Text(
           entry.location,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
           '${entry.createdAt.day}/${entry.createdAt.month}/${entry.createdAt.year}',
         ),
         children: [
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -245,25 +247,25 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                   entry.content,
                   style: TextStyle(color: Colors.grey[700], height: 1.5),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Text(
-                  'Profundidad de Reflexión: ${entry.reflectionDepth}/5',
-                  style: TextStyle(
+                  'Profundidad de ReflexiÃ³n: ${entry.reflectionDepth}/5',
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Colors.deepPurple,
                   ),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
                   children: entry.emotions
                       .map((emotion) => Chip(
                         label: Text(emotion),
-                        backgroundColor: Colors.deepPurple.withOpacity(0.2),
+                        backgroundColor: Colors.deepPurple.withValues(alpha: 0.2),
                       ))
                       .toList(),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -271,11 +273,11 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                       onPressed: () {
                         _controller.deleteDiaryEntry(entry.id);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Entrada eliminada')),
+                          const SnackBar(content: Text('Entrada eliminada')),
                         );
                       },
-                      icon: Icon(Icons.delete),
-                      label: Text('Eliminar'),
+                      icon: const Icon(Icons.delete),
+                      label: const Text('Eliminar'),
                     ),
                   ],
                 ),
@@ -289,44 +291,44 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
 
   Widget _buildEntryForm() {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 24),
-          Text(
+          const SizedBox(height: 24),
+          const Text(
             'Nueva Entrada en el Diario',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           TextField(
             controller: _locationController,
-            decoration: InputDecoration(
-              labelText: 'Ubicación',
-              hintText: 'Dónde estás ahora?',
+            decoration: const InputDecoration(
+              labelText: 'UbicaciÃ³n',
+              hintText: 'DÃ³nde estÃ¡s ahora?',
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.location_on),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           TextField(
             controller: _contentController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Tus Pensamientos',
               hintText: 'Escribe lo que sientes y piensas...',
               border: OutlineInputBorder(),
             ),
             maxLines: 6,
           ),
-          SizedBox(height: 16),
-          Text(
-            'Profundidad de Reflexión',
+          const SizedBox(height: 16),
+          const Text(
+            'Profundidad de ReflexiÃ³n',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Slider(
             value: _reflectionDepth.toDouble(),
             min: 1,
@@ -340,15 +342,15 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
             label: '$_reflectionDepth/5',
           ),
           Text(
-            '${_reflectionDepth} - ${['Superficial', 'Ligera', 'Moderada', 'Profunda', 'Muy Profunda'][_reflectionDepth - 1]}',
+            '$_reflectionDepth - ${['Superficial', 'Ligera', 'Moderada', 'Profunda', 'Muy Profunda'][_reflectionDepth - 1]}',
             style: TextStyle(color: Colors.grey[600]),
           ),
-          SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 16),
+          const Text(
             'Emociones que Sientes:',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             children: _emotionOptions
@@ -367,7 +369,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                 ))
                 .toList(),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Row(
             children: [
               Expanded(
@@ -381,10 +383,10 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                       _reflectionDepth = 3;
                     });
                   },
-                  child: Text('Cancelar'),
+                  child: const Text('Cancelar'),
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
@@ -405,22 +407,23 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                         _reflectionDepth = 3;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Entrada guardada exitosamente')),
+                        const SnackBar(content: Text('Entrada guardada exitosamente')),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Por favor completa todos los campos')),
+                        const SnackBar(content: Text('Por favor completa todos los campos')),
                       );
                     }
                   },
-                  child: Text('Guardar'),
+                  child: const Text('Guardar'),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 32),
+          const SizedBox(height: 32),
         ],
       ),
     );
   }
 }
+

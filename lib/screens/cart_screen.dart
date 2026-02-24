@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
   @override
   State<CartScreen> createState() => _CartScreenState();
 }
@@ -35,7 +37,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Carrito de Compras'),
+        title: const Text('Carrito de Compras'),
         backgroundColor: Colors.deepPurple,
       ),
       body: cartItems.isEmpty
@@ -43,26 +45,26 @@ class _CartScreenState extends State<CartScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.shopping_cart_outlined,
                     size: 64,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Tu carrito está vacío',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
                     ),
-                    child: Text('Continuar Comprando'),
+                    child: const Text('Continuar Comprando'),
                   ),
                 ],
               ),
@@ -73,7 +75,7 @@ class _CartScreenState extends State<CartScreen> {
                   // Items del carrito
                   ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: cartItems.length,
                     itemBuilder: (context, index) {
                       final item = cartItems[index];
@@ -87,16 +89,16 @@ class _CartScreenState extends State<CartScreen> {
                         background: Container(
                           color: Colors.red,
                           alignment: Alignment.centerRight,
-                          padding: EdgeInsets.only(right: 16),
-                          child: Icon(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: const Icon(
                             Icons.delete,
                             color: Colors.white,
                           ),
                         ),
                         child: Card(
-                          margin: EdgeInsets.all(12),
+                          margin: const EdgeInsets.all(12),
                           child: Padding(
-                            padding: EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(12),
                             child: Row(
                               children: [
                                 Container(
@@ -109,11 +111,11 @@ class _CartScreenState extends State<CartScreen> {
                                   child: Center(
                                     child: Text(
                                       item['image'],
-                                      style: TextStyle(fontSize: 32),
+                                      style: const TextStyle(fontSize: 32),
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 12),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -121,23 +123,23 @@ class _CartScreenState extends State<CartScreen> {
                                     children: [
                                       Text(
                                         item['title'],
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
                                         ),
                                       ),
-                                      SizedBox(height: 4),
+                                      const SizedBox(height: 4),
                                       Text(
                                         item['destination'],
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.grey,
                                           fontSize: 12,
                                         ),
                                       ),
-                                      SizedBox(height: 8),
+                                      const SizedBox(height: 8),
                                       Text(
                                         '\$${item['price']}',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.deepPurple,
                                         ),
@@ -148,7 +150,7 @@ class _CartScreenState extends State<CartScreen> {
                                 Column(
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.add),
+                                      icon: const Icon(Icons.add),
                                       onPressed: () {
                                         setState(() {
                                           item['quantity']++;
@@ -158,7 +160,7 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                     Text('${item['quantity']}'),
                                     IconButton(
-                                      icon: Icon(Icons.remove),
+                                      icon: const Icon(Icons.remove),
                                       onPressed: item['quantity'] > 1
                                           ? () {
                                               setState(() {
@@ -178,50 +180,50 @@ class _CartScreenState extends State<CartScreen> {
                     },
                   ),
 
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
                   // Resumen de pago
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
-                      borderRadius: BorderRadius.vertical(
+                      borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(16),
                       ),
                     ),
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Resumen de Pago',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Subtotal:'),
+                            const Text('Subtotal:'),
                             Text('\$${_subtotal.toStringAsFixed(2)}'),
                           ],
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Impuestos (10%):'),
+                            const Text('Impuestos (10%):'),
                             Text('\$${_tax.toStringAsFixed(2)}'),
                           ],
                         ),
-                        SizedBox(height: 8),
-                        Divider(),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
+                        const Divider(),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               'Total:',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -230,7 +232,7 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             Text(
                               '\$${_total.toStringAsFixed(2)}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                                 color: Colors.deepPurple,
@@ -238,7 +240,7 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -247,9 +249,9 @@ class _CartScreenState extends State<CartScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.deepPurple,
-                              padding: EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                            child: Text(
+                            child: const Text(
                               'Proceder al Pago',
                               style: TextStyle(
                                 fontSize: 16,
@@ -258,16 +260,16 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton(
                             onPressed: () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.deepPurple),
-                              padding: EdgeInsets.symmetric(vertical: 16),
+                              side: const BorderSide(color: Colors.deepPurple),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                            child: Text(
+                            child: const Text(
                               'Continuar Comprando',
                               style: TextStyle(
                                 fontSize: 16,
@@ -276,7 +278,7 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
@@ -290,35 +292,35 @@ class _CartScreenState extends State<CartScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmar Compra'),
+        title: const Text('Confirmar Compra'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${cartItems.length} viajes en tu carrito'),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'Total: \$${_total.toStringAsFixed(2)}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
                 color: Colors.deepPurple,
               ),
             ),
-            SizedBox(height: 12),
-            Text('Se enviarán detalles a tu email'),
+            const SizedBox(height: 12),
+            const Text('Se enviarán detalles a tu email'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
+            child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('¡Compra realizada con éxito!'),
                   backgroundColor: Colors.green,
                 ),
@@ -330,7 +332,7 @@ class _CartScreenState extends State<CartScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
             ),
-            child: Text('Confirmar Pago'),
+            child: const Text('Confirmar Pago'),
           ),
         ],
       ),

@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
@@ -12,20 +14,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<OnboardingPage> pages = [
     OnboardingPage(
       title: 'Explora el Mundo',
-      description: 'Descubre destinos increíbles y vive experiencias únicas',
-      image: '🌍',
+      description: 'Descubre destinos increÃ­bles y vive experiencias Ãºnicas',
+      image: 'ðŸŒ',
       color: Colors.blue,
     ),
     OnboardingPage(
       title: 'Siente Emociones',
       description: 'Cada viaje es una aventura llena de emociones y recuerdos',
-      image: '❤️',
+      image: 'â¤ï¸',
       color: Colors.red,
     ),
     OnboardingPage(
-      title: 'Reserva Fácilmente',
+      title: 'Reserva FÃ¡cilmente',
       description: 'Planifica tus vacaciones de forma simple y segura',
-      image: '✈️',
+      image: 'âœˆï¸',
       color: Colors.deepPurple,
     ),
   ];
@@ -64,8 +66,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: List.generate(
                     pages.length,
                     (index) => AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
-                      margin: EdgeInsets.symmetric(horizontal: 4),
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
                       height: 8,
                       width: _currentPage == index ? 24 : 8,
                       decoration: BoxDecoration(
@@ -77,9 +79,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
                     children: [
                       if (_currentPage > 0)
@@ -87,14 +89,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: OutlinedButton(
                             onPressed: () {
                               _pageController.previousPage(
-                                duration: Duration(milliseconds: 300),
+                                duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeInOut,
                               );
                             },
-                            child: Text('Atrás'),
+                            child: const Text('AtrÃ¡s'),
                           ),
                         ),
-                      if (_currentPage > 0) SizedBox(width: 12),
+                      if (_currentPage > 0) const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
@@ -105,7 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               );
                             } else {
                               _pageController.nextPage(
-                                duration: Duration(milliseconds: 300),
+                                duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeInOut,
                               );
                             }
@@ -117,7 +119,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             _currentPage == pages.length - 1
                                 ? 'Empezar'
                                 : 'Siguiente',
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
                       ),
@@ -136,7 +138,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [page.color.withOpacity(0.1), Colors.white],
+          colors: [page.color.withValues(alpha: 0.1), Colors.white],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -146,20 +148,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             page.image,
-            style: TextStyle(fontSize: 120),
+            style: const TextStyle(fontSize: 120),
           ),
-          SizedBox(height: 32),
+          const SizedBox(height: 32),
           Text(
             page.title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
               page.description,
               style: TextStyle(
@@ -188,3 +190,4 @@ class OnboardingPage {
     required this.color,
   });
 }
+

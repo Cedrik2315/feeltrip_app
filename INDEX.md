@@ -91,6 +91,11 @@
   - Collection structure
   - Integration patterns
 
+### Cloud Functions
+- [CLOUD_FUNCTIONS_SETUP.md](./CLOUD_FUNCTIONS_SETUP.md) ✨
+  - Guía paso a paso para desplegar funciones
+  - Configuración de entorno Node.js
+
 ### Status & Checklist
 - [FIREBASE_INTEGRATION_STATUS.md](./FIREBASE_INTEGRATION_STATUS.md)
   - Checklist de completitud
