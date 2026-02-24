@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _carouselIndex = 0;
   List<Trip> _featuredTrips = [];
   List<TravelerStory> _stories = [];
+  bool _isLoadingTrips = true;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -32,12 +34,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadFeaturedTrips() async {
-    final homeController = context.read<HomeController>();
-    final trips = await homeController.loadFeaturedTrips();
-    if (!mounted) return;
     setState(() {
-      _featuredTrips = trips;
+      _isLoadingTrips = true;
+      _errorMessage = null;
     });
+
+    try {
+      final homeController = context.read<HomeController>();
+      final trips = await homeController.loadFeaturedTrips();
+      if (!mounted) return;
+      setState(() {
+        _featuredTrips = trips;
+        _isLoadingTrips = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingTrips = false;
+        _errorMessage = 'Error al cargar viajes: ${e.toString()}';
+      });
+    }
   }
 
   void _loadStories() {
@@ -45,6 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _stories = homeController.loadMockStories();
     });
+  }
+
+  void _retryLoadTrips() {
+    _loadFeaturedTrips();
   }
 
   @override
@@ -225,7 +245,43 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (_featuredTrips.isNotEmpty)
+                  if (_isLoadingTrips)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  else if (_errorMessage != null)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            Icon(Icons.error_outline,
+                                size: 48, color: Colors.red[300]),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Error al cargar los viajes',
+                              style: TextStyle(color: Colors.red[700]),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: _retryLoadTrips,
+                              child: const Text('Reintentar'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else if (_featuredTrips.isEmpty)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text('No hay viajes disponibles'),
+                      ),
+                    )
+                  else
                     Column(
                       children: [
                         CarouselSlider.builder(
