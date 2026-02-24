@@ -1,99 +1,42 @@
-# FeelTrip - Aplicación de Agencia de Viajes
+# FeelTrip - Plataforma de Viajes Vivenciales
 
-Una aplicación Flutter completa para una agencia de viajes que ofrece una experiencia de usuario moderna e intuitiva para reservar y explorar viajes alrededor del mundo.
+Una aplicación Flutter que transforma la manera en que viajamos, enfocándose en **experiencias transformadoras y vivenciales**. FeelTrip no es solo para reservar viajes, sino para capturar, compartir y revivir el impacto emocional de cada aventura.
+
+La aplicación está construida sobre una arquitectura moderna con **Flutter y Firebase**, permitiendo sincronización de datos en tiempo real, persistencia en la nube y una base escalable para el futuro.
 
 ## 🌟 Características
 
-### Autenticación
-- ✅ Pantalla de Onboarding
-- ✅ Registro de nuevos usuarios
-- ✅ Inicio de sesión seguro
-- ✅ Gestión de sesión local
+### Core Vivencial (Fase 2)
+- ✅ **Historias de Viajeros:** Inspírate con historias reales de transformación compartidas por la comunidad.
+- ✅ **Diario Personal:** Registra tus reflexiones, emociones y la profundidad de tus experiencias en tiempo real.
+- ✅ **Estadísticas de Impacto:** Observa cómo los viajes te transforman a través de métricas automáticas.
+- ✅ **Quiz de Arquetipos:** Descubre tu perfil de viajero (Conector, Transformado, Aventurero, etc.) y recibe recomendaciones personalizadas.
+- ✅ **Sincronización en la Nube:** Todos tus datos se guardan y sincronizan al instante entre dispositivos con Firebase Firestore.
 
-### Exploración de Viajes
-- ✅ Pantalla de inicio con viajes destacados
-- ✅ Búsqueda avanzada por destino, categoría y dificultad
-- ✅ Filtrado de viajes por precio
-- ✅ Detalles completos de cada viaje con galerías de imágenes
+### Características Adicionales
+- ✅ Autenticación de usuarios (preparado para Firebase Auth).
+- ✅ Exploración de viajes y búsqueda.
+- ✅ Sistema de perfiles para agencias de viajes.
+- ✅ Funcionalidad para compartir en redes sociales.
+- ✅ Comentarios y reacciones en las historias.
 
-### Reservas y Carrito
-- ✅ Agregar viajes al carrito
-- ✅ Gestionar cantidad de viajeros
-- ✅ Carrito de compras persistente
-- ✅ Proceso de pago simulado
-- ✅ Sistema de impuestos
+## 🔧 Instalación y Setup
 
-### Historial de Reservas
-- ✅ Ver todas las reservas del usuario
-- ✅ Estado de las reservas
-- ✅ Cancelación de viajes
-- ✅ Detalles y recibos
+Para una guía rápida de 30 minutos y poner todo en marcha, consulta **[QUICK_START.md](./QUICK_START.md)**.
 
-### Perfil de Usuario
-- ✅ Editar información personal
-- ✅ Cambiar contraseña
-- ✅ Preferencias de notificaciones
-- ✅ Cambio de idioma y tema
-- ✅ Cierre de sesión
+Para una guía de configuración detallada, incluyendo la creación del proyecto en Firebase, consulta **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)**.
 
-### Experiencia de Usuario
-- ✅ Interfaz moderna y responsiva
-- ✅ Tema coherente con paleta de colores púrpura
-- ✅ Navegación intuitiva con barra inferior
-- ✅ Animaciones suaves
-- ✅ Cargas asincrónicas
-- ✅ Manejo de errores
-
-## 📱 Pantallas
-
-1. **Onboarding** - Introducción a la aplicación
-2. **Login** - Inicio de sesión
-3. **Register** - Registro de nuevos usuarios
-4. **Home** - Página principal con viajes destacados
-5. **Search** - Búsqueda y filtrado de viajes
-6. **Trip Details** - Detalles completos de un viaje
-7. **Cart** - Carrito de compras
-8. **Bookings** - Mis reservas
-9. **Profile** - Perfil del usuario
-
-## 🔧 Instalación
-
-### Requisitos
+### Requisitos Previos
 - Flutter SDK (>=2.12.0)
-- Dart SDK
-- Android Studio o Xcode para emuladores
-- Un editor de código (VS Code o Android Studio)
+- Una cuenta de Google para configurar Firebase.
+- Android Studio / Xcode para emuladores.
 
-### Pasos
+## 📦 Dependencias Clave
 
-1. **Clonar el repositorio**
-```bash
-git clone https://github.com/tu-usuario/feeltrip_app.git
-cd feeltrip_app
-```
-
-2. **Instalar dependencias**
-```bash
-flutter pub get
-```
-
-3. **Ejecutar la aplicación**
-```bash
-flutter run
-```
-
-## 📦 Dependencias
-
-- **get**: Gestión de estado y navegación
-- **http**: Llamadas a API REST
-- **shared_preferences**: Almacenamiento local
-- **carousel_slider**: Carruseles de imágenes
-- **smooth_page_indicator**: Indicadores de página
-- **flutter_rating_bar**: Barras de calificación
-- **image_picker**: Selección de imágenes
-- **intl**: Internacionalización
-- **uuid**: Generación de IDs únicos
-- **cached_network_image**: Caché de imágenes
+- **`firebase_core`** & **`cloud_firestore`**: Para la integración con el backend de Firebase.
+- **`get`**: Para la gestión de estado y navegación.
+- **`flutter_dotenv`**: Para manejar variables de entorno y credenciales.
+- **`uuid`**: Para la generación de IDs únicos.
 
 ## 🏗️ Estructura del Proyecto
 
@@ -124,81 +67,35 @@ lib/
 
 ```
 
-## 🌐 API Endpoints
-
-La aplicación está configurada para conectarse a `https://api.feeltrip.com/api` con los siguientes endpoints:
-
-### Viajes
-- `GET /trips` - Obtener todos los viajes
-- `GET /trips/{id}` - Obtener detalles de un viaje
-- `GET /trips/{id}/reviews` - Obtener reseñas de un viaje
-
-### Reservas
-- `POST /bookings` - Crear una reserva
-- `GET /users/{userId}/bookings` - Obtener mis reservas
-- `POST /bookings/{id}/cancel` - Cancelar una reserva
-
-### Favoritos
-- `POST /users/{userId}/favorites/{tripId}` - Agregar/quitar favorito
-- `GET /users/{userId}/favorites` - Obtener favoritos
-
-### Reseñas
-- `POST /trips/{tripId}/reviews` - Agregar reseña
-
-### Pagos
-- `POST /payments` - Procesar pago
+## ️ Arquitectura
+La aplicación sigue una arquitectura limpia y escalable:
+- **UI (Screens)**: Widgets de Flutter que reaccionan a los cambios de estado.
+- **State Management (Controllers)**: `ExperienceController` (GetX) maneja el estado de la UI y la lógica de presentación.
+- **Business Logic (Services)**: `StoryService`, `DiaryService`, etc., encapsulan toda la comunicación con Firestore.
+- **Data (Models)**: Clases Dart con métodos `toFirestore()` y `fromFirestore()` para serialización.
+- **Backend**: Firebase Firestore como base de datos NoSQL en tiempo real.
+Para más detalles, consulta **ARCHITECTURE.md** y **FIREBASE_ARCHITECTURE.md**.
 
 ## 🎨 Temas y Estilos
 
 La aplicación utiliza:
-- **Color primario**: `Colors.deepPurple` (#673AB7)
 - **Color secundario**: `Colors.purple`
-- **Tipografía**: Fuentes del sistema
-- **Espaciado**: Consistente con Material Design 3
+- **Tipografía**: Fuentes del sistema (Roboto/San Francisco)
 
-## 💾 Almacenamiento Local
+##  Seguridad
 
-Usando `SharedPreferences`:
-- Token de autenticación
-- Datos del usuario
-- Carrito de compras
-- Preferencias (tema, idioma)
-
-## 🔐 Seguridad
-
-- Tokens almacenados localmente
-- Validación de formularios
-- Manejo seguro de contraseñas
-- HTTPS para comunicación con API
-
-## 📝 Notas de Implementación
-
-### Datos Simulados
-Actualmente la aplicación utiliza datos simulados para demostración. Para conectarla a una API real:
-
-1. Actualiza `ApiService` con tu URL de API
-2. Implementa autenticación real con tokens JWT
-3. Conecta Firebase o tu servicio de autenticación
-
-### Personalización
-
-Para personalizar la aplicación:
-- Cambiar colores: Actualizar `Colors.deepPurple` en `main.dart`
-- Agregar más categorías: Modificar arrays en `search_screen.dart`
-- Añadir métodos de pago: Extender `processPayment()` en `api_service.dart`
+- **Aislamiento de Datos:** La estructura de Firestore aísla los datos privados de cada usuario.
+- **Reglas de Seguridad:** El archivo `firestore-rules.txt` define reglas de acceso robustas para proteger los datos en el backend.
+- **Autenticación:** Preparado para integración con Firebase Auth para una gestión de usuarios segura.
 
 ## 🚀 Características Futuras
 
-- [ ] Integración real con API backend
-- [ ] Autenticación con Firebase
-- [ ] Pagos con Stripe
-- [ ] Chat con agentes de viajes
-- [ ] Seguimiento de viajes en tiempo real
-- [ ] Integración con mapas
-- [ ] Sistema de reseñas completo
-- [ ] Notificaciones push
-- [ ] Descubrimiento de experiencias locales
-- [ ] Idiomas múltiples
+El roadmap completo se encuentra en **ROADMAP.md**. Las próximas prioridades incluyen:
+- [ ] **Notificaciones Push:** Con Firebase Cloud Messaging para alertar sobre comentarios y reacciones.
+- [ ] **Autenticación Real:** Integración completa con Firebase Auth (Email, Google, etc.).
+- [ ] **Almacenamiento de Imágenes:** Usar Firebase Storage para las fotos de las historias.
+- [ ] **Dashboard de Analíticas:** Para los perfiles de agencias.
+- [ ] **Monetización:** Integración de comisiones por reserva y tiers premium para agencias.
 
 ## 🤝 Contribución
 

@@ -1,24 +1,22 @@
-import 'package:flutter/material.dart';
-import 'diary_screen.dart';
+﻿import 'package:flutter/material.dart';
+
+import '../constants/strings.dart';
+import 'diario_screen.dart';
 
 class ResultsScreen extends StatelessWidget {
+  const ResultsScreen({super.key, required this.answers});
+
   final List<String> answers;
 
-  const ResultsScreen({Key? key, required this.answers}) : super(key: key);
-
-  // Función para determinar el viaje según respuestas
   Map<String, dynamic> getRecommendedTrip() {
-    String emotion = answers[0];
-    String season = answers[3];
-    String budget = answers[2];
+    final emotion = answers[0];
+    final season = answers[3];
 
-    // Lógica de recomendación básica
     if (emotion.contains('Lágrima') && season == 'Invierno') {
       return {
         'title': 'Auroras en Tromsø',
         'description': '5 días para llorar de emoción bajo las auroras boreales',
-        'price': '€1,290',
-        'image': 'tromso_aurora.jpg',
+        'price': 'EUR 1,290',
         'emotion': 'Lágrima de emoción',
         'includes': ['Vuelos', 'Cabaña de cristal', 'Sauna', 'Guía local']
       };
@@ -26,8 +24,7 @@ class ResultsScreen extends StatelessWidget {
       return {
         'title': 'Cocina con Nonna',
         'description': '7 días de abrazos italianos y pasta casera',
-        'price': '€980',
-        'image': 'tuscana_nonna.jpg',
+        'price': 'EUR 980',
         'emotion': 'Abrazo cálido',
         'includes': ['Vuelos', 'Casa rural', 'Clases de cocina', 'Mercado local']
       };
@@ -35,21 +32,19 @@ class ResultsScreen extends StatelessWidget {
       return {
         'title': 'Aventura en Queenstown',
         'description': '6 días de adrenalina pura en Nueva Zelanda',
-        'price': '€1,450',
-        'image': 'queenstown_adventure.jpg',
+        'price': 'EUR 1,450',
         'emotion': 'Explosión de adrenalina',
-        'includes': ['Vuelos', 'Hotel 4★', 'Paracaídas', 'Bungee', 'Rafting']
-      };
-    } else {
-      return {
-        'title': 'Meditación en Bali',
-        'description': '8 días de paz profunda y yoga',
-        'price': '€850',
-        'image': 'bali_yoga.jpg',
-        'emotion': 'Paz interior',
-        'includes': ['Vuelos', 'Retiro', 'Yoga diario', 'Meditación', 'Spa']
+        'includes': ['Vuelos', 'Hotel 4*', 'Paracaídas', 'Bungee', 'Rafting']
       };
     }
+
+    return {
+      'title': 'Meditación en Bali',
+      'description': '8 días de paz profunda y yoga',
+      'price': 'EUR 850',
+      'emotion': 'Paz interior',
+      'includes': ['Vuelos', 'Retiro', 'Yoga diario', 'Meditación', 'Spa']
+    };
   }
 
   @override
@@ -58,7 +53,7 @@ class ResultsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tu viaje te está esperando'),
+        title: const Text(AppStrings.resultsTitle),
         backgroundColor: Colors.blue[800],
       ),
       body: Container(
@@ -71,18 +66,18 @@ class ResultsScreen extends StatelessWidget {
         ),
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
-                Text(
-                  'Encontramos tu sensación:',
+                const Text(
+                  AppStrings.resultsFound,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   trip['emotion'],
                   style: TextStyle(
@@ -91,9 +86,9 @@ class ResultsScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 Container(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -108,7 +103,7 @@ class ResultsScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         trip['description'],
                         textAlign: TextAlign.center,
@@ -117,30 +112,30 @@ class ResultsScreen extends StatelessWidget {
                           fontSize: 16,
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Text(
-                        'Incluye:',
+                        AppStrings.resultsIncludes,
                         style: TextStyle(
                           color: Colors.blue[800],
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      ...(trip['includes'] as List<String>).map((item) =>
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4),
+                      ...(trip['includes'] as List<String>).map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Row(
                             children: [
-                              Icon(Icons.check_circle, color: Colors.green, size: 16),
-                              SizedBox(width: 8),
+                              const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                              const SizedBox(width: 8),
                               Text(item, style: TextStyle(color: Colors.blue[600])),
                             ],
                           ),
-                        )
-                      ).toList(),
-                      SizedBox(height: 20),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       Text(
-                        'Precio: ${trip['price']}',
+                        '${AppStrings.resultsPrice}: ${trip['price']}',
                         style: TextStyle(
                           color: Colors.blue[800],
                           fontSize: 24,
@@ -150,14 +145,14 @@ class ResultsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.blue[800],
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -166,23 +161,21 @@ class ResultsScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DiaryScreen(),
+                          builder: (context) => const DiarioScreen(),
                         ),
                       );
                     },
-                    child: Text(
-                      'Reservar esta sensación',
+                    child: const Text(
+                      AppStrings.resultsBook,
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'Hacer el quiz de nuevo',
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    AppStrings.resultsRedoQuiz,
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

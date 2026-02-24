@@ -1,0 +1,6 @@
+{
+  "title": "feat: Add DAFO analysis and fix ConsentService and RevenueCatService",
+  "body": "## Summary\n\nThis PR adds a comprehensive SWOT (DAFO) analysis for the FeelTrip app and fixes several issues:\n\n### Changes Made:\n- Add comprehensive SWOT analysis (DAFO) for the FeelTrip app\n- Fix ConsentService with corrected Google Mobile Ads APIs\n- Implement RevenueCatService for premium subscriptions management\n\n### Files Changed:\n- DAFO.md - New SWOT analysis document\n- lib/services/consent_service.dart - Fixed Google Mobile Ads API usage\n- lib/services/revenuecat_service.dart - Created complete RevenueCat subscription service",
+  "base": "main",
+  "head": "blackboxai/feature/dafo-analysis"
+}

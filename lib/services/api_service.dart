@@ -1,22 +1,51 @@
-import 'package:http/http.dart' as http;
+﻿import 'dart:async';
 import 'dart:convert';
-import 'dart:async';
-import '../models/trip_model.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+
 import '../models/booking_model.dart';
 import '../models/review_model.dart';
-import '../models/user_model.dart';
+import '../models/trip_model.dart';
 
-class ApiService {
-  static const String baseUrl = 'https://api.feeltrip.com/api';
-  static const Duration timeout = Duration(seconds: 30);
-  
-  static final ApiService _instance = ApiService._internal();
+class AuthTokenClient extends http.BaseClient {
+  AuthTokenClient(
+    this._inner, {
+    Future<String?> Function()? tokenProvider,
+  }) : _tokenProvider = tokenProvider ?? _defaultTokenProvider;
 
-  factory ApiService() {
-    return _instance;
+  final http.Client _inner;
+  final Future<String?> Function() _tokenProvider;
+
+  static Future<String?> _defaultTokenProvider() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    return user.getIdToken();
   }
 
-  ApiService._internal();
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    final token = await _tokenProvider();
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    return _inner.send(request);
+  }
+
+  @override
+  void close() {
+    _inner.close();
+    super.close();
+  }
+}
+
+class ApiService {
+  ApiService({http.Client? client}) : _client = client ?? AuthTokenClient(http.Client());
+
+  static const String baseUrl = 'https://api.feeltrip.com/api';
+  static const Duration timeout = Duration(seconds: 30);
+
+  final http.Client _client;
 
   Future<List<Trip>> getTrips({String? category, String? destination}) async {
     try {
@@ -29,14 +58,13 @@ class ApiService {
         queryParameters: params.isNotEmpty ? params : null,
       );
 
-      final response = await http.get(uri).timeout(timeout);
+      final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body)['trips'];
         return data.map((trip) => Trip.fromJson(trip)).toList();
-      } else {
-        throw Exception('Error al obtener viajes: ${response.statusCode}');
       }
+      throw Exception('Error al obtener viajes: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -45,14 +73,13 @@ class ApiService {
   Future<Trip> getTripDetails(String tripId) async {
     try {
       final uri = Uri.parse('$baseUrl/trips/$tripId');
-      final response = await http.get(uri).timeout(timeout);
+      final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['trip'];
         return Trip.fromJson(data);
-      } else {
-        throw Exception('Error al obtener detalles: ${response.statusCode}');
       }
+      throw Exception('Error al obtener detalles: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -61,14 +88,13 @@ class ApiService {
   Future<List<Review>> getTripReviews(String tripId) async {
     try {
       final uri = Uri.parse('$baseUrl/trips/$tripId/reviews');
-      final response = await http.get(uri).timeout(timeout);
+      final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body)['reviews'];
         return data.map((review) => Review.fromJson(review)).toList();
-      } else {
-        throw Exception('Error al obtener reseñas: ${response.statusCode}');
       }
+      throw Exception('Error al obtener reseñas: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -90,18 +116,19 @@ class ApiService {
         'bookingDate': DateTime.now().toIso8601String(),
       };
 
-      final response = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(body),
-      ).timeout(timeout);
+      final response = await _client
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(body),
+          )
+          .timeout(timeout);
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body)['booking'];
         return Booking.fromJson(data);
-      } else {
-        throw Exception('Error al crear reserva: ${response.statusCode}');
       }
+      throw Exception('Error al crear reserva: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -110,14 +137,13 @@ class ApiService {
   Future<List<Booking>> getUserBookings(String userId) async {
     try {
       final uri = Uri.parse('$baseUrl/users/$userId/bookings');
-      final response = await http.get(uri).timeout(timeout);
+      final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body)['bookings'];
         return data.map((booking) => Booking.fromJson(booking)).toList();
-      } else {
-        throw Exception('Error al obtener reservas: ${response.statusCode}');
       }
+      throw Exception('Error al obtener reservas: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -126,13 +152,12 @@ class ApiService {
   Future<bool> cancelBooking(String bookingId) async {
     try {
       final uri = Uri.parse('$baseUrl/bookings/$bookingId/cancel');
-      final response = await http.post(uri).timeout(timeout);
+      final response = await _client.post(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         return true;
-      } else {
-        throw Exception('Error al cancelar: ${response.statusCode}');
       }
+      throw Exception('Error al cancelar: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -155,17 +180,18 @@ class ApiService {
         'createdAt': DateTime.now().toIso8601String(),
       };
 
-      final response = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(body),
-      ).timeout(timeout);
+      final response = await _client
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(body),
+          )
+          .timeout(timeout);
 
       if (response.statusCode == 201) {
         return true;
-      } else {
-        throw Exception('Error al añadir reseña: ${response.statusCode}');
       }
+      throw Exception('Error al añadir reseña: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -174,13 +200,12 @@ class ApiService {
   Future<bool> toggleFavorite(String userId, String tripId) async {
     try {
       final uri = Uri.parse('$baseUrl/users/$userId/favorites/$tripId');
-      final response = await http.post(uri).timeout(timeout);
+      final response = await _client.post(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         return true;
-      } else {
-        throw Exception('Error al actualizar favoritos: ${response.statusCode}');
       }
+      throw Exception('Error al actualizar favoritos: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -189,14 +214,13 @@ class ApiService {
   Future<List<Trip>> getFavoritedTrips(String userId) async {
     try {
       final uri = Uri.parse('$baseUrl/users/$userId/favorites');
-      final response = await http.get(uri).timeout(timeout);
+      final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body)['trips'];
         return data.map((trip) => Trip.fromJson(trip)).toList();
-      } else {
-        throw Exception('Error al obtener favoritos: ${response.statusCode}');
       }
+      throw Exception('Error al obtener favoritos: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
@@ -216,19 +240,21 @@ class ApiService {
         'timestamp': DateTime.now().toIso8601String(),
       };
 
-      final response = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(body),
-      ).timeout(timeout);
+      final response = await _client
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(body),
+          )
+          .timeout(timeout);
 
       if (response.statusCode == 200) {
         return true;
-      } else {
-        throw Exception('Error al procesar pago: ${response.statusCode}');
       }
+      throw Exception('Error al procesar pago: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error de conexión: $e');
     }
   }
 }
+

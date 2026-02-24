@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/comment_model.dart';
 import '../services/comment_service.dart';
 
@@ -18,8 +19,10 @@ class CommentsScreen extends StatefulWidget {
 class _CommentsScreenState extends State<CommentsScreen> {
   final CommentService _commentService = CommentService();
   final TextEditingController _commentController = TextEditingController();
-  final String userId = 'user123'; // TODO: Obtener del usuario actual
-  final String userName = 'Usuario'; // TODO: Obtener del perfil del usuario
+  final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'anonimo';
+  final String userName = FirebaseAuth.instance.currentUser?.displayName?.trim().isNotEmpty == true
+      ? FirebaseAuth.instance.currentUser!.displayName!.trim()
+      : (FirebaseAuth.instance.currentUser?.email?.split('@').first ?? 'Usuario');
   final String userAvatar = 'https://via.placeholder.com/50';
 
   final List<String> reactions = ['❤️', '😂', '😍', '🔥', '👍', '😢'];

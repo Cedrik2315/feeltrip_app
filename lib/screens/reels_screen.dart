@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -6,8 +6,10 @@ import 'dart:convert';
 import 'dart:math';
 
 class ReelsScreen extends StatefulWidget {
+  const ReelsScreen({super.key});
+
   @override
-  _ReelsScreenState createState() => _ReelsScreenState();
+  State<ReelsScreen> createState() => _ReelsScreenState();
 }
 
 class _ReelsScreenState extends State<ReelsScreen> {
@@ -38,12 +40,12 @@ class _ReelsScreenState extends State<ReelsScreen> {
   Future<void> generateReel() async {
     setState(() => isGenerating = true);
     
-    // Simulamos la generación del video
-    await Future.delayed(Duration(seconds: 3));
+    // Simulamos la generaciÃ³n del video
+    await Future.delayed(const Duration(seconds: 3));
     
-    // En una implementación real, aquí usarías:
-    // - FFmpeg para unir imágenes/videos
-    // - Agregar música de fondo
+    // En una implementaciÃ³n real, aquÃ­ usarÃ­as:
+    // - FFmpeg para unir imÃ¡genes/videos
+    // - Agregar mÃºsica de fondo
     // - Aplicar transiciones y efectos
     
     // Por ahora, creamos un archivo simulado
@@ -99,12 +101,12 @@ class _ReelsScreenState extends State<ReelsScreen> {
 
   void shareReel() {
     if (generatedVideoPath != null) {
-      // En implementación real usarías:
+      // En implementaciÃ³n real usarÃ­as:
       // - Share plugin para compartir el archivo
       // - Social media APIs para publicar
       
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Reel compartido exitosamente! 🎉')),
+        const SnackBar(content: Text('Reel compartido exitosamente! ðŸŽ‰')),
       );
     }
   }
@@ -119,7 +121,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mi Reel de Viaje'),
+        title: const Text('Mi Reel de Viaje'),
         backgroundColor: Colors.teal[800],
       ),
       body: Container(
@@ -131,11 +133,11 @@ class _ReelsScreenState extends State<ReelsScreen> {
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
               // Header
-              Text(
+              const Text(
                 'Tu historia en 30 segundos',
                 style: TextStyle(
                   color: Colors.white,
@@ -143,44 +145,44 @@ class _ReelsScreenState extends State<ReelsScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
-                'Convertí tus momentos en una película',
+                'ConvertÃ­ tus momentos en una pelÃ­cula',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 16,
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-              // Botón generar
+              // BotÃ³n generar
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.teal[800],
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   onPressed: isGenerating ? null : generateReel,
                   icon: isGenerating 
-                    ? SizedBox(
+                    ? const SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Icon(Icons.movie_creation),
+                    : const Icon(Icons.movie_creation),
                   label: Text(
                     isGenerating ? 'Creando magia...' : 'Generar mi reel',
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Preview del reel
               if (generatedVideoPath != null && videoController != null)
@@ -217,9 +219,9 @@ class _ReelsScreenState extends State<ReelsScreen> {
                                       });
                                     },
                                   ),
-                                  SizedBox(width: 20),
+                                  const SizedBox(width: 20),
                                   IconButton(
-                                    icon: Icon(Icons.share, color: Colors.white),
+                                    icon: const Icon(Icons.share, color: Colors.white),
                                     onPressed: shareReel,
                                   ),
                                 ],
@@ -227,19 +229,19 @@ class _ReelsScreenState extends State<ReelsScreen> {
                             ),
                           ],
                         )
-                      : Center(
+                      : const Center(
                           child: CircularProgressIndicator(),
                         ),
                 ),
 
-              // Información del reel
+              // InformaciÃ³n del reel
               if (generatedVideoPath != null)
                 Padding(
-                  padding: EdgeInsets.only(top: 20),
+                  padding: const EdgeInsets.only(top: 20),
                   child: Container(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
@@ -252,11 +254,11 @@ class _ReelsScreenState extends State<ReelsScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Text('🎵 Música: ${_getRandomMusic()}'),
-                        Text('🎬 Transiciones: ${_getRandomTransitions().join(', ')}'),
-                        Text('📸 Momentos: ${entries.length}'),
-                        Text('⏱️ Duración: 30 segundos'),
+                        const SizedBox(height: 10),
+                        Text('ðŸŽµ MÃºsica: ${_getRandomMusic()}'),
+                        Text('ðŸŽ¬ Transiciones: ${_getRandomTransitions().join(', ')}'),
+                        Text('ðŸ“¸ Momentos: ${entries.length}'),
+                        const Text('â±ï¸ DuraciÃ³n: 30 segundos'),
                       ],
                     ),
                   ),
@@ -265,12 +267,12 @@ class _ReelsScreenState extends State<ReelsScreen> {
               // Mensaje cuando no hay entradas
               if (entries.isEmpty)
                 Padding(
-                  padding: EdgeInsets.only(top: 50),
+                  padding: const EdgeInsets.only(top: 50),
                   child: Text(
-                    'Aún no hay momentos guardados.\nEmpezá a crear tu diario!',
+                    'AÃºn no hay momentos guardados.\nEmpezÃ¡ a crear tu diario!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 16,
                     ),
                   ),

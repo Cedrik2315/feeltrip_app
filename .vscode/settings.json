@@ -1,0 +1,7 @@
+{
+    "cmake.sourceDirectory": "C:/Users/monch/Documents/feeltrip_app/windows",
+    "cmake.configureArgs": [
+        "-A",
+        "x64"
+    ]
+}

@@ -156,29 +156,23 @@ DiaryService.createDiaryEntry(userId, entry)
     │ ┌─ Converts toFirestore()
     ▼
 Firestore.collection('users/{userId}/diaryEntries')
-       .doc(entry.id).set(data)
+       .doc(entry.id).set(data)        
     │
-    ▼
-DiaryService._updateUserDiaryStats(userId)
-    │ ┌─ Lee todas las entradas
-    │ ┌─ Calcula:
-    │   ├─ entryCount = total
-    │   ├─ avgReflectionDepth = promedio
-    │   ├─ uniqueEmotionCount = SET.length
-    │   └─ overallImpactScore = suma
-    ▼
-Firestore.collection('users/{userId}/diaryStats')
-       .doc(userId).set(stats)
+    └─► (Firestore Trigger)
+    ┌──────────────────▼──────────────────┐
+    │    Firebase Cloud Function          │
+    │   `onDiaryEntryWrite`               │
+    │    - Lee TODAS las entradas         │
+    │    - Calcula entryCount, avgDepth, etc.│
+    │    - Escribe en `diaryStats` doc    │
+    └──────────────────┬──────────────────┘
+                       │
+    ┌──────────────────▼──────────────────┐
+    │ Stream de diaryStats se actualiza   │
+    └──────────────────┬──────────────────┘
     │
-    ▼
-Stream de diaryEntries y diaryStats se actualiza
-    │
-    ▼
 ExperienceController recibe cambios
-    │ ┌─ diaryEntries.obs actualiza
     │ ┌─ diaryStats.obs actualiza
-    ▼
-Obx() detectan cambios
     │
     ▼
 TravelDiaryScreen re-construye con:

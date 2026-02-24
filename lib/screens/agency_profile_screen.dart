@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/agency_model.dart';
 import '../services/agency_service.dart';
@@ -386,24 +385,25 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
   }
 
   Future<void> _launchPhone(String phoneNumber) async {
-    final url = 'tel:$phoneNumber';
-    if (await canLaunch(url)) {
-      await launch(url);
+    final Uri url = Uri.parse('tel:$phoneNumber');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     }
   }
 
   Future<void> _launchEmail(String email) async {
-    final url = 'mailto:$email';
-    if (await canLaunch(url)) {
-      await launch(url);
+    final Uri url = Uri.parse('mailto:$email');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     }
   }
 
   Future<void> _launchWebsite(String website) async {
-    final url =
+    final String normalizedUrl =
         website.startsWith('http') ? website : 'https://$website';
-    if (await canLaunch(url)) {
-      await launch(url);
+    final Uri url = Uri.parse(normalizedUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     }
   }
 }

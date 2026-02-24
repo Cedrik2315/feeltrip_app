@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class BookingsScreen extends StatefulWidget {
+  const BookingsScreen({super.key});
+
   @override
   State<BookingsScreen> createState() => _BookingsScreenState();
 }
@@ -43,7 +45,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mis Reservas'),
+        title: const Text('Mis Reservas'),
         backgroundColor: Colors.deepPurple,
       ),
       body: bookings.isEmpty
@@ -51,37 +53,37 @@ class _BookingsScreenState extends State<BookingsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.calendar_today,
                     size: 64,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'No tienes reservas',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
                     ),
-                    child: Text('Explorar Viajes'),
+                    child: const Text('Explorar Viajes'),
                   ),
                 ],
               ),
             )
           : ListView.builder(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               itemCount: bookings.length,
               itemBuilder: (context, index) {
                 final booking = bookings[index];
                 return Card(
-                  margin: EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsets.only(bottom: 12),
                   child: ExpansionTile(
                     leading: Container(
                       width: 60,
@@ -93,26 +95,26 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       child: Center(
                         child: Text(
                           booking['image'],
-                          style: TextStyle(fontSize: 28),
+                          style: const TextStyle(fontSize: 28),
                         ),
                       ),
                     ),
                     title: Text(
                       booking['title'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(booking['destination']),
                     trailing: Chip(
                       label: Text(booking['status']),
                       backgroundColor: _getStatusColor(booking['status']),
-                      labelStyle: TextStyle(
+                      labelStyle: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -120,24 +122,24 @@ class _BookingsScreenState extends State<BookingsScreen> {
                               'ID Reserva:',
                               booking['id'],
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             _buildInfoRow(
                               'Fecha:',
                               booking['date'],
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             _buildInfoRow(
                               'Viajeros:',
                               '${booking['people']} ${booking['people'] == 1 ? 'persona' : 'personas'}',
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             _buildInfoRow(
                               'Total:',
                               '\$${booking['price']}',
                               bold: true,
                               color: Colors.deepPurple,
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             Row(
                               children: [
                                 if (booking['status'] != 'Cancelada')
@@ -146,16 +148,16 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                       onPressed: () {
                                         _showCancelDialog(booking);
                                       },
-                                      child: Text('Cancelar'),
+                                      child: const Text('Cancelar'),
                                     ),
                                   ),
-                                SizedBox(width: 8),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: ElevatedButton(
                                     onPressed: () {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        SnackBar(
+                                        const SnackBar(
                                           content: Text(
                                               'Detalles enviados a tu email'),
                                         ),
@@ -164,7 +166,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.deepPurple,
                                     ),
-                                    child: Text('Ver Detalles'),
+                                    child: const Text('Ver Detalles'),
                                   ),
                                 ),
                               ],
@@ -218,14 +220,14 @@ class _BookingsScreenState extends State<BookingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Cancelar Reserva'),
+        title: const Text('Cancelar Reserva'),
         content: Text(
           '¿Estás seguro de que deseas cancelar la reserva "${booking['title']}"?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('No'),
+            child: const Text('No'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -234,7 +236,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                 booking['status'] = 'Cancelada';
               });
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Reserva cancelada'),
                   backgroundColor: Colors.red,
                 ),
@@ -243,7 +245,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
             ),
-            child: Text('Sí, Cancelar'),
+            child: const Text('Sí, Cancelar'),
           ),
         ],
       ),
