@@ -2,6 +2,7 @@
 import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue, Timestamp } from "firebase-admin/firestore";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 initializeApp();
 const db = getFirestore();
@@ -82,49 +83,27 @@ export const analyzeDiaryEntry = onCall(
 
     await enforceRateLimit(request.auth.uid);
 
-    const model = getModelName();
-    const apiVersion = process.env.GEMINI_API_VERSION?.trim() || "v1";
-    const url =
-      `https://generativelanguage.googleapis.com/${apiVersion}/models/` +
-      `${model}:generateContent?key=${apiKey}`;
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: getModelName() });
+
+    const prompt = `Analiza el siguiente diario emocional: "${normalizedText}". 
+    Responde ÚNICAMENTE en formato JSON con esta estructura:
+    {
+      "emociones": ["emocion1", "emocion2"],
+      "destino_sugerido": "Nombre de ciudad o lugar",
+      "explicacion": "Una frase corta de por qué este lugar ayudará a su estado emocional"
+    }`;
 
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text:
-                    `Extrae las 3 emociones principales de: \"${normalizedText}\". ` +
-                    "Responde solo las emociones separadas por comas.",
-                },
-              ],
-            },
-          ],
-        }),
-      });
-
-      const data = (await response.json()) as {
-        error?: { message?: string };
-        candidates?: Array<{
-          content?: { parts?: Array<{ text?: string }> };
-        }>;
-      };
-
-      if (!response.ok) {
-        logger.error("Error en Gemini API", {
-          status: response.status,
-          message: data.error?.message,
-          uid: request.auth.uid,
-        });
-        throw new HttpsError("internal", "No se pudo procesar el análisis.");
-      }
-
-      const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      return { suggestions: resultText || "Sin resultados" };
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      
+      // Limpiamos la respuesta para asegurar que sea JSON válido
+      let jsonText = response.text();
+      const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+      jsonText = jsonMatch ? jsonMatch[0] : jsonText;
+      
+      return JSON.parse(jsonText);
     } catch (error) {
       if (error instanceof HttpsError) {
         throw error;
