@@ -12,7 +12,7 @@ class DiaryController {
   final EmotionService _emotionService;
   final DatabaseService _databaseService;
 
-  Future<List<String>> analizarYGuardar(String texto) async {
+  Future<AnalisisResultado?> analizarYGuardar(String texto) async {
     final limpio = texto.trim();
     if (limpio.isEmpty) {
       throw Exception('El texto está vacío');
@@ -21,13 +21,16 @@ class DiaryController {
     return ObservabilityService.trace(
       name: 'diary_analizar_y_guardar',
       action: () async {
-        final emociones = await _emotionService.analizarTexto(limpio);
-        await _databaseService.guardarEntrada(texto: limpio, emociones: emociones);
-        await ObservabilityService.logEvent(
-          'diary_saved',
-          parameters: {'emotions_count': emociones.length},
-        );
-        return emociones;
+        final resultado = await _emotionService.analizarTexto(limpio);
+        if (resultado != null) {
+          await _databaseService.guardarEntrada(
+              texto: limpio, emociones: resultado.emociones);
+          await ObservabilityService.logEvent(
+            'diary_saved',
+            parameters: {'emotions_count': resultado.emociones.length},
+          );
+        }
+        return resultado;
       },
     );
   }

@@ -41,9 +41,12 @@ void main() {
     final authService = _MockAuthService();
     final emotionService = _MockEmotionService();
     final databaseService = _MockDatabaseService();
-    when(() => emotionService.analizarTexto(any())).thenAnswer((_) async => ['Calma']);
-    when(() => databaseService.guardarEntrada(texto: any(named: 'texto'), emociones: any(named: 'emociones')))
-        .thenAnswer((_) async {});
+    when(() => emotionService.analizarTexto(any())).thenAnswer((_) async =>
+        AnalisisResultado(
+            emociones: ['Calma'], destino: 'Playa', explicacion: 'Test'));
+    when(() => databaseService.guardarEntrada(
+        texto: any(named: 'texto'),
+        emociones: any(named: 'emociones'))).thenAnswer((_) async {});
     when(() => authService.signOut()).thenAnswer((_) async {});
 
     await tester.pumpWidget(
