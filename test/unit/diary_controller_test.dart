@@ -32,14 +32,18 @@ void main() {
   });
 
   test('analizarYGuardar analiza y guarda', () async {
-    when(() => emotionService.analizarTexto('Hola')).thenAnswer((_) async => ['Alegría']);
-    when(() => databaseService.guardarEntrada(texto: any(named: 'texto'), emociones: any(named: 'emociones')))
-        .thenAnswer((_) async {});
+    when(() => emotionService.analizarTexto('Hola')).thenAnswer((_) async =>
+        AnalisisResultado(
+            emociones: ['Alegría'], destino: 'Playa', explicacion: 'Test'));
+    when(() => databaseService.guardarEntrada(
+        texto: any(named: 'texto'),
+        emociones: any(named: 'emociones'))).thenAnswer((_) async {});
 
     final result = await controller.analizarYGuardar(' Hola ');
 
-    expect(result, ['Alegría']);
+    expect(result?.emociones, ['Alegría']);
     verify(() => emotionService.analizarTexto('Hola')).called(1);
-    verify(() => databaseService.guardarEntrada(texto: 'Hola', emociones: ['Alegría'])).called(1);
+    verify(() => databaseService
+        .guardarEntrada(texto: 'Hola', emociones: ['Alegría'])).called(1);
   });
 }

@@ -25,11 +25,17 @@ void main() {
       databaseService: databaseService,
     );
 
-    when(() => authService.signInWithEmail(email: any(named: 'email'), password: any(named: 'password')))
+    when(() => authService.signInWithEmail(
+            email: any(named: 'email'), password: any(named: 'password')))
         .thenAnswer((_) async => throw UnimplementedError());
-    when(() => emotionService.analizarTexto(any())).thenAnswer((_) async => ['Calma', 'Gratitud']);
-    when(() => databaseService.guardarEntrada(texto: any(named: 'texto'), emociones: any(named: 'emociones')))
-        .thenAnswer((_) async {});
+    when(() => emotionService.analizarTexto(any())).thenAnswer((_) async =>
+        AnalisisResultado(
+            emociones: ['Calma', 'Gratitud'],
+            destino: 'Montaña',
+            explicacion: 'Test'));
+    when(() => databaseService.guardarEntrada(
+        texto: any(named: 'texto'),
+        emociones: any(named: 'emociones'))).thenAnswer((_) async {});
     when(() => databaseService.obtenerEntradas()).thenAnswer(
       (_) => Stream.value([
         DiarioRegistro(
@@ -45,8 +51,9 @@ void main() {
       await authController.login(email: 'smoke@test.com', password: '123456');
     } catch (_) {}
 
-    final emociones = await diaryController.analizarYGuardar('Hoy fue un gran día');
-    expect(emociones, isNotEmpty);
+    final resultado =
+        await diaryController.analizarYGuardar('Hoy fue un gran día');
+    expect(resultado?.emociones, isNotEmpty);
 
     final historial = await databaseService.obtenerEntradas().first;
     expect(historial, isNotEmpty);

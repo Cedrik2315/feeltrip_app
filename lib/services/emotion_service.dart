@@ -1,25 +1,32 @@
 ﻿import 'package:cloud_functions/cloud_functions.dart';
 import 'dart:developer' as developer;
 
-class EmotionService {
-  // Configuramos la instancia para apuntar a la regiÃ³n donde vive tu funciÃ³n
-  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'us-east1');
+class AnalisisResultado {
+  final List<String> emociones;
+  final String destino;
+  final String explicacion;
 
-  Future<List<String>> analizarTexto(String texto) async {
+  AnalisisResultado(
+      {required this.emociones,
+      required this.destino,
+      required this.explicacion});
+}
+
+class EmotionService {
+  final FirebaseFunctions _functions =
+      FirebaseFunctions.instanceFor(region: 'us-east1');
+
+  Future<AnalisisResultado?> analizarTexto(String texto) async {
     try {
-      // Nombre exacto de la funciÃ³n desplegada en index.ts
       HttpsCallable callable = _functions.httpsCallable('analyzeDiaryEntry');
-      
-      // Enviamos el texto en el formato que espera el backend
       final results = await callable.call({'text': texto});
 
-      // La respuesta exitosa que vimos en PowerShell llega aquÃ­
-      if (results.data['suggestions'] != null) {
-        String sugerencias = results.data['suggestions'];
-        // Convierte el String "AlegrÃ­a, Alivio" en una lista real de Flutter
-        return sugerencias.split(',').map((e) => e.trim()).toList();
-      }
-      return [];
+      final data = results.data;
+      return AnalisisResultado(
+        emociones: List<String>.from(data['emociones']),
+        destino: data['destino_sugerido'],
+        explicacion: data['explicacion'],
+      );
     } catch (e, st) {
       developer.log(
         'Error llamando a la IA',
@@ -27,7 +34,7 @@ class EmotionService {
         error: e,
         stackTrace: st,
       );
-      return [];
+      return null;
     }
   }
 }

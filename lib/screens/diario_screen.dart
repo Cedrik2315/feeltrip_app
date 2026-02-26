@@ -133,12 +133,13 @@ class _DiarioScreenState extends State<DiarioScreen> {
     setState(() => _estaCargando = true);
 
     try {
-      final listaEmociones = await context.read<DiaryController>().analizarYGuardar(textoBusqueda);
+      final resultado =
+          await context.read<DiaryController>().analizarYGuardar(textoBusqueda);
 
       if (!mounted) return;
 
       setState(() {
-        _emocionesDetectadas = listaEmociones;
+        _emocionesDetectadas = resultado?.emociones ?? [];
         _estaCargando = false;
         _controller.clear();
       });
@@ -158,9 +159,10 @@ class _DiarioScreenState extends State<DiarioScreen> {
       setState(() => _estaCargando = false);
 
       final message = e.toString();
-      final uiMessage = message.contains('permission') || message.contains('sesión')
-          ? AppStrings.diaryNeedLogin
-          : message.replaceFirst('Exception: ', '');
+      final uiMessage =
+          message.contains('permission') || message.contains('sesión')
+              ? AppStrings.diaryNeedLogin
+              : message.replaceFirst('Exception: ', '');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -197,7 +199,8 @@ class _DiarioScreenState extends State<DiarioScreen> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            const Icon(Icons.auto_awesome_outlined, size: 64, color: Colors.deepPurple),
+            const Icon(Icons.auto_awesome_outlined,
+                size: 64, color: Colors.deepPurple),
             const SizedBox(height: 16),
             const Text(
               AppStrings.diaryPrompt,
@@ -210,7 +213,8 @@ class _DiarioScreenState extends State<DiarioScreen> {
               decoration: InputDecoration(
                 hintText: AppStrings.diaryHint,
                 alignLabelWithHint: true,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                 filled: true,
                 fillColor: Colors.grey.withValues(alpha: 0.05),
               ),
@@ -222,18 +226,21 @@ class _DiarioScreenState extends State<DiarioScreen> {
                 minimumSize: const Size(double.infinity, 55),
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
                 elevation: 2,
               ),
               child: _estaCargando
                   ? const SizedBox(
                       height: 24,
                       width: 24,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
                     )
                   : const Text(
                       AppStrings.diaryAnalyze,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
             ),
             const SizedBox(height: 32),
@@ -242,7 +249,8 @@ class _DiarioScreenState extends State<DiarioScreen> {
               const SizedBox(height: 16),
               const Text(
                 AppStrings.diaryAnalysisTitle,
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
               ),
               const SizedBox(height: 12),
               Wrap(
@@ -252,10 +260,14 @@ class _DiarioScreenState extends State<DiarioScreen> {
                 children: _emocionesDetectadas
                     .map(
                       (e) => Chip(
-                        label: Text(e, style: const TextStyle(color: Colors.deepPurple)),
-                        backgroundColor: Colors.deepPurple.withValues(alpha: 0.1),
-                        side: const BorderSide(color: Colors.deepPurple, width: 0.5),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        label: Text(e,
+                            style: const TextStyle(color: Colors.deepPurple)),
+                        backgroundColor:
+                            Colors.deepPurple.withValues(alpha: 0.1),
+                        side: const BorderSide(
+                            color: Colors.deepPurple, width: 0.5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
                       ),
                     )
                     .toList(),
@@ -276,4 +288,3 @@ class _DiarioScreenState extends State<DiarioScreen> {
     );
   }
 }
-
