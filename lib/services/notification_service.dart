@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
 
 /// Servicio de notificaciones push para FeelTrip
@@ -17,10 +18,10 @@ class NotificationService {
   final FirebaseMessaging _messaging;
   final FirebaseAuth _auth;
 
-  static const String _channelId = 'feeltrip_notifications';
-  static const String _channelName = 'FeelTrip Notifications';
-  static const String _channelDescription =
-      'Notificaciones de viajes y promociones';
+  // ignore: unused_field - Para uso futuro con flutter_local_notifications
+  // static const String _channelId = 'feeltrip_notifications';
+  // static const String _channelName = 'FeelTrip Notifications';
+  // static const String _channelDescription = 'Notificaciones de viajes y promociones';
 
   bool _isInitialized = false;
 
@@ -74,8 +75,7 @@ class NotificationService {
       // En debug, usar vapid key alternativa
       if (kDebugMode) {
         return await _messaging.getToken(
-          vapidKey:
-              'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYpN1athS0U',
+          vapidKey: dotenv.env['VAPID_KEY'],
         );
       }
       return await _messaging.getToken();

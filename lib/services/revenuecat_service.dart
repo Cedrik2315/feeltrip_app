@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Servicio de suscripciones premium usando RevenueCat
 /// Gestiona compras, suscripciones y entitlements
@@ -13,8 +14,19 @@ class RevenueCatService {
   final FirebaseAuth _auth;
 
   // Configuración de RevenueCat
-  // Reemplaza con tu API key de RevenueCat
-  static const String _apiKey = 'YOUR_REVENUECAT_API_KEY';
+  // La API Key se obtiene de las variables de entorno (.env)
+  static String get _apiKey {
+    final key = dotenv.env['REVENUECAT_API_KEY'] ?? '';
+    if (key.isEmpty) {
+      developer.log(
+        'ADVERTENCIA: REVENUECAT_API_KEY no configurada en .env',
+        name: 'RevenueCatService',
+      );
+    }
+    return key;
+  }
+
+  static bool get isConfigured => _apiKey.isNotEmpty;
 
   bool _isInitialized = false;
   CustomerInfo? _customerInfo;
@@ -26,6 +38,15 @@ class RevenueCatService {
   /// Inicializa el SDK de RevenueCat
   Future<void> initialize() async {
     if (_isInitialized) return;
+
+    // Verificar que la API key esté configurada
+    if (!isConfigured) {
+      developer.log(
+        'RevenueCat no inicializado: API key no configurada',
+        name: 'RevenueCatService',
+      );
+      return;
+    }
 
     try {
       await Purchases.setLogLevel(LogLevel.debug);
@@ -91,6 +112,7 @@ class RevenueCatService {
   }
 
   /// Compra un paquete
+  /// ignore: deprecated_member_use - El método purchasePackage es el más estable
   Future<bool> purchasePackage(Package package) async {
     try {
       final user = _auth.currentUser;
@@ -98,6 +120,8 @@ class RevenueCatService {
         await Purchases.logIn(user.uid);
       }
 
+      // Usar purchasePackage que está deprecated pero es estable
+      // ignore: deprecated_member_use
       final result = await Purchases.purchasePackage(package);
 
       if (result.customerInfo.entitlements.active['premium'] != null) {

@@ -6,14 +6,21 @@ import 'package:flutter/material.dart';
 import '../services/database_service.dart';
 
 class DiaryScreen extends StatefulWidget {
-  const DiaryScreen({super.key});
+  const DiaryScreen({
+    super.key,
+    this.databaseService,
+    this.enableCamera = true,
+  });
+
+  final DatabaseService? databaseService;
+  final bool enableCamera;
 
   @override
   State<DiaryScreen> createState() => _DiaryScreenState();
 }
 
 class _DiaryScreenState extends State<DiaryScreen> {
-  final DatabaseService _dbService = DatabaseService();
+  late final DatabaseService _dbService;
   List<DiaryEntry> entries = [];
   CameraController? cameraController;
   bool isCameraReady = false;
@@ -24,20 +31,24 @@ class _DiaryScreenState extends State<DiaryScreen> {
   @override
   void initState() {
     super.initState();
-    initializeCamera();
+    _dbService = widget.databaseService ?? DatabaseService();
+    if (widget.enableCamera) {
+      initializeCamera();
+    }
     loadEntries();
   }
 
   Future<void> initializeCamera() async {
-    final cameras = await availableCameras();
-    final firstCamera = cameras.first;
-
-    cameraController = CameraController(
-      firstCamera,
-      ResolutionPreset.medium,
-    );
-
     try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) return;
+
+      final firstCamera = cameras.first;
+      cameraController = CameraController(
+        firstCamera,
+        ResolutionPreset.medium,
+      );
+
       await cameraController!.initialize();
       setState(() => isCameraReady = true);
     } catch (e) {

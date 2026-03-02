@@ -61,7 +61,7 @@ class ConsentService {
       _canRequestAds = await ConsentInformation.instance.canRequestAds();
 
       // Obtener estado de consentimiento
-      final status = ConsentInformation.instance.getConsentStatus();
+      final status = await ConsentInformation.instance.getConsentStatus();
       _privacyOptionsRequired = status == ConsentStatus.required;
 
       AppLogger.info(

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../constants/strings.dart';
 import '../controllers/auth_controller.dart';
-import 'home_screen.dart';
+import 'main_navigation_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -27,7 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    if (_emailController.text.trim().isEmpty || _passwordController.text.isEmpty) {
+    if (_emailController.text.trim().isEmpty ||
+        _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Completa email y contraseña')),
       );
@@ -44,17 +45,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
         (route) => false,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesión iniciada'), backgroundColor: Colors.green),
+        const SnackBar(
+            content: Text('Sesión iniciada'), backgroundColor: Colors.green),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', '')), backgroundColor: Colors.redAccent),
+        SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            backgroundColor: Colors.redAccent),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -62,7 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _recuperarContrasena() async {
-    final emailController = TextEditingController(text: _emailController.text.trim());
+    final emailController =
+        TextEditingController(text: _emailController.text.trim());
 
     final email = await showDialog<String>(
       context: context,
@@ -82,7 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
             child: const Text(AppStrings.cancel),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, emailController.text.trim()),
+            onPressed: () =>
+                Navigator.pop(context, emailController.text.trim()),
             child: const Text(AppStrings.send),
           ),
         ],
@@ -120,6 +126,16 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Logo con fondo blanco para evitar "cuadritos" si es transparente
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Image.asset('assets/images/logo.png', height: 100),
+            ),
+            const SizedBox(height: 32),
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
@@ -136,8 +152,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 labelText: AppStrings.passwordLabel,
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  icon: Icon(_obscurePassword
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
             ),
@@ -167,7 +186,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ? null
                   : () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const RegisterScreen()),
                       );
                     },
               child: const Text(AppStrings.createAccount),
@@ -178,4 +198,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

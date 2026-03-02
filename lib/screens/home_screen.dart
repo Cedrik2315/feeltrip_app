@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../constants/home_content.dart';
 import '../constants/strings.dart';
+import '../controllers/experience_controller.dart';
 import '../controllers/home_controller.dart';
 import '../models/experience_model.dart';
 import '../models/trip_model.dart';
@@ -20,28 +21,41 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _carouselIndex = 0;
   List<Trip> _featuredTrips = [];
-  List<TravelerStory> _stories = [];
   bool _isLoadingTrips = true;
   String? _errorMessage;
+  
+  late final ExperienceController _experienceController;
+  late final HomeController _homeController;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadFeaturedTrips();
-      _loadStories();
-    });
+    _experienceController = context.read<ExperienceController>();
+    _homeController = context.read<HomeController>();
+    _experienceController.addListener(_onControllerUpdate);
+    _loadFeaturedTrips();
+  }
+
+  @override
+  void dispose() {
+    _experienceController.removeListener(_onControllerUpdate);
+    super.dispose();
+  }
+
+  void _onControllerUpdate() {
+    // Protección contra fugas de memoria: solo actualizar si el widget está montado
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadFeaturedTrips() async {
-    setState(() {
-      _isLoadingTrips = true;
-      _errorMessage = null;
-    });
+    // Si ya está cargando o montado, actualizamos estado local
+    if (mounted) setState(() => _isLoadingTrips = true);
 
     try {
-      final homeController = context.read<HomeController>();
-      final trips = await homeController.loadFeaturedTrips();
+      final trips = await _homeController.loadFeaturedTrips();
+      // Verificación crítica antes de usar setState después de un await
       if (!mounted) return;
       setState(() {
         _featuredTrips = trips;
@@ -54,13 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
         _errorMessage = 'Error al cargar viajes: ${e.toString()}';
       });
     }
-  }
-
-  void _loadStories() {
-    final homeController = context.read<HomeController>();
-    setState(() {
-      _stories = homeController.loadMockStories();
-    });
   }
 
   void _retryLoadTrips() {
@@ -181,9 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/quiz');
-                        },
+                        onPressed: () => Navigator.pushNamed(context, '/quiz'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.deepPurple,
@@ -331,9 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pushNamed('/stories');
-                        },
+                        onTap: () => Navigator.pushNamed(context, '/stories'),
                         child: const Text(
                           AppStrings.homeViewAll,
                           style: TextStyle(
@@ -346,10 +349,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  ..._stories
-                      .take(2)
-                      .map((story) => _buildStoryPreviewCard(story))
-                      .toList(),
+                  Consumer<ExperienceController>(
+                      builder: (context, controller, child) {
+                    if (controller.stories.isEmpty) {
+                      return const SizedBox();
+                    }
+                    return Column(
+                      children: controller.stories.take(2).map((story) => _buildStoryPreviewCard(story)).toList(),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -379,8 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             homeQuickAccessItems[i].title,
                             homeQuickAccessItems[i].subtitle,
                             () {
-                              Navigator.of(context)
-                                  .pushNamed(homeQuickAccessItems[i].route);
+                              Navigator.pushNamed(context, homeQuickAccessItems[i].route);
                             },
                           ),
                         ),
@@ -559,9 +566,7 @@ class TripCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/trip-details', arguments: trip.id);
-      },
+      onTap: () => Navigator.pushNamed(context, '/trip-details', arguments: trip.id),
       child: Card(
         margin: const EdgeInsets.all(8),
         child: Column(

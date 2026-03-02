@@ -626,4 +626,3 @@ void main() {
   debugPrint('ReseÃ±as: ${MockData.mockReviews.length}');
   debugPrint('Reservas: ${MockData.mockBookings.length}');
 }
-

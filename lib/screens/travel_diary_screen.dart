@@ -1,7 +1,9 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import '../models/experience_model.dart';
 import '../controllers/experience_controller.dart';
+import '../services/story_service.dart';
+import '../services/diary_service.dart';
 
 class TravelDiaryScreen extends StatefulWidget {
   const TravelDiaryScreen({super.key});
@@ -34,11 +36,18 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
   @override
   void initState() {
     super.initState();
-    // Get or create the controller
-    _controller = Get.isRegistered<ExperienceController>()
-        ? Get.find<ExperienceController>()
-        : Get.put(ExperienceController());
-    
+    // Usar Provider si está disponible
+    try {
+      _controller = context.read<ExperienceController>();
+    } catch (e) {
+      // Si no hay Provider, crear con los servicios necesarios
+      _controller = ExperienceController(
+        storyService: context.read<StoryService>(),
+        diaryService: context.read<DiaryService>(),
+      );
+      _controller.loadAllData();
+    }
+
     // Load diary entries if not already loaded
     if (_controller.diaryEntries.isEmpty) {
       _controller.loadAllData();
@@ -59,9 +68,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
         title: const Text('Mi Diario de Viaje'),
         backgroundColor: Colors.deepPurple,
       ),
-      body: _isAddingEntry
-          ? _buildEntryForm()
-          : _buildDiaryList(),
+      body: _isAddingEntry ? _buildEntryForm() : _buildDiaryList(),
       floatingActionButton: !_isAddingEntry
           ? FloatingActionButton(
               onPressed: () {
@@ -96,14 +103,16 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Obx(() => Text(
-                  '${_controller.diaryEntries.length} reflexiones capturadas',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
+                ListenableBuilder(
+                  listenable: _controller,
+                  builder: (context, child) => Text(
+                    '${_controller.diaryEntries.length} reflexiones capturadas',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
                   ),
-                )),
+                ),
               ],
             ),
           ),
@@ -111,83 +120,90 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
           // Stats Cards
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Obx(() {
-              final stats = _controller.diaryStats;
-              return GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                children: [
-                  _buildStatCard(
-                    'Total',
-                    '${_controller.diaryEntries.length}',
-                    Icons.note,
-                  ),
-                  _buildStatCard(
-                    'Promedio Profundidad',
-                    '${(stats['avgReflectionDepth'] ?? 0).toStringAsFixed(1)}/5',
-                    Icons.trending_up,
-                  ),
-                  _buildStatCard(
-                    'Emociones Ãšnicas',
-                    '${stats['uniqueEmotionCount'] ?? 0}',
-                    Icons.sentiment_very_satisfied,
-                  ),
-                  _buildStatCard(
-                    'Impacto General',
-                    '${stats['overallImpactScore'] ?? 0}',
-                    Icons.stars,
-                  ),
-                ],
-              );
-            }),
+            child: ListenableBuilder(
+              listenable: _controller,
+              builder: (context, child) {
+                final stats = _controller.diaryStats;
+                return GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  children: [
+                    _buildStatCard(
+                      'Total',
+                      '${_controller.diaryEntries.length}',
+                      Icons.note,
+                    ),
+                    _buildStatCard(
+                      'Promedio Profundidad',
+                      '${(stats['avgReflectionDepth'] ?? 0).toStringAsFixed(1)}/5',
+                      Icons.trending_up,
+                    ),
+                    _buildStatCard(
+                      'Emociones Ãšnicas',
+                      '${stats['uniqueEmotionCount'] ?? 0}',
+                      Icons.sentiment_very_satisfied,
+                    ),
+                    _buildStatCard(
+                      'Impacto General',
+                      '${stats['overallImpactScore'] ?? 0}',
+                      Icons.stars,
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
 
           // Timeline
-          Obx(() {
-            if (_controller.isLoading.value) {
-              return const Padding(
-                padding: EdgeInsets.all(32),
-                child: CircularProgressIndicator(),
-              );
-            }
+          ListenableBuilder(
+            listenable: _controller,
+            builder: (context, child) {
+              if (_controller.isLoading) {
+                return const Padding(
+                  padding: EdgeInsets.all(32),
+                  child: CircularProgressIndicator(),
+                );
+              }
 
-            if (_controller.diaryEntries.isEmpty) {
-              return const Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Icon(Icons.note_alt_outlined, size: 64, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text(
-                      'AÃºn no tienes entradas',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+              if (_controller.diaryEntries.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Icon(Icons.note_alt_outlined,
+                          size: 64, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text(
+                        'AÃºn no tienes entradas',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Captura tus pensamientos y emociones durante el viaje',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              );
-            }
+                      SizedBox(height: 8),
+                      Text(
+                        'Captura tus pensamientos y emociones durante el viaje',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _controller.diaryEntries.length,
-              itemBuilder: (context, index) {
-                return _buildDiaryEntryCard(_controller.diaryEntries[index]);
-              },
-            );
-          }),
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _controller.diaryEntries.length,
+                itemBuilder: (context, index) {
+                  return _buildDiaryEntryCard(_controller.diaryEntries[index]);
+                },
+              );
+            },
+          ),
 
           const SizedBox(height: 24),
         ],
@@ -260,9 +276,10 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                   spacing: 8,
                   children: entry.emotions
                       .map((emotion) => Chip(
-                        label: Text(emotion),
-                        backgroundColor: Colors.deepPurple.withValues(alpha: 0.2),
-                      ))
+                            label: Text(emotion),
+                            backgroundColor:
+                                Colors.deepPurple.withValues(alpha: 0.2),
+                          ))
                       .toList(),
                 ),
                 const SizedBox(height: 12),
@@ -342,7 +359,13 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
             label: '$_reflectionDepth/5',
           ),
           Text(
-            '$_reflectionDepth - ${['Superficial', 'Ligera', 'Moderada', 'Profunda', 'Muy Profunda'][_reflectionDepth - 1]}',
+            '$_reflectionDepth - ${[
+              'Superficial',
+              'Ligera',
+              'Moderada',
+              'Profunda',
+              'Muy Profunda'
+            ][_reflectionDepth - 1]}',
             style: TextStyle(color: Colors.grey[600]),
           ),
           const SizedBox(height: 16),
@@ -355,18 +378,18 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
             spacing: 8,
             children: _emotionOptions
                 .map((emotion) => FilterChip(
-                  label: Text(emotion),
-                  selected: _selectedEmotions.contains(emotion),
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        _selectedEmotions.add(emotion);
-                      } else {
-                        _selectedEmotions.remove(emotion);
-                      }
-                    });
-                  },
-                ))
+                      label: Text(emotion),
+                      selected: _selectedEmotions.contains(emotion),
+                      onSelected: (selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedEmotions.add(emotion);
+                          } else {
+                            _selectedEmotions.remove(emotion);
+                          }
+                        });
+                      },
+                    ))
                 .toList(),
           ),
           const SizedBox(height: 24),
@@ -407,11 +430,14 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                         _reflectionDepth = 3;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Entrada guardada exitosamente')),
+                        const SnackBar(
+                            content: Text('Entrada guardada exitosamente')),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Por favor completa todos los campos')),
+                        const SnackBar(
+                            content:
+                                Text('Por favor completa todos los campos')),
                       );
                     }
                   },
@@ -426,4 +452,3 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
     );
   }
 }
-
