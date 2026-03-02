@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 /// Servicio de IA para análisis emocional y recomendaciones de viajes
@@ -205,11 +205,19 @@ Devuelve solo los nombres de las actividades, uno por línea.
   }
 
   Future<String?> _getApiKey() async {
-    // Intentar obtener desde Firebase Functions environment
+    // Obtener API key desde variables de entorno (.env)
     try {
-      // Por ahora devolvemos null - se debe configurar en Firebase
-      return const String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
-    } catch (_) {
+      final apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
+      if (apiKey.isEmpty) {
+        developer.log(
+          'ADVERTENCIA: GEMINI_API_KEY no configurada en .env',
+          name: 'AIService',
+        );
+        return null;
+      }
+      return apiKey;
+    } catch (e) {
+      developer.log('Error obteniendo API key: $e', name: 'AIService');
       return null;
     }
   }

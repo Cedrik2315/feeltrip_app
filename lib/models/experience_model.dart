@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 enum ExperienceTypeEnum {
   adventure,
@@ -99,6 +100,20 @@ class ExperienceImpact {
       'createdAt': createdAt,
     };
   }
+}
+
+class ParadaViaje {
+  String nombre;
+  LatLng posicion;
+  String? descripcion;
+  String? imagePath; // Ruta local de la foto tomada
+
+  ParadaViaje({
+    required this.nombre,
+    required this.posicion,
+    this.descripcion,
+    this.imagePath,
+  });
 }
 
 class TravelerStory {

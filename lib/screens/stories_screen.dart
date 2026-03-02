@@ -1,8 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import '../models/experience_model.dart';
 import '../controllers/experience_controller.dart';
 import '../services/sharing_service.dart';
+import '../services/story_service.dart';
+import '../services/diary_service.dart';
 import 'comments_screen.dart';
 
 class StoriesScreen extends StatefulWidget {
@@ -21,10 +24,18 @@ class _StoriesScreenState extends State<StoriesScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = Get.isRegistered<ExperienceController>()
-        ? Get.find<ExperienceController>()
-        : Get.put(ExperienceController());
-    
+    // Usar Provider si está disponible, si no crear con servicios
+    try {
+      _controller = context.read<ExperienceController>();
+    } catch (e) {
+      // Si no hay Provider, crear el controlador con los servicios necesarios
+      _controller = ExperienceController(
+        storyService: context.read<StoryService>(),
+        diaryService: context.read<DiaryService>(),
+      );
+      _controller.loadAllData();
+    }
+
     if (_controller.stories.isEmpty) {
       _controller.loadAllData();
     }
@@ -65,7 +76,8 @@ class _StoriesScreenState extends State<StoriesScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.travel_explore, size: 64, color: Colors.grey),
+                      const Icon(Icons.travel_explore,
+                          size: 64, color: Colors.grey),
                       const SizedBox(height: 16),
                       const Text('No hay historias aÃºn'),
                       const SizedBox(height: 24),
@@ -130,14 +142,16 @@ class _StoriesScreenState extends State<StoriesScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.deepPurple.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${story.likes} me gusta',
-                    style: const TextStyle(fontSize: 12, color: Colors.deepPurple),
+                    style:
+                        const TextStyle(fontSize: 12, color: Colors.deepPurple),
                   ),
                 ),
               ],
@@ -155,10 +169,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
               children: story.emotionalHighlights
                   .take(3)
                   .map((highlight) => Chip(
-                    label: Text(highlight, style: const TextStyle(fontSize: 11)),
-                    backgroundColor: Colors.blue.shade100,
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  ))
+                        label: Text(highlight,
+                            style: const TextStyle(fontSize: 11)),
+                        backgroundColor: Colors.blue.shade100,
+                        labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+                      ))
                   .toList(),
             ),
             const SizedBox(height: 12),
@@ -176,21 +191,24 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       onPressed: () {
                         _controller.likeStory(story.id);
                       },
-                      constraints: const BoxConstraints(maxHeight: 32, maxWidth: 32),
+                      constraints:
+                          const BoxConstraints(maxHeight: 32, maxWidth: 32),
                     ),
                     IconButton(
                       icon: const Icon(Icons.comment, size: 20),
                       onPressed: () {
                         Get.to(() => CommentsScreen(storyId: story.id));
                       },
-                      constraints: const BoxConstraints(maxHeight: 32, maxWidth: 32),
+                      constraints:
+                          const BoxConstraints(maxHeight: 32, maxWidth: 32),
                     ),
                     IconButton(
                       icon: const Icon(Icons.share, size: 20),
                       onPressed: () {
                         _shareStory(story);
                       },
-                      constraints: const BoxConstraints(maxHeight: 32, maxWidth: 32),
+                      constraints:
+                          const BoxConstraints(maxHeight: 32, maxWidth: 32),
                     ),
                   ],
                 ),
@@ -247,26 +265,26 @@ class _StoriesScreenState extends State<StoriesScreen> {
               ),
               const SizedBox(height: 8),
               Obx(() => Wrap(
-                spacing: 8,
-                children: [
-                  'TransformaciÃ³n',
-                  'ConexiÃ³n',
-                  'ReflexiÃ³n',
-                  'AlegrÃ­a',
-                ]
-                    .map((emotion) => FilterChip(
-                      label: Text(emotion),
-                      selected: emotionsSelected.contains(emotion),
-                      onSelected: (selected) {
-                        if (selected) {
-                          emotionsSelected.add(emotion);
-                        } else {
-                          emotionsSelected.remove(emotion);
-                        }
-                      },
-                    ))
-                    .toList(),
-              )),
+                    spacing: 8,
+                    children: [
+                      'TransformaciÃ³n',
+                      'ConexiÃ³n',
+                      'ReflexiÃ³n',
+                      'AlegrÃ­a',
+                    ]
+                        .map((emotion) => FilterChip(
+                              label: Text(emotion),
+                              selected: emotionsSelected.contains(emotion),
+                              onSelected: (selected) {
+                                if (selected) {
+                                  emotionsSelected.add(emotion);
+                                } else {
+                                  emotionsSelected.remove(emotion);
+                                }
+                              },
+                            ))
+                        .toList(),
+                  )),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -300,5 +318,3 @@ class _StoriesScreenState extends State<StoriesScreen> {
     );
   }
 }
-
-

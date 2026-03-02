@@ -39,11 +39,12 @@ android {
 
     defaultConfig {
         applicationId = "com.example.feeltrip_app"
-        minSdk = flutter.minSdkVersion
+        minSdk = flutter.minSdkVersion  // Establecido explícitamente para compatibilidad con Firebase y Google Maps
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
+        manifestPlaceholders["mapsApiKey"] = (findProperty("flutter.mapsApiKey") as String?) ?: ""
     }
 
     buildTypes {
@@ -68,3 +69,4 @@ flutter {
 dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
   }
+

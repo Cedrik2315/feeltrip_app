@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 
 import '../constants/strings.dart';
-import 'diario_screen.dart';
+import 'diary_screen.dart';
 
 class ResultsScreen extends StatelessWidget {
   const ResultsScreen({super.key, required this.answers});
@@ -15,7 +15,8 @@ class ResultsScreen extends StatelessWidget {
     if (emotion.contains('Lágrima') && season == 'Invierno') {
       return {
         'title': 'Auroras en Tromsø',
-        'description': '5 días para llorar de emoción bajo las auroras boreales',
+        'description':
+            '5 días para llorar de emoción bajo las auroras boreales',
         'price': 'EUR 1,290',
         'emotion': 'Lágrima de emoción',
         'includes': ['Vuelos', 'Cabaña de cristal', 'Sauna', 'Guía local']
@@ -26,7 +27,12 @@ class ResultsScreen extends StatelessWidget {
         'description': '7 días de abrazos italianos y pasta casera',
         'price': 'EUR 980',
         'emotion': 'Abrazo cálido',
-        'includes': ['Vuelos', 'Casa rural', 'Clases de cocina', 'Mercado local']
+        'includes': [
+          'Vuelos',
+          'Casa rural',
+          'Clases de cocina',
+          'Mercado local'
+        ]
       };
     } else if (emotion.contains('Boom')) {
       return {
@@ -126,9 +132,11 @@ class ResultsScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Row(
                             children: [
-                              const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                              const Icon(Icons.check_circle,
+                                  color: Colors.green, size: 16),
                               const SizedBox(width: 8),
-                              Text(item, style: TextStyle(color: Colors.blue[600])),
+                              Text(item,
+                                  style: TextStyle(color: Colors.blue[600])),
                             ],
                           ),
                         ),
@@ -161,7 +169,7 @@ class ResultsScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const DiarioScreen(),
+                          builder: (context) => const DiaryScreen(),
                         ),
                       );
                     },
