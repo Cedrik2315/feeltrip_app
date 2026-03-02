@@ -15,6 +15,26 @@ class AuthController {
     }
   }
 
+  Future<void> loginWithGoogle() async {
+    try {
+      await _authService.signInWithGoogle();
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_messageFromCode(e.code));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> loginWithFacebook() async {
+    try {
+      await _authService.signInWithFacebook();
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_messageFromCode(e.code));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> register({
     required String name,
     required String email,
