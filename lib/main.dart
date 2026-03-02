@@ -16,6 +16,7 @@ import 'screens/diary_screen.dart';
 import 'screens/experience_impact_dashboard_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/quiz_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/stories_screen.dart';
@@ -154,6 +155,7 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [ObservabilityService.analyticsObserver],
       home: const AuthGate(),
       routes: {
+        '/onboarding': (_) => const OnboardingScreen(),
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),
@@ -282,7 +284,7 @@ class _AuthGateState extends State<AuthGate> {
           return const HomeScreen();
         }
 
-        return const LoginScreen();
+        return const OnboardingScreen();
       },
     );
   }
