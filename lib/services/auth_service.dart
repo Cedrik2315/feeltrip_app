@@ -81,6 +81,15 @@ class AuthService {
     return _auth.signInWithCredential(credential);
   }
 
+  Future<User?> iniciarSesionConFacebook() async {
+    try {
+      final credential = await signInWithFacebook();
+      return credential.user;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await FacebookAuth.instance.logOut();

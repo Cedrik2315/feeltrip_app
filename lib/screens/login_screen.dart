@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../constants/strings.dart';
 import '../controllers/auth_controller.dart';
+import '../widgets/facebook_login_button.dart';
 import 'main_navigation_screen.dart';
 import 'register_screen.dart';
 
@@ -80,37 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Sesion iniciada con Google'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _loginWithFacebook() async {
-    setState(() => _isLoading = true);
-
-    try {
-      await context.read<AuthController>().loginWithFacebook();
-      if (!mounted) return;
-
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-        (route) => false,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sesion iniciada con Facebook'),
           backgroundColor: Colors.green,
         ),
       );
@@ -262,11 +232,9 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _isLoading ? null : _loginWithFacebook,
-                icon: const Icon(Icons.facebook, size: 22),
-                label: const Text('Continuar con Facebook'),
-              ),
+              child: _isLoading
+                  ? const SizedBox.shrink()
+                  : FacebookLoginButton(),
             ),
             Align(
               alignment: Alignment.centerRight,
