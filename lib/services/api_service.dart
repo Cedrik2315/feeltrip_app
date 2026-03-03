@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/booking_model.dart';
@@ -40,12 +41,27 @@ class AuthTokenClient extends http.BaseClient {
 }
 
 class ApiService {
-  ApiService({http.Client? client}) : _client = client ?? AuthTokenClient(http.Client());
+  ApiService({http.Client? client})
+      : _client = client ?? AuthTokenClient(http.Client());
 
-  static const String baseUrl = 'https://api.feeltrip.com/api';
+  static const String _defaultBaseUrl = 'https://api.feeltrip.com/api';
+  static String get baseUrl {
+    final fromEnv = dotenv.env['API_BASE_URL']?.trim();
+    if (fromEnv != null && fromEnv.isNotEmpty) {
+      return fromEnv;
+    }
+    return _defaultBaseUrl;
+  }
   static const Duration timeout = Duration(seconds: 30);
 
   final http.Client _client;
+
+  Never _rethrowConnectionError(Object error, StackTrace stackTrace) {
+    Error.throwWithStackTrace(
+      Exception('Error de conexión: $error'),
+      stackTrace,
+    );
+  }
 
   Future<List<Trip>> getTrips({String? category, String? destination}) async {
     try {
@@ -65,8 +81,8 @@ class ApiService {
         return data.map((trip) => Trip.fromJson(trip)).toList();
       }
       throw Exception('Error al obtener viajes: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
 
@@ -80,8 +96,8 @@ class ApiService {
         return Trip.fromJson(data);
       }
       throw Exception('Error al obtener detalles: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
 
@@ -95,8 +111,8 @@ class ApiService {
         return data.map((review) => Review.fromJson(review)).toList();
       }
       throw Exception('Error al obtener reseñas: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
 
@@ -129,8 +145,8 @@ class ApiService {
         return Booking.fromJson(data);
       }
       throw Exception('Error al crear reserva: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
 
@@ -144,8 +160,8 @@ class ApiService {
         return data.map((booking) => Booking.fromJson(booking)).toList();
       }
       throw Exception('Error al obtener reservas: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
 
@@ -158,8 +174,8 @@ class ApiService {
         return true;
       }
       throw Exception('Error al cancelar: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
 
@@ -192,8 +208,8 @@ class ApiService {
         return true;
       }
       throw Exception('Error al añadir reseña: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
 
@@ -206,8 +222,8 @@ class ApiService {
         return true;
       }
       throw Exception('Error al actualizar favoritos: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
 
@@ -252,9 +268,14 @@ class ApiService {
         return true;
       }
       throw Exception('Error al procesar pago: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+    } catch (e, st) {
+      _rethrowConnectionError(e, st);
     }
   }
+
+  void dispose() {
+    _client.close();
+  }
 }
+
 
