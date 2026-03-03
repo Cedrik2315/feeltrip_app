@@ -88,7 +88,10 @@ void main() async {
     MultiProvider(
       providers: [
         Provider<AuthService>(create: (_) => AuthService()),
-        Provider<ApiService>(create: (_) => ApiService()),
+        Provider<ApiService>(
+          create: (_) => ApiService(),
+          dispose: (_, api) => api.dispose(),
+        ),
         Provider<DatabaseService>(create: (_) => DatabaseService()),
         Provider<EmotionService>(create: (_) => EmotionService()),
         Provider<StoryService>(create: (_) => StoryService()),
