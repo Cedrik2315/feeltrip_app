@@ -74,4 +74,10 @@ const List<HomeQuickAccessItem> homeQuickAccessItems = [
     subtitle: 'Mide tu transformación',
     route: '/impact-dashboard',
   ),
+  HomeQuickAccessItem(
+    emoji: '🌐',
+    title: 'Comunidad',
+    subtitle: 'Historias de viajeros',
+    route: '/stories',
+  ),
 ];

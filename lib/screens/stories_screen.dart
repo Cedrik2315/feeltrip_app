@@ -1,11 +1,12 @@
-﻿import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/experience_model.dart';
 import '../controllers/experience_controller.dart';
+import '../controllers/auth_controller.dart';
 import '../services/sharing_service.dart';
-import '../services/story_service.dart';
-import '../services/diary_service.dart';
 import 'comments_screen.dart';
 
 class StoriesScreen extends StatefulWidget {
@@ -20,21 +21,13 @@ class StoriesScreen extends StatefulWidget {
 class _StoriesScreenState extends State<StoriesScreen> {
   late ExperienceController _controller;
   final TextEditingController _searchController = TextEditingController();
+  final _searchQuery = ''.obs;
+  final _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    // Usar Provider si está disponible, si no crear con servicios
-    try {
-      _controller = context.read<ExperienceController>();
-    } catch (e) {
-      // Si no hay Provider, crear el controlador con los servicios necesarios
-      _controller = ExperienceController(
-        storyService: context.read<StoryService>(),
-        diaryService: context.read<DiaryService>(),
-      );
-      _controller.loadAllData();
-    }
+    _controller = Get.find<ExperienceController>();
 
     if (_controller.stories.isEmpty) {
       _controller.loadAllData();
@@ -60,6 +53,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
             padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
+              onChanged: (value) => _searchQuery.value = value,
               decoration: InputDecoration(
                 hintText: 'Buscar historias...',
                 prefixIcon: const Icon(Icons.search),
@@ -71,7 +65,13 @@ class _StoriesScreenState extends State<StoriesScreen> {
           ),
           Expanded(
             child: Obx(() {
-              if (_controller.stories.isEmpty) {
+              if (_controller.isLoading && _controller.stories.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final filteredStories = _filteredStories();
+
+              if (filteredStories.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -79,7 +79,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       const Icon(Icons.travel_explore,
                           size: 64, color: Colors.grey),
                       const SizedBox(height: 16),
-                      const Text('No hay historias aÃºn'),
+                      Text(
+                        _controller.stories.isEmpty
+                            ? 'No hay historias aún'
+                            : 'No hay resultados para tu búsqueda',
+                      ),
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: () => _showAddStoryDialog(),
@@ -92,9 +96,9 @@ class _StoriesScreenState extends State<StoriesScreen> {
               }
 
               return ListView.builder(
-                itemCount: _controller.stories.length,
+                itemCount: filteredStories.length,
                 itemBuilder: (context, index) {
-                  final story = _controller.stories[index];
+                  final story = filteredStories[index];
                   return _buildStoryCard(story);
                 },
               );
@@ -110,6 +114,33 @@ class _StoriesScreenState extends State<StoriesScreen> {
     );
   }
 
+  List<TravelerStory> _filteredStories() {
+    final query = _normalizeText(_searchQuery.value.trim());
+    if (query.isEmpty) return _controller.stories;
+
+    return _controller.stories.where((story) {
+      final title = _normalizeText(story.title);
+      final body = _normalizeText(story.story);
+      final author = _normalizeText(story.author);
+      return title.contains(query) ||
+          body.contains(query) ||
+          author.contains(query);
+    }).toList();
+  }
+
+  String _normalizeText(String input) {
+    final lowered = input.toLowerCase();
+    const withAccents = 'áéíóúäëïöüàèìòùâêîôûñ';
+    const withoutAccents = 'aeiouaeiouaeiouaeioun';
+    final buffer = StringBuffer();
+    for (final rune in lowered.runes) {
+      final ch = String.fromCharCode(rune);
+      final idx = withAccents.indexOf(ch);
+      buffer.write(idx >= 0 ? withoutAccents[idx] : ch);
+    }
+    return buffer.toString();
+  }
+
   Widget _buildStoryCard(TravelerStory story) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -118,6 +149,26 @@ class _StoriesScreenState extends State<StoriesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (story.imageUrl != null && story.imageUrl!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: story.imageUrl!,
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      height: 180,
+                      color: Colors.grey[200],
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const SizedBox.shrink(),
+                  ),
+                ),
+              ),
             Row(
               children: [
                 Expanded(
@@ -135,7 +186,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'CalificaciÃ³n: ${story.rating}/5',
+                        'Calificación: ${story.rating}/5',
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -197,7 +248,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
                     IconButton(
                       icon: const Icon(Icons.comment, size: 20),
                       onPressed: () {
-                        Get.to(() => CommentsScreen(storyId: story.id));
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => CommentsScreen(storyId: story.id),
+                          ),
+                        );
                       },
                       constraints:
                           const BoxConstraints(maxHeight: 32, maxWidth: 32),
@@ -231,88 +286,143 @@ class _StoriesScreenState extends State<StoriesScreen> {
 
   void _showAddStoryDialog() {
     final storyController = TextEditingController();
+    final titleController = TextEditingController();
     final emotionsSelected = <String>[].obs;
+    File? imageFile;
 
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Comparte Tu Historia',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: storyController,
-                decoration: const InputDecoration(
-                  labelText: 'Tu historia',
-                  border: OutlineInputBorder(),
-                  hintText: 'Comparte tu experiencia...',
-                ),
-                maxLines: 5,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Emociones:',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              Obx(() => Wrap(
-                    spacing: 8,
-                    children: [
-                      'TransformaciÃ³n',
-                      'ConexiÃ³n',
-                      'ReflexiÃ³n',
-                      'AlegrÃ­a',
-                    ]
-                        .map((emotion) => FilterChip(
-                              label: Text(emotion),
-                              selected: emotionsSelected.contains(emotion),
-                              onSelected: (selected) {
-                                if (selected) {
-                                  emotionsSelected.add(emotion);
-                                } else {
-                                  emotionsSelected.remove(emotion);
-                                }
-                              },
-                            ))
-                        .toList(),
-                  )),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+        child: StatefulBuilder(
+          builder: (context, setDialogState) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(dialogContext),
-                    child: const Text('Cancelar'),
+                  const Text(
+                    'Comparte Tu Historia',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (storyController.text.isNotEmpty) {
-                        _controller.createStory(
-                          title: 'Mi Historia',
-                          story: storyController.text,
-                          author: 'Usuario Actual',
-                          emotionalHighlights: emotionsSelected.toList(),
-                          rating: 5.0,
-                        );
-                        Navigator.pop(dialogContext);
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      labelText: 'Título de tu historia',
+                      border: OutlineInputBorder(),
+                      hintText: 'Un título para tu experiencia',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: storyController,
+                    decoration: const InputDecoration(
+                      labelText: 'Tu historia',
+                      border: OutlineInputBorder(),
+                      hintText: 'Comparte tu experiencia...',
+                    ),
+                    maxLines: 5,
+                  ),
+                  const SizedBox(height: 16),
+                  if (imageFile != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          imageFile!,
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      final pickedFile =
+                          await _picker.pickImage(source: ImageSource.gallery);
+                      if (pickedFile != null) {
+                        setDialogState(() {
+                          imageFile = File(pickedFile.path);
+                        });
                       }
                     },
-                    child: const Text('Publicar'),
+                    icon: const Icon(Icons.photo_library),
+                    label: Text(imageFile == null
+                        ? 'Añadir una imagen'
+                        : 'Cambiar imagen'),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Emociones:',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Obx(() => Wrap(
+                        spacing: 8,
+                        children: [
+                          'Transformación',
+                          'Conexión',
+                          'Reflexión',
+                          'Alegría',
+                        ]
+                            .map((emotion) => FilterChip(
+                                  label: Text(emotion),
+                                  selected: emotionsSelected.contains(emotion),
+                                  onSelected: (selected) {
+                                    if (selected) {
+                                      emotionsSelected.add(emotion);
+                                    } else {
+                                      emotionsSelected.remove(emotion);
+                                    }
+                                  },
+                                ))
+                            .toList(),
+                      )),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: const Text('Cancelar'),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (storyController.text.trim().isNotEmpty &&
+                              titleController.text.trim().isNotEmpty) {
+                            final authController = Get.find<AuthController>();
+                            final user = authController.user;
+                            final authorName =
+                                (user?.displayName?.trim().isNotEmpty == true)
+                                    ? user!.displayName!
+                                    : (user?.email?.split('@').first ??
+                                        'Viajero Anónimo');
+
+                            _controller.createStory(
+                              title: titleController.text.trim(),
+                              story: storyController.text.trim(),
+                              author: authorName,
+                              emotionalHighlights: emotionsSelected.toList(),
+                              rating: 5.0,
+                              imageFile: imageFile,
+                            );
+                            Navigator.pop(dialogContext);
+                          }
+                        },
+                        child: const Text('Publicar'),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

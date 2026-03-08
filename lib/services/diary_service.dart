@@ -1,4 +1,5 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+// diary_service.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../config/firebase_config.dart';
 import '../core/app_logger.dart';
@@ -28,16 +29,14 @@ class DiaryService {
           .limit(limit)
           .get();
 
-      return snapshot.docs
-          .map((doc) => DiaryEntry.fromFirestore(doc))
-          .toList();
+      return snapshot.docs.map((doc) => DiaryEntry.fromFirestore(doc)).toList();
     } catch (e) {
-      AppLogger.debug('âŒ Error fetching diary entries: $e');
+      AppLogger.debug('�O Error fetching diary entries: $e');
       rethrow;
     }
   }
 
-  /// Obtener una entrada especÃ­fica
+  /// Obtener una entrada específica
   Future<DiaryEntry?> getDiaryEntry(String userId, String entryId) async {
     try {
       final doc = await _firestore
@@ -52,7 +51,7 @@ class DiaryService {
       }
       return null;
     } catch (e) {
-      AppLogger.debug('âŒ Error fetching diary entry: $e');
+      AppLogger.debug('�O Error fetching diary entry: $e');
       rethrow;
     }
   }
@@ -78,13 +77,13 @@ class DiaryService {
           .doc(entry.id)
           .set(entryData);
 
-      // Actualizar estadÃ­sticas del usuario
+      // Actualizar estadísticas del usuario
       await _updateUserDiaryStats(userId);
 
-      AppLogger.debug('âœ… Diary entry created: ${entry.id}');
+      AppLogger.debug('�o. Diary entry created: ${entry.id}');
       return entry.id;
     } catch (e) {
-      AppLogger.debug('âŒ Error creating diary entry: $e');
+      AppLogger.debug('�O Error creating diary entry: $e');
       rethrow;
     }
   }
@@ -102,12 +101,12 @@ class DiaryService {
           .doc(entryId)
           .update(updates);
 
-      // Actualizar estadÃ­sticas
+      // Actualizar estadísticas
       await _updateUserDiaryStats(userId);
 
-      AppLogger.debug('âœ… Diary entry updated: $entryId');
+      AppLogger.debug('�o. Diary entry updated: $entryId');
     } catch (e) {
-      AppLogger.debug('âŒ Error updating diary entry: $e');
+      AppLogger.debug('�O Error updating diary entry: $e');
       rethrow;
     }
   }
@@ -122,12 +121,12 @@ class DiaryService {
           .doc(entryId)
           .delete();
 
-      // Actualizar estadÃ­sticas
+      // Actualizar estadísticas
       await _updateUserDiaryStats(userId);
 
-      AppLogger.debug('âœ… Diary entry deleted: $entryId');
+      AppLogger.debug('�o. Diary entry deleted: $entryId');
     } catch (e) {
-      AppLogger.debug('âŒ Error deleting diary entry: $e');
+      AppLogger.debug('�O Error deleting diary entry: $e');
       rethrow;
     }
   }
@@ -147,14 +146,14 @@ class DiaryService {
               .map((doc) => DiaryEntry.fromFirestore(doc))
               .toList());
     } catch (e) {
-      AppLogger.debug('âŒ Error setting up diary stream: $e');
+      AppLogger.debug('�O Error setting up diary stream: $e');
       rethrow;
     }
   }
 
   // ============ STATISTICS ============
 
-  /// Obtener estadÃ­sticas del diario
+  /// Obtener estadísticas del diario
   Future<Map<String, dynamic>> getDiaryStats(String userId) async {
     try {
       final doc = await _firestore
@@ -165,12 +164,12 @@ class DiaryService {
       final stats = doc.data()?['diaryStats'] ?? {};
       return stats;
     } catch (e) {
-      AppLogger.debug('âŒ Error fetching diary stats: $e');
+      AppLogger.debug('�O Error fetching diary stats: $e');
       return {};
     }
   }
 
-  /// Actualizar estadÃ­sticas del diario automÃ¡ticamente
+  /// Actualizar estadísticas del diario automáticamente
   Future<void> _updateUserDiaryStats(String userId) async {
     try {
       final entries = await getDiaryEntries(userId, limit: 1000);
@@ -196,16 +195,16 @@ class DiaryService {
           entries.map((e) => e.reflectionDepth).reduce((a, b) => a + b) /
               entries.length;
 
-      // Contar emociones Ãºnicas
+      // Contar emociones únicas
       final uniqueEmotions = <String>{};
       for (var entry in entries) {
         uniqueEmotions.addAll(entry.emotions);
       }
 
-      // Calcular puntuaciÃ³n de impacto
+      // Calcular puntuación de impacto
       int impactScore = ((avgDepth / 5) * 100).toInt();
 
-      // Guardar estadÃ­sticas
+      // Guardar estadísticas
       await _firestore
           .collection(FirebaseConfig.usersCollection)
           .doc(userId)
@@ -215,21 +214,20 @@ class DiaryService {
           'avgReflectionDepth': double.parse(avgDepth.toStringAsFixed(2)),
           'uniqueEmotionCount': uniqueEmotions.length,
           'overallImpactScore': impactScore,
-          'lastEntryDate':
-              entries.isNotEmpty ? entries.first.createdAt : null,
+          'lastEntryDate': entries.isNotEmpty ? entries.first.createdAt : null,
           'lastUpdated': DateTime.now(),
         },
       }, SetOptions(merge: true));
 
-      AppLogger.debug('âœ… Diary stats updated for user: $userId');
+      AppLogger.debug('�o. Diary stats updated for user: $userId');
     } catch (e) {
-      AppLogger.debug('âŒ Error updating diary stats: $e');
+      AppLogger.debug('�O Error updating diary stats: $e');
     }
   }
 
   // ============ FILTERS ============
 
-  /// Obtener entradas por emociÃ³n especÃ­fica
+  /// Obtener entradas por emoción específica
   Future<List<DiaryEntry>> getEntriesByEmotion(
       String userId, String emotion) async {
     try {
@@ -238,7 +236,7 @@ class DiaryService {
           .where((entry) => entry.emotions.contains(emotion))
           .toList();
     } catch (e) {
-      AppLogger.debug('âŒ Error filtering by emotion: $e');
+      AppLogger.debug('�O Error filtering by emotion: $e');
       rethrow;
     }
   }
@@ -251,21 +249,20 @@ class DiaryService {
           .collection(FirebaseConfig.usersCollection)
           .doc(userId)
           .collection(FirebaseConfig.diaryEntriesSubcollection)
-          .where(FirebaseConfig.createdAtField, isGreaterThanOrEqualTo: startDate)
+          .where(FirebaseConfig.createdAtField,
+              isGreaterThanOrEqualTo: startDate)
           .where(FirebaseConfig.createdAtField, isLessThanOrEqualTo: endDate)
           .orderBy(FirebaseConfig.createdAtField, descending: true)
           .get();
 
-      return snapshot.docs
-          .map((doc) => DiaryEntry.fromFirestore(doc))
-          .toList();
+      return snapshot.docs.map((doc) => DiaryEntry.fromFirestore(doc)).toList();
     } catch (e) {
-      AppLogger.debug('âŒ Error fetching entries by date range: $e');
+      AppLogger.debug('�O Error fetching entries by date range: $e');
       rethrow;
     }
   }
 
-  /// Obtener entradas por profundidad mÃ­nima
+  /// Obtener entradas por profundidad mínima
   Future<List<DiaryEntry>> getEntriesByMinDepth(
       String userId, int minDepth) async {
     try {
@@ -274,7 +271,7 @@ class DiaryService {
           .where((entry) => entry.reflectionDepth >= minDepth)
           .toList();
     } catch (e) {
-      AppLogger.debug('âŒ Error filtering by depth: $e');
+      AppLogger.debug('�O Error filtering by depth: $e');
       rethrow;
     }
   }
@@ -287,11 +284,8 @@ class DiaryService {
       final entries = await getDiaryEntries(userId, limit: 10000);
       return entries.map((entry) => entry.toJson()).toList();
     } catch (e) {
-      AppLogger.debug('âŒ Error exporting diary: $e');
+      AppLogger.debug('�O Error exporting diary: $e');
       rethrow;
     }
   }
 }
-
-
-

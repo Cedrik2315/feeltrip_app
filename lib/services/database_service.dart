@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import '../screens/streak_service.dart';
+
 enum DiarySaveStrategy {
   cloudOnly,
   localOnly,
@@ -103,6 +105,7 @@ class DatabaseService {
   static const String _pendingSyncKey = 'pending_sync_entries';
 
   FirebaseFirestore get _firestore => _db ?? FirebaseFirestore.instance;
+  String? get currentUserId => _auth.currentUser?.uid;
 
   Future<void> guardarEntrada({
     required String texto,
@@ -179,6 +182,31 @@ class DatabaseService {
         'lng': lng,
         'rutaDetallada': rutaDetallada,
       });
+
+      final photoCount = rutaDetallada
+              ?.where((stop) =>
+                  stop['imagePath'] != null &&
+                  (stop['imagePath'] as String).isNotEmpty)
+              .length ??
+          0;
+
+      // Fórmula de Crecimiento:
+      // Base por viaje: 100 XP
+      // Por cada foto: 50 XP
+      final int xpGanada = 100 + (photoCount * 50);
+
+      // Incrementa la XP del usuario por guardar un viaje/diario.
+      await _firestore.collection('users').doc(user.uid).set(
+        {
+          'totalXP': FieldValue.increment(xpGanada),
+          'diaryEntriesCount': FieldValue.increment(1),
+          if (photoCount > 0) 'photosCount': FieldValue.increment(photoCount),
+        },
+        SetOptions(merge: true),
+      );
+
+      // Actualizar Racha de Fuego
+      await StreakService().actualizarRacha(user.uid);
 
       // Mantiene un cache local minimo para continuidad offline.
       await _guardarEntradaLocal(user.uid, docRef.id, texto, emociones,

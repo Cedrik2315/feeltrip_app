@@ -44,6 +44,14 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <intent-filter android:label="filter_pago_feeltrip">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="feeltrip" android:host="pago-exitoso" />
+                <data android:scheme="feeltrip" android:host="pago-fallido" />
+                <data android:scheme="feeltrip" android:host="pago-pendiente" />
+            </intent-filter>
         </activity>
 
         <meta-data

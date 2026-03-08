@@ -5,18 +5,29 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isOwner(uid) {
-      return isSignedIn() && request.auth.uid == uid;
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
     }
 
-    function isAdmin() {
-      return isSignedIn() && request.auth.token.admin == true;
+    function isStoryOwner() {
+      return isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    function onlyStoryLikeMutation() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes']) &&
+        request.resource.data.userId == resource.data.userId;
+    }
+
+    function onlyCommentReactionMutation() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes', 'reactions']) &&
+        request.resource.data.userId == resource.data.userId;
     }
 
     match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
+      allow read: if isOwner(userId);
       allow create: if isOwner(userId);
-      allow update, delete: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
 
       match /diaryEntries/{entryId} {
         allow read, create, update, delete: if isOwner(userId);
@@ -25,65 +36,38 @@ service cloud.firestore {
       match /stories/{storyId} {
         allow read, create, update, delete: if isOwner(userId);
       }
+
+      match /private/{docId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
+
+      match /cartItems/{itemId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
     }
 
     match /stories/{storyId} {
       allow read: if true;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isOwner(resource.data.userId) ||
-        (isSignedIn() &&
-          request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes']));
-      allow delete: if isOwner(resource.data.userId);
+      allow update: if isStoryOwner() || onlyStoryLikeMutation();
+      allow delete: if isStoryOwner();
 
       match /comments/{commentId} {
         allow read: if true;
-        allow create: if isSignedIn() &&
-          request.resource.data.userId == request.auth.uid;
-        allow update: if isOwner(resource.data.userId) ||
-          (isSignedIn() &&
-            request.resource.data.diff(resource.data).changedKeys().hasOnly(['reactions', 'likes']));
-        allow delete: if isOwner(resource.data.userId);
+        allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+        allow update: if (isSignedIn() && resource.data.userId == request.auth.uid) || onlyCommentReactionMutation();
+        allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       }
     }
 
     match /agencies/{agencyId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow update: if isOwner(resource.data.ownerId) || isAdmin();
-      allow delete: if isAdmin();
-
-      match /reviews/{reviewId} {
-        allow read: if true;
-        allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-        allow update, delete: if isOwner(resource.data.userId) || isAdmin();
-      }
+      allow create, update, delete: if false;
     }
 
     match /experiences/{experienceId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
-    }
-
-    match /diary_entries/{entryId} {
-      allow read: if isOwner(resource.data.userId);
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isOwner(resource.data.userId);
-    }
-
-    match /followers/{followId} {
-      allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.followerId == request.auth.uid;
-      allow delete: if isOwner(resource.data.followerId);
-    }
-
-    match /user_preferences/{userId} {
-      allow read, create, update, delete: if isOwner(userId);
-    }
-
-    match /notifications/{notificationId} {
-      allow read, update, delete: if isOwner(resource.data.userId);
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow create, update, delete: if false;
     }
 
     match /{document=**} {

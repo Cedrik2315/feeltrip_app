@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../config/app_flags.dart';
+import '../core/error_presenter.dart';
+import '../models/booking_model.dart';
+import '../repositories/app_data_repository.dart';
 
 class BookingsScreen extends StatefulWidget {
   const BookingsScreen({super.key});
@@ -8,38 +14,35 @@ class BookingsScreen extends StatefulWidget {
 }
 
 class _BookingsScreenState extends State<BookingsScreen> {
-  List<Map<String, dynamic>> bookings = [
-    {
-      'id': 'BK001',
-      'title': 'Tromsø Aurora Borealis',
-      'destination': 'Tromsø, Noruega',
-      'date': '15/02/2026',
-      'status': 'Confirmada',
-      'people': 2,
-      'price': 2580,
-      'image': '🌌',
-    },
-    {
-      'id': 'BK002',
-      'title': 'Cocina Toscana',
-      'destination': 'Toscana, Italia',
-      'date': '20/03/2026',
-      'status': 'En Proceso',
-      'people': 1,
-      'price': 980,
-      'image': '🍝',
-    },
-    {
-      'id': 'BK003',
-      'title': 'Bali Yoga Retreat',
-      'destination': 'Bali, Indonesia',
-      'date': '01/04/2026',
-      'status': 'Cancelada',
-      'people': 1,
-      'price': 750,
-      'image': '🧘',
-    },
-  ];
+  final AppDataRepository _repository = AppDataRepository();
+
+  List<Booking> _bookings = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBookings();
+  }
+
+  Future<void> _loadBookings() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final result = await _repository.getCurrentUserBookings();
+      if (!mounted) return;
+      setState(() => _bookings = result.getOrElse([]));
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = ErrorPresenter.message(e));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,138 +50,162 @@ class _BookingsScreenState extends State<BookingsScreen> {
       appBar: AppBar(
         title: const Text('Mis Reservas'),
         backgroundColor: Colors.deepPurple,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _isLoading ? null : _loadBookings,
+          ),
+        ],
       ),
-      body: bookings.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.calendar_today,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No tienes reservas',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                    ),
-                    child: const Text('Explorar Viajes'),
-                  ),
-                ],
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage != null
+              ? Center(child: Text(_errorMessage!))
+              : _buildContent(),
+    );
+  }
+
+  Widget _buildContent() {
+    if (_bookings.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.calendar_today,
+              size: 64,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No tienes reservas',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: bookings.length,
-              itemBuilder: (context, index) {
-                final booking = bookings[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ExpansionTile(
-                    leading: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.purple[100],
-                      ),
-                      child: Center(
-                        child: Text(
-                          booking['image'],
-                          style: const TextStyle(fontSize: 28),
-                        ),
-                      ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              ),
+              child: const Text('Explorar Viajes'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        if (showDemoIndicators && _repository.isMockMode)
+          Container(
+            width: double.infinity,
+            color: Colors.amber.shade100,
+            padding: const EdgeInsets.all(8),
+            child: const Text(
+              'Modo demo activo: reservas simuladas',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: _bookings.length,
+            itemBuilder: (context, index) {
+              final booking = _bookings[index];
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ExpansionTile(
+                  leading: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.purple[100],
                     ),
-                    title: Text(
-                      booking['title'],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    child: const Center(
+                      child: Icon(Icons.flight_takeoff, color: Colors.deepPurple),
                     ),
-                    subtitle: Text(booking['destination']),
-                    trailing: Chip(
-                      label: Text(booking['status']),
-                      backgroundColor: _getStatusColor(booking['status']),
-                      labelStyle: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  ),
+                  title: Text(
+                    booking.tripTitle,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    DateFormat('dd/MM/yyyy').format(booking.startDate),
+                  ),
+                  trailing: Chip(
+                    label: Text(booking.status),
+                    backgroundColor: _getStatusColor(booking.status),
+                    labelStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildInfoRow(
-                              'ID Reserva:',
-                              booking['id'],
-                            ),
-                            const SizedBox(height: 8),
-                            _buildInfoRow(
-                              'Fecha:',
-                              booking['date'],
-                            ),
-                            const SizedBox(height: 8),
-                            _buildInfoRow(
-                              'Viajeros:',
-                              '${booking['people']} ${booking['people'] == 1 ? 'persona' : 'personas'}',
-                            ),
-                            const SizedBox(height: 8),
-                            _buildInfoRow(
-                              'Total:',
-                              '\$${booking['price']}',
-                              bold: true,
-                              color: Colors.deepPurple,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                if (booking['status'] != 'Cancelada')
-                                  Expanded(
-                                    child: OutlinedButton(
-                                      onPressed: () {
-                                        _showCancelDialog(booking);
-                                      },
-                                      child: const Text('Cancelar'),
-                                    ),
-                                  ),
-                                const SizedBox(width: 8),
+                  ),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildInfoRow('ID Reserva:', booking.id),
+                          const SizedBox(height: 8),
+                          _buildInfoRow(
+                            'Fecha de reserva:',
+                            DateFormat('dd/MM/yyyy').format(booking.bookingDate),
+                          ),
+                          const SizedBox(height: 8),
+                          _buildInfoRow(
+                            'Viajeros:',
+                            '${booking.numberOfPeople} ${booking.numberOfPeople == 1 ? 'persona' : 'personas'}',
+                          ),
+                          const SizedBox(height: 8),
+                          _buildInfoRow(
+                            'Total:',
+                            '\$${booking.totalPrice.toStringAsFixed(2)}',
+                            bold: true,
+                            color: Colors.deepPurple,
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              if (booking.status != 'Cancelada')
                                 Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Detalles enviados a tu email'),
-                                        ),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.deepPurple,
-                                    ),
-                                    child: const Text('Ver Detalles'),
+                                  child: OutlinedButton(
+                                    onPressed: () => _showCancelDialog(index),
+                                    child: const Text('Cancelar'),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Detalles enviados a tu email'),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.deepPurple,
+                                  ),
+                                  child: const Text('Ver Detalles'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -216,36 +243,77 @@ class _BookingsScreenState extends State<BookingsScreen> {
     }
   }
 
-  void _showCancelDialog(Map<String, dynamic> booking) {
+  void _showCancelDialog(int index) {
+    final booking = _bookings[index];
+    final rootContext = context;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Cancelar Reserva'),
         content: Text(
-          '¿Estás seguro de que deseas cancelar la reserva "${booking['title']}"?',
+          'Estas seguro de que deseas cancelar la reserva "${booking.tripTitle}"?',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('No'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                booking['status'] = 'Cancelada';
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Reserva cancelada'),
-                  backgroundColor: Colors.red,
-                ),
-              );
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(rootContext);
+              Navigator.pop(dialogContext);
+
+              bool success = false;
+              try {
+                final result = await _repository.cancelBooking(booking.id);
+                success = result.getOrElse(false);
+              } catch (e) {
+                if (!mounted) return;
+                messenger.showSnackBar(
+                  SnackBar(content: Text(ErrorPresenter.message(e)), backgroundColor: Colors.redAccent),
+                );
+                return;
+              }
+              if (!mounted) return;
+
+              if (success) {
+                setState(() {
+                  _bookings[index] = Booking(
+                    id: booking.id,
+                    userId: booking.userId,
+                    tripId: booking.tripId,
+                    tripTitle: booking.tripTitle,
+                    numberOfPeople: booking.numberOfPeople,
+                    totalPrice: booking.totalPrice,
+                    status: 'Cancelada',
+                    bookingDate: booking.bookingDate,
+                    startDate: booking.startDate,
+                    passengers: booking.passengers,
+                    paymentMethod: booking.paymentMethod,
+                    isPaid: booking.isPaid,
+                  );
+                });
+
+                messenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Reserva cancelada'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              } else {
+                messenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('No se pudo cancelar la reserva'),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
             ),
-            child: const Text('Sí, Cancelar'),
+            child: const Text('Si, Cancelar'),
           ),
         ],
       ),

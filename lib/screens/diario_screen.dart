@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -7,11 +8,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/strings.dart';
+import '../controllers/auth_controller.dart';
 import '../controllers/diary_controller.dart';
-import '../models/experience_model.dart';
+import '../controllers/experience_controller.dart';
+import '../models/achievement_model.dart';
 import '../services/admob_service.dart';
-import '../services/auth_service.dart';
-import '../services/travel_service.dart';
+import '../services/emotion_service.dart';
+import '../widgets/achievement_dialog.dart';
+import '../widgets/quick_translator_sheet.dart';
 import 'historial_screen.dart';
 import 'login_screen.dart';
 
@@ -31,6 +35,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
   InterstitialAd? _interstitialAd;
   bool _bannerListo = false;
   int _guardadosExitosos = 0;
+  bool _shareAsExperience = true;
 
   @override
   void initState() {
@@ -50,13 +55,9 @@ class _DiarioScreenState extends State<DiarioScreen> {
   }
 
   Future<void> _cerrarSesion() async {
-    await context.read<AuthService>().signOut();
-    if (!mounted) return;
-
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
-    );
+    await Get.find<AuthController>().signOut();
+    // Use GetX for navigation to be consistent across the app.
+    Get.offAll(() => const LoginScreen());
   }
 
   void _cargarBanner() {
@@ -150,8 +151,21 @@ class _DiarioScreenState extends State<DiarioScreen> {
 
   Future<void> _guardarDiario() async {
     final controller = context.read<DiaryController>();
+    final storyText = _controller.text.trim();
+    final snapshotEmotions = List<String>.from(controller.detectedEmotions);
+    final snapshotResult = controller.aiResult;
+
     try {
-      await controller.saveDiary(_controller.text.trim());
+      final unlockedAchievements = await controller.saveDiary(storyText);
+
+      if (_shareAsExperience) {
+        await _shareDiaryAsExperience(
+          storyText: storyText,
+          emotions: snapshotEmotions,
+          aiResult: snapshotResult,
+        );
+      }
+
       if (!mounted) return;
       _controller.clear();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -163,11 +177,75 @@ class _DiarioScreenState extends State<DiarioScreen> {
       if (widget.enableAds) {
         _mostrarInterstitialSiCorresponde();
       }
+      if (unlockedAchievements.isNotEmpty) {
+        _showAchievementsDialog(unlockedAchievements);
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al guardar: $e')),
       );
     }
+  }
+
+  void _showAchievementsDialog(List<Achievement> achievements) {
+    if (achievements.isEmpty) return;
+
+    final achievement = achievements.first;
+
+    HapticFeedback.vibrate();
+
+    showDialog(
+      context: context,
+      builder: (context) => AchievementDialog(
+        title: achievement.title,
+        icon: _iconForAchievement(achievement.iconName),
+      ),
+    );
+  }
+
+  IconData _iconForAchievement(String iconName) {
+    switch (iconName) {
+      case 'explore':
+        return Icons.explore;
+      case 'auto_awesome':
+        return Icons.auto_awesome;
+      case 'camera_alt':
+        return Icons.camera_alt;
+      default:
+        return Icons.emoji_events;
+    }
+  }
+
+  Future<void> _shareDiaryAsExperience({
+    required String storyText,
+    required List<String> emotions,
+    required AnalisisResultado? aiResult,
+  }) async {
+    final authController = Get.find<AuthController>();
+    final user = authController.user;
+    if (user == null || storyText.isEmpty) return;
+
+    final author = (user.displayName?.trim().isNotEmpty == true)
+        ? user.displayName!
+        : (user.email?.split('@').first ?? 'Viajero FeelTrip');
+
+    final highlights = emotions.isNotEmpty
+        ? emotions
+        : <String>['TransformaciÃ³n', 'ReflexiÃ³n'];
+
+    final destination = aiResult?.destino.trim();
+    final title = destination != null && destination.isNotEmpty
+        ? 'Diario IA: $destination'
+        : 'Diario IA: Mi experiencia transformadora';
+
+    // Usar ExperienceController para centralizar la lÃ³gica de creaciÃ³n de historias
+    final experienceController = Get.find<ExperienceController>();
+    await experienceController.createStory(
+        author: author,
+        title: title,
+        story: storyText,
+        emotionalHighlights: highlights,
+        rating: 5.0);
   }
 
   Future<void> _tomarFotoParada(int index) async {
@@ -184,11 +262,11 @@ class _DiarioScreenState extends State<DiarioScreen> {
       builder: (context) {
         String query = '';
         return AlertDialog(
-          title: const Text('Añadir parada'),
+          title: const Text('AÃ±adir parada'),
           content: TextField(
             autofocus: true,
             decoration:
-                const InputDecoration(hintText: 'Ej: Termas Geométricas'),
+                const InputDecoration(hintText: 'Ej: Termas GeomÃ©tricas'),
             onChanged: (val) => query = val,
           ),
           actions: [
@@ -214,10 +292,23 @@ class _DiarioScreenState extends State<DiarioScreen> {
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se encontró el lugar')),
+          const SnackBar(content: Text('No se encontrÃ³ el lugar')),
         );
       }
     }
+  }
+
+  void _mostrarTraductor(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: const QuickTranslatorSheet(),
+      ),
+    );
   }
 
   @override
@@ -234,6 +325,11 @@ class _DiarioScreenState extends State<DiarioScreen> {
         title: const Text(AppStrings.diaryTitle),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.translate),
+            tooltip: 'Traductor RÃ¡pido',
+            onPressed: () => _mostrarTraductor(context),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: AppStrings.logout,
@@ -341,8 +437,6 @@ class _DiarioScreenState extends State<DiarioScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // LA TARJETA ESTILIZADA
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
@@ -355,37 +449,30 @@ class _DiarioScreenState extends State<DiarioScreen> {
                   ],
                 ),
                 child: Card(
-                  elevation: 0, // La sombra la da el contenedor
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24)),
-                  clipBehavior: Clip
-                      .antiAlias, // Importante para que la imagen respete los bordes
+                  clipBehavior: Clip.antiAlias,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 1. Imagen Dinámica del Destino (Unsplash Source)
                       CachedNetworkImage(
-                        // Esta URL busca una imagen de 'travel' + el nombre del destino
                         imageUrl:
                             "https://source.unsplash.com/featured/800x450/?travel,${Uri.encodeComponent(aiResult.destino)}",
                         height: 200,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        // Shimmer o loading mientras carga
                         placeholder: (context, url) => Container(
                           color: Colors.deepPurple[50],
                           child:
                               const Center(child: CircularProgressIndicator()),
                         ),
-                        // Imagen de error si falla la red
                         errorWidget: (context, url, error) => Container(
                           color: Colors.grey[200],
                           child: const Icon(Icons.landscape,
                               size: 50, color: Colors.grey),
                         ),
                       ),
-
-                      // 2. Información del Destino
                       Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
@@ -405,7 +492,6 @@ class _DiarioScreenState extends State<DiarioScreen> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                // Un badge de "Match Emocional"
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 6),
@@ -426,8 +512,6 @@ class _DiarioScreenState extends State<DiarioScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-
-                            // Explicación de la IA
                             Text(
                               aiResult.explicacion,
                               style: TextStyle(
@@ -437,8 +521,6 @@ class _DiarioScreenState extends State<DiarioScreen> {
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
-
-                            // Mapa de Google - Debajo de la explicación y antes del botón de Airbnb
                             if (aiResult.lat != null && aiResult.lng != null)
                               Container(
                                 height: 120,
@@ -479,8 +561,6 @@ class _DiarioScreenState extends State<DiarioScreen> {
                                   ),
                                 ),
                               ),
-
-                            // Botón Añadir Parada
                             if (aiResult.lat != null && aiResult.lng != null)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 16.0),
@@ -488,13 +568,11 @@ class _DiarioScreenState extends State<DiarioScreen> {
                                   onPressed: _mostrarBuscadorDeLugares,
                                   icon: const Icon(Icons.add_location_alt,
                                       color: Colors.deepPurple),
-                                  label: const Text("Añadir parada a la ruta",
+                                  label: const Text("AÃ±adir parada a la ruta",
                                       style:
                                           TextStyle(color: Colors.deepPurple)),
                                 ),
                               ),
-
-                            // Widget de la Línea de Tiempo
                             if (stops.isNotEmpty) ...[
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -504,116 +582,49 @@ class _DiarioScreenState extends State<DiarioScreen> {
                                         fontSize: 16)),
                               ),
                               ListView.builder(
-                                shrinkWrap:
-                                    true, // Importante dentro de una Column
+                                shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: stops.length,
                                 itemBuilder: (context, index) {
-                                  final parada = stops[index];
                                   return ListTile(
-                                    leading: Column(
-                                      children: [
-                                        Icon(
-                                            index == 0
-                                                ? Icons.trip_origin
-                                                : Icons.location_on,
-                                            color: Colors.deepPurple),
-                                        if (index != stops.length - 1)
-                                          Container(
-                                              width: 2,
-                                              height: 20,
-                                              color: Colors.deepPurple[100]),
-                                      ],
+                                    leading: CircleAvatar(
+                                      child: Text('${index + 1}'),
                                     ),
-                                    title: Text(parada.nombre),
-                                    subtitle: parada.imagePath != null
-                                        ? Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8.0),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: Image.file(
-                                                  File(parada.imagePath!),
-                                                  height: 100,
-                                                  fit: BoxFit.cover),
-                                            ),
-                                          )
-                                        : const Text(
-                                            "Toca el icono para añadir una foto",
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey)),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.add_a_photo,
-                                              color: Colors.blueGrey),
-                                          onPressed: () =>
-                                              _tomarFotoParada(index),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                              Icons.remove_circle_outline,
-                                              color: Colors.redAccent),
-                                          onPressed: () =>
-                                              controller.removeStop(index),
-                                        ),
-                                      ],
+                                    title: Text('Parada ${index + 1}'),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.camera_alt),
+                                      onPressed: () => _tomarFotoParada(index),
                                     ),
                                   );
                                 },
                               ),
                             ],
-
-                            const SizedBox(height: 24),
-
-                            // Botón de Acción Principal (Airbnb)
-                            ElevatedButton.icon(
-                              onPressed: () => context
-                                  .read<TravelService>()
-                                  .buscarEnAirbnb(aiResult.destino),
-                              icon: const Icon(Icons.hotel_class_rounded,
-                                  color: Colors.white),
-                              label: const Text(
-                                "Ver Alojamientos en Airbnb",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(
-                                    0xFFFF5A5F), // Color Rosa Airbnb
-                                minimumSize: const Size(double.infinity, 55),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16)),
-                                elevation: 3,
-                                shadowColor: const Color(0xFFFF5A5F)
-                                    .withValues(alpha: 0.4),
-                              ),
+                            const Divider(height: 32),
+                            SwitchListTile(
+                              title: const Text(
+                                  'Compartir como Experiencia PÃºblica'),
+                              subtitle: const Text(
+                                  'Tu diario se publicarÃ¡ anÃ³nimamente para inspirar a otros.'),
+                              value: _shareAsExperience,
+                              onChanged: (value) {
+                                setState(() {
+                                  _shareAsExperience = value;
+                                });
+                              },
+                              activeTrackColor: Colors.deepPurple,
+                              secondary: const Icon(Icons.public),
                             ),
-
-                            const SizedBox(height: 16),
-
-                            // Botón Guardar Diario
+                            const SizedBox(height: 20),
                             ElevatedButton.icon(
-                              onPressed: isLoading ? null : _guardarDiario,
-                              icon: const Icon(Icons.save, color: Colors.white),
-                              label: const Text(
-                                "Guardar en mi Diario",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
+                              onPressed: _guardarDiario,
+                              icon: const Icon(Icons.save_alt_rounded),
+                              label: const Text('Guardar Diario'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
                                 minimumSize: const Size(double.infinity, 55),
+                                backgroundColor: Colors.green.shade700,
+                                foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16)),
-                                elevation: 3,
                               ),
                             ),
                           ],
@@ -623,16 +634,16 @@ class _DiarioScreenState extends State<DiarioScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
-            ]
+            ],
           ],
         ),
       ),
-      bottomNavigationBar: widget.enableAds && _bannerListo && _bannerAd != null
+      bottomNavigationBar: (_bannerListo && _bannerAd != null)
           ? SafeArea(
-              child: SizedBox(
-                height: _bannerAd!.size.height.toDouble(),
+              child: Container(
+                alignment: Alignment.center,
                 width: _bannerAd!.size.width.toDouble(),
+                height: _bannerAd!.size.height.toDouble(),
                 child: AdWidget(ad: _bannerAd!),
               ),
             )

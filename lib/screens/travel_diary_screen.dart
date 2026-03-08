@@ -1,9 +1,7 @@
-﻿import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../models/experience_model.dart';
 import '../controllers/experience_controller.dart';
-import '../services/story_service.dart';
-import '../services/diary_service.dart';
 
 class TravelDiaryScreen extends StatefulWidget {
   const TravelDiaryScreen({super.key});
@@ -21,32 +19,22 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
   int _reflectionDepth = 3;
 
   final List<String> _emotionOptions = [
-    'AlegrÃ­a',
+    'Alegría',
     'Asombro',
     'Gratitud',
-    'TransformaciÃ³n',
+    'Transformación',
     'Miedo',
     'Paz',
-    'ConexiÃ³n',
+    'Conexión',
     'Nostalgia',
     'Esperanza',
-    'ReflexiÃ³n',
+    'Reflexión',
   ];
 
   @override
   void initState() {
     super.initState();
-    // Usar Provider si está disponible
-    try {
-      _controller = context.read<ExperienceController>();
-    } catch (e) {
-      // Si no hay Provider, crear con los servicios necesarios
-      _controller = ExperienceController(
-        storyService: context.read<StoryService>(),
-        diaryService: context.read<DiaryService>(),
-      );
-      _controller.loadAllData();
-    }
+    _controller = Get.find<ExperienceController>();
 
     // Load diary entries if not already loaded
     if (_controller.diaryEntries.isEmpty) {
@@ -120,90 +108,83 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
           // Stats Cards
           Padding(
             padding: const EdgeInsets.all(16),
-            child: ListenableBuilder(
-              listenable: _controller,
-              builder: (context, child) {
-                final stats = _controller.diaryStats;
-                return GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  children: [
-                    _buildStatCard(
-                      'Total',
-                      '${_controller.diaryEntries.length}',
-                      Icons.note,
-                    ),
-                    _buildStatCard(
-                      'Promedio Profundidad',
-                      '${(stats['avgReflectionDepth'] ?? 0).toStringAsFixed(1)}/5',
-                      Icons.trending_up,
-                    ),
-                    _buildStatCard(
-                      'Emociones Ãšnicas',
-                      '${stats['uniqueEmotionCount'] ?? 0}',
-                      Icons.sentiment_very_satisfied,
-                    ),
-                    _buildStatCard(
-                      'Impacto General',
-                      '${stats['overallImpactScore'] ?? 0}',
-                      Icons.stars,
-                    ),
-                  ],
-                );
-              },
-            ),
+            child: Obx(() {
+              final stats = _controller.diaryStats;
+              return GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                children: [
+                  _buildStatCard(
+                    'Total',
+                    '${_controller.diaryEntries.length}',
+                    Icons.note,
+                  ),
+                  _buildStatCard(
+                    'Promedio Profundidad',
+                    '${(stats['avgReflectionDepth'] ?? 0).toStringAsFixed(1)}/5',
+                    Icons.trending_up,
+                  ),
+                  _buildStatCard(
+                    'Emociones Únicas',
+                    '${stats['uniqueEmotionCount'] ?? 0}',
+                    Icons.sentiment_very_satisfied,
+                  ),
+                  _buildStatCard(
+                    'Impacto General',
+                    '${stats['overallImpactScore'] ?? 0}',
+                    Icons.stars,
+                  ),
+                ],
+              );
+            }),
           ),
 
           // Timeline
-          ListenableBuilder(
-            listenable: _controller,
-            builder: (context, child) {
-              if (_controller.isLoading) {
-                return const Padding(
-                  padding: EdgeInsets.all(32),
-                  child: CircularProgressIndicator(),
-                );
-              }
-
-              if (_controller.diaryEntries.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      Icon(Icons.note_alt_outlined,
-                          size: 64, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text(
-                        'AÃºn no tienes entradas',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Captura tus pensamientos y emociones durante el viaje',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _controller.diaryEntries.length,
-                itemBuilder: (context, index) {
-                  return _buildDiaryEntryCard(_controller.diaryEntries[index]);
-                },
+          Obx(() {
+            if (_controller.isLoading) {
+              return const Padding(
+                padding: EdgeInsets.all(32),
+                child: CircularProgressIndicator(),
               );
-            },
-          ),
+            }
+
+            if (_controller.diaryEntries.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Icon(Icons.note_alt_outlined, size: 64, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      'Aún no tienes entradas',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Captura tus pensamientos y emociones durante el viaje',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _controller.diaryEntries.length,
+              itemBuilder: (context, index) {
+                return _buildDiaryEntryCard(_controller.diaryEntries[index]);
+              },
+            );
+          }),
 
           const SizedBox(height: 24),
         ],
@@ -265,7 +246,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Profundidad de ReflexiÃ³n: ${entry.reflectionDepth}/5',
+                  'Profundidad de Reflexión: ${entry.reflectionDepth}/5',
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Colors.deepPurple,
@@ -324,8 +305,8 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
           TextField(
             controller: _locationController,
             decoration: const InputDecoration(
-              labelText: 'UbicaciÃ³n',
-              hintText: 'DÃ³nde estÃ¡s ahora?',
+              labelText: 'Ubicación',
+              hintText: 'Dónde estás ahora?',
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.location_on),
             ),
@@ -342,7 +323,7 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Profundidad de ReflexiÃ³n',
+            'Profundidad de Reflexión',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),

@@ -125,6 +125,7 @@ class TravelerStory {
   final double rating;
   int likes;
   final DateTime createdAt;
+  final String? imageUrl;
 
   TravelerStory({
     required this.id,
@@ -135,6 +136,7 @@ class TravelerStory {
     required this.rating,
     required this.likes,
     required this.createdAt,
+    this.imageUrl,
   });
 
   factory TravelerStory.fromJson(Map<String, dynamic> json) {
@@ -149,6 +151,7 @@ class TravelerStory {
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
+      imageUrl: json['imageUrl'],
     );
   }
 
@@ -163,6 +166,7 @@ class TravelerStory {
       rating: (data['rating'] ?? 0).toDouble(),
       likes: data['likes'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      imageUrl: data['imageUrl'],
     );
   }
 
@@ -176,6 +180,7 @@ class TravelerStory {
       'rating': rating,
       'likes': likes,
       'createdAt': createdAt.toIso8601String(),
+      'imageUrl': imageUrl,
     };
   }
 
@@ -189,6 +194,7 @@ class TravelerStory {
       'rating': rating,
       'likes': likes,
       'createdAt': createdAt,
+      'imageUrl': imageUrl,
     };
   }
 }

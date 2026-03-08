@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'diary_screen.dart';
+import 'diario_screen.dart';
 import 'historial_screen.dart';
 import 'stats_screen.dart';
+import 'stories_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -15,9 +16,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   // Lista de pantallas a las que navegaremos
   final List<Widget> _screens = [
-    const DiaryScreen(),
+    const DiarioScreen(),
     const HistorialScreen(),
     const StatsScreen(),
+    const StoriesScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -61,6 +63,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               icon: Icon(Icons.insights_rounded),
               activeIcon: Icon(Icons.insights_rounded, size: 30),
               label: 'Bienestar',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.groups_outlined),
+              activeIcon: Icon(Icons.groups_rounded, size: 30),
+              label: 'Comunidad',
             ),
           ],
         ),

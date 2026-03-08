@@ -29,3 +29,13 @@
 - Latencia de función `analyzeDiaryEntry`
 - Tasa de error (`invalid-argument`, `resource-exhausted`, `internal`)
 - Conversión de flujo diario: login -> guardar -> historial
+
+## 6) Kit operativo de release (Dia 10)
+- Queries KPI listas: `ANALYTICS_KPI_QUERIES_DAY10.sql`
+- Scorecard y umbrales: `KPI_SCORECARD_DAY10.md`
+- Cierre de fase: `RELEASE_DAY10.md`
+
+## 7) Dashboard visual (Dia 11)
+- Setup de vistas BigQuery: `DAY11_LOOKER_SETUP.sql`
+- Guia de Looker Studio: `LOOKER_DASHBOARD_DAY11.md`
+- Cierre de fase: `RELEASE_DAY11.md`

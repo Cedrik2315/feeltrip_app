@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:feeltrip_app/controllers/auth_controller.dart';
 import 'package:feeltrip_app/controllers/diary_controller.dart';
 import 'package:feeltrip_app/services/auth_service.dart';
+import 'package:feeltrip_app/services/achievements_service.dart';
 import 'package:feeltrip_app/services/database_service.dart';
 import 'package:feeltrip_app/services/emotion_service.dart';
 import 'package:feeltrip_app/services/location_service.dart';
@@ -19,6 +20,10 @@ class MockLocationService extends Mock implements LocationService {}
 
 class MockStorageService extends Mock implements StorageService {}
 
+class MockDiaryAchievementsService extends Mock implements DiaryAchievementsService {}
+
+class MockAchievementService extends Mock implements AchievementService {}
+
 // Registrar fallback values para los mocks
 class FakeDiarioRegistro extends Fake implements DiarioRegistro {}
 
@@ -33,6 +38,8 @@ void main() {
     final databaseService = MockDatabaseService();
     final locationService = MockLocationService();
     final storageService = MockStorageService();
+    final diaryAchievementsService = MockDiaryAchievementsService();
+    final achievementService = MockAchievementService();
 
     final authController = AuthController(authService);
     final diaryController = DiaryController(
@@ -40,6 +47,8 @@ void main() {
       databaseService: databaseService,
       locationService: locationService,
       storageService: storageService,
+      diaryAchievementsService: diaryAchievementsService,
+      achievementService: achievementService,
     );
 
     // Configurar los mocks correctamente - incluyendo TODOS los parámetros que usa saveDiary

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../core/app_logger.dart';
+import '../models/achievement_model.dart';
 import '../models/experience_model.dart';
+import '../services/achievements_service.dart';
 import '../services/database_service.dart';
 import '../services/emotion_service.dart';
 import '../services/location_service.dart';
@@ -15,15 +17,21 @@ class DiaryController extends ChangeNotifier {
     required DatabaseService databaseService,
     required LocationService locationService,
     required StorageService storageService,
+    required DiaryAchievementsService diaryAchievementsService,
+    required AchievementService achievementService,
   })  : _emotionService = emotionService,
         _databaseService = databaseService,
         _locationService = locationService,
-        _storageService = storageService;
+        _storageService = storageService,
+        _diaryAchievementsService = diaryAchievementsService,
+        _achievementService = achievementService;
 
   final EmotionService _emotionService;
   final DatabaseService _databaseService;
   final LocationService _locationService;
   final StorageService _storageService;
+  final DiaryAchievementsService _diaryAchievementsService;
+  final AchievementService _achievementService;
 
   // Estado
   bool _isLoading = false;
@@ -116,10 +124,11 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
-  Future<void> saveDiary(String texto) async {
+  Future<List<Achievement>> saveDiary(String texto) async {
     _isLoading = true;
     notifyListeners();
 
+    var unlocked = <Achievement>[];
     try {
       List<Map<String, dynamic>> rutaDetallada = [];
 
@@ -148,11 +157,23 @@ class DiaryController extends ChangeNotifier {
         rutaDetallada: rutaDetallada,
       );
 
+      final currentUserId = _databaseService.currentUserId;
+      if (currentUserId != null && currentUserId.isNotEmpty) {
+        unlocked = await _diaryAchievementsService.evaluateDiarySave(
+          userId: currentUserId,
+          emotions: _detectedEmotions,
+          routeDetails: rutaDetallada,
+        );
+        // Compatibilidad: sincroniza también en users/{uid}/achievements.
+        await _achievementService.verificarYOtorgarLogros();
+      }
+
       // Limpiar estado después de guardar
       _aiResult = null;
       _detectedEmotions = [];
       _stops.clear();
       _markers.clear();
+      return unlocked;
     } finally {
       _isLoading = false;
       notifyListeners();

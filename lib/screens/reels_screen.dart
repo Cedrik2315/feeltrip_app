@@ -40,12 +40,12 @@ class _ReelsScreenState extends State<ReelsScreen> {
   Future<void> generateReel() async {
     setState(() => isGenerating = true);
     
-    // Simulamos la generaciÃ³n del video
+    // Simulamos la generacion del video
     await Future.delayed(const Duration(seconds: 3));
     
-    // En una implementaciÃ³n real, aquÃ­ usarÃ­as:
-    // - FFmpeg para unir imÃ¡genes/videos
-    // - Agregar mÃºsica de fondo
+    // En una implementacion real, aqui usarias:
+    // - FFmpeg para unir imagenes/videos
+    // - Agregar musica de fondo
     // - Aplicar transiciones y efectos
     
     // Por ahora, creamos un archivo simulado
@@ -101,12 +101,12 @@ class _ReelsScreenState extends State<ReelsScreen> {
 
   void shareReel() {
     if (generatedVideoPath != null) {
-      // En implementaciÃ³n real usarÃ­as:
+      // En implementacion real usarias:
       // - Share plugin para compartir el archivo
       // - Social media APIs para publicar
       
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reel compartido exitosamente! ðŸŽ‰')),
+        const SnackBar(content: Text('Reel compartido exitosamente 🎉')),
       );
     }
   }
@@ -147,7 +147,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                'ConvertÃ­ tus momentos en una pelÃ­cula',
+                'Convertí tus momentos en una película',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 16,
@@ -155,7 +155,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
               ),
               const SizedBox(height: 30),
 
-              // BotÃ³n generar
+              // Boton generar
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -234,7 +234,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                         ),
                 ),
 
-              // InformaciÃ³n del reel
+              // Informacion del reel
               if (generatedVideoPath != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
@@ -255,10 +255,10 @@ class _ReelsScreenState extends State<ReelsScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Text('ðŸŽµ MÃºsica: ${_getRandomMusic()}'),
-                        Text('ðŸŽ¬ Transiciones: ${_getRandomTransitions().join(', ')}'),
-                        Text('ðŸ“¸ Momentos: ${entries.length}'),
-                        const Text('â±ï¸ DuraciÃ³n: 30 segundos'),
+                        Text('🎵 Música: ${_getRandomMusic()}'),
+                        Text('🎬 Transiciones: ${_getRandomTransitions().join(', ')}'),
+                        Text('📸 Momentos: ${entries.length}'),
+                        const Text('⏱️ Duración: 30 segundos'),
                       ],
                     ),
                   ),
@@ -269,7 +269,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 50),
                   child: Text(
-                    'AÃºn no hay momentos guardados.\nEmpezÃ¡ a crear tu diario!',
+                    'Aún no hay momentos guardados.\nEmpieza a crear tu diario.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.8),
