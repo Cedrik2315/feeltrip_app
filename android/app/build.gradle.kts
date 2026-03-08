@@ -19,6 +19,12 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
+    externalNativeBuild {
+        cmake {
+            version = "3.22.1"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -69,4 +75,3 @@ flutter {
 dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
   }
-

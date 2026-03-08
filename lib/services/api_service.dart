@@ -1,10 +1,11 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
+import '../core/result.dart';
 import '../models/booking_model.dart';
 import '../models/review_model.dart';
 import '../models/trip_model.dart';
@@ -45,6 +46,8 @@ class ApiService {
       : _client = client ?? AuthTokenClient(http.Client());
 
   static const String _defaultBaseUrl = 'https://api.feeltrip.com/api';
+  static const String _defaultCheckoutBaseUrl =
+      'https://us-east1-feeltrip-app.cloudfunctions.net';
   static String get baseUrl {
     final fromEnv = dotenv.env['API_BASE_URL']?.trim();
     if (fromEnv != null && fromEnv.isNotEmpty) {
@@ -52,18 +55,18 @@ class ApiService {
     }
     return _defaultBaseUrl;
   }
+  static String get checkoutBaseUrl {
+    final fromEnv = dotenv.env['CHECKOUT_API_BASE_URL']?.trim();
+    if (fromEnv != null && fromEnv.isNotEmpty) {
+      return fromEnv;
+    }
+    return _defaultCheckoutBaseUrl;
+  }
   static const Duration timeout = Duration(seconds: 30);
 
   final http.Client _client;
 
-  Never _rethrowConnectionError(Object error, StackTrace stackTrace) {
-    Error.throwWithStackTrace(
-      Exception('Error de conexión: $error'),
-      stackTrace,
-    );
-  }
-
-  Future<List<Trip>> getTrips({String? category, String? destination}) async {
+  Future<Result<List<Trip>>> getTrips({String? category, String? destination}) async {
     try {
       final params = <String, String>{};
       if (category != null) params['category'] = category;
@@ -78,45 +81,51 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body)['trips'];
-        return data.map((trip) => Trip.fromJson(trip)).toList();
+        return Success(data.map((trip) => Trip.fromJson(trip)).toList());
       }
-      throw Exception('Error al obtener viajes: ${response.statusCode}');
+      return Failure(
+        Exception('Error al obtener viajes: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
     }
   }
 
-  Future<Trip> getTripDetails(String tripId) async {
+  Future<Result<Trip>> getTripDetails(String tripId) async {
     try {
       final uri = Uri.parse('$baseUrl/trips/$tripId');
       final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['trip'];
-        return Trip.fromJson(data);
+        return Success(Trip.fromJson(data));
       }
-      throw Exception('Error al obtener detalles: ${response.statusCode}');
+      return Failure(
+        Exception('Error al obtener detalles: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
     }
   }
 
-  Future<List<Review>> getTripReviews(String tripId) async {
+  Future<Result<List<Review>>> getTripReviews(String tripId) async {
     try {
       final uri = Uri.parse('$baseUrl/trips/$tripId/reviews');
       final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body)['reviews'];
-        return data.map((review) => Review.fromJson(review)).toList();
+        return Success(data.map((review) => Review.fromJson(review)).toList());
       }
-      throw Exception('Error al obtener reseñas: ${response.statusCode}');
+      return Failure(
+        Exception('Error al obtener reseñas: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
     }
   }
 
-  Future<Booking> createBooking({
+  Future<Result<Booking>> createBooking({
     required String userId,
     required String tripId,
     required int numberOfPeople,
@@ -142,55 +151,57 @@ class ApiService {
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body)['booking'];
-        return Booking.fromJson(data);
+        return Success(Booking.fromJson(data));
       }
-      throw Exception('Error al crear reserva: ${response.statusCode}');
+      return Failure(
+        Exception('Error al crear reserva: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
     }
   }
 
-  Future<List<Booking>> getUserBookings(String userId) async {
+  Future<Result<List<Booking>>> getUserBookings(String userId) async {
     try {
       final uri = Uri.parse('$baseUrl/users/$userId/bookings');
       final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body)['bookings'];
-        return data.map((booking) => Booking.fromJson(booking)).toList();
+        return Success(data.map((booking) => Booking.fromJson(booking)).toList());
       }
-      throw Exception('Error al obtener reservas: ${response.statusCode}');
+      return Failure(
+        Exception('Error al obtener reservas: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
     }
   }
 
-  Future<bool> cancelBooking(String bookingId) async {
+  Future<Result<bool>> cancelBooking(String bookingId) async {
     try {
       final uri = Uri.parse('$baseUrl/bookings/$bookingId/cancel');
       final response = await _client.post(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
-        return true;
+        return const Success(true);
       }
-      throw Exception('Error al cancelar: ${response.statusCode}');
+      return Failure(
+        Exception('Error al cancelar: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
     }
   }
 
-  Future<bool> addReview({
+  Future<Result<bool>> addReview({
     required String tripId,
-    required String userId,
-    required String userName,
     required double rating,
     required String comment,
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/trips/$tripId/reviews');
       final body = {
-        'userId': userId,
-        'userName': userName,
         'rating': rating,
         'comment': comment,
         'createdAt': DateTime.now().toIso8601String(),
@@ -205,53 +216,59 @@ class ApiService {
           .timeout(timeout);
 
       if (response.statusCode == 201) {
-        return true;
+        return const Success(true);
       }
-      throw Exception('Error al añadir reseña: ${response.statusCode}');
+      return Failure(
+        Exception('Error al añadir reseña: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
     }
   }
 
-  Future<bool> toggleFavorite(String userId, String tripId) async {
+  Future<Result<bool>> toggleFavorite(String userId, String tripId) async {
     try {
       final uri = Uri.parse('$baseUrl/users/$userId/favorites/$tripId');
       final response = await _client.post(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
-        return true;
+        return const Success(true);
       }
-      throw Exception('Error al actualizar favoritos: ${response.statusCode}');
+      return Failure(
+        Exception('Error al actualizar favoritos: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
     }
   }
 
-  Future<List<Trip>> getFavoritedTrips(String userId) async {
+  Future<Result<List<Trip>>> getFavoritedTrips(String userId) async {
     try {
       final uri = Uri.parse('$baseUrl/users/$userId/favorites');
       final response = await _client.get(uri).timeout(timeout);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body)['trips'];
-        return data.map((trip) => Trip.fromJson(trip)).toList();
+        return Success(data.map((trip) => Trip.fromJson(trip)).toList());
       }
-      throw Exception('Error al obtener favoritos: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
+      return Failure(
+        Exception('Error al obtener favoritos: ${response.statusCode}'),
+      );
+    } catch (e, st) {
+      return Failure(e, st);
     }
   }
 
-  Future<bool> processPayment({
-    required String userId,
-    required double amount,
+  Future<Result<bool>> processPayment({
+    required String productId,
+    required int quantity,
     required String currency,
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/payments');
       final body = {
-        'userId': userId,
-        'amount': amount,
+        'productId': productId,
+        'quantity': quantity,
         'currency': currency,
         'timestamp': DateTime.now().toIso8601String(),
       };
@@ -265,11 +282,78 @@ class ApiService {
           .timeout(timeout);
 
       if (response.statusCode == 200) {
-        return true;
+        return const Success(true);
       }
-      throw Exception('Error al procesar pago: ${response.statusCode}');
+      return Failure(
+        Exception('Error al procesar pago: ${response.statusCode}'),
+      );
     } catch (e, st) {
-      _rethrowConnectionError(e, st);
+      return Failure(e, st);
+    }
+  }
+
+  Future<Result<Map<String, dynamic>>> createCheckoutSession({
+    required List<Map<String, dynamic>> items,
+    required String currency,
+    String? successUrl,
+    String? cancelUrl,
+  }) async {
+    try {
+      final uri = Uri.parse('$checkoutBaseUrl/createCheckoutSession');
+      final body = <String, dynamic>{
+        'items': items,
+        'currency': currency,
+      };
+      if (successUrl != null && successUrl.trim().isNotEmpty) {
+        body['successUrl'] = successUrl.trim();
+      }
+      if (cancelUrl != null && cancelUrl.trim().isNotEmpty) {
+        body['cancelUrl'] = cancelUrl.trim();
+      }
+
+      final response = await _client
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(body),
+          )
+          .timeout(timeout);
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final decoded = json.decode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return Success(decoded);
+        }
+        return Failure(Exception('Respuesta de checkout invalida'));
+      }
+      return Failure(
+        Exception('Error al crear checkout: ${response.statusCode}'),
+      );
+    } catch (e, st) {
+      return Failure(e, st);
+    }
+  }
+
+  Future<Result<Map<String, dynamic>>> getCheckoutOrderStatus(String orderId) async {
+    try {
+      final uri = Uri.parse(
+        '$checkoutBaseUrl/getCheckoutOrderStatus?orderId=${Uri.encodeQueryComponent(orderId)}',
+      );
+
+      final response = await _client.get(uri).timeout(timeout);
+
+      if (response.statusCode == 200) {
+        final decoded = json.decode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return Success(decoded);
+        }
+        return Failure(Exception('Respuesta de estado invalida'));
+      }
+      return Failure(
+        Exception('Error consultando orden: ${response.statusCode}'),
+      );
+    } catch (e, st) {
+      return Failure(e, st);
     }
   }
 
@@ -277,5 +361,3 @@ class ApiService {
     _client.close();
   }
 }
-
-

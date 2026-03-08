@@ -1,4 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+
+import '../widgets/premium_banner.dart';
+import '../widgets/achievement_grid.dart';
+import '../controllers/auth_controller.dart';
+import '../level_service.dart';
+import '../xp_bar_widget.dart';
+import '../widgets/achievement_dialog.dart';
+import 'login_screen.dart';
+import '../widgets/streak_badge.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -8,310 +21,208 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _isEditing = false;
-  late TextEditingController _nameController;
-  late TextEditingController _emailController;
-  late TextEditingController _phoneController;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: 'Juan García');
-    _emailController =
-        TextEditingController(text: 'juan.garcia@email.com');
-    _phoneController = TextEditingController(text: '+34 612 345 678');
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    super.dispose();
-  }
+  final User? user = FirebaseAuth.instance.currentUser;
+  int? _previousLevel;
 
   @override
   Widget build(BuildContext context) {
+    // Handle case where user is not logged in
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text("No se ha iniciado sesión.")),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mi Perfil'),
-        backgroundColor: Colors.deepPurple,
-        actions: [
-          IconButton(
-            icon: Icon(_isEditing ? Icons.check : Icons.edit),
-            onPressed: () {
-              setState(() {
-                _isEditing = !_isEditing;
-              });
-            },
+      backgroundColor: Colors.grey[50],
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(user?.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+                child: Text(
+                    "Error al cargar el perfil: ${snapshot.error.toString()}"));
+          }
+          if (!snapshot.hasData || snapshot.data?.data() == null) {
+            return _buildProfileContent(context, 0, 0, 0, 0, false);
+          }
+
+          final data = snapshot.data!.data() as Map<String, dynamic>;
+          final totalXP = data['totalXP'] as int? ?? 0;
+          final diaryCount = data['diaryEntriesCount'] as int? ?? 0;
+          final photoCount = data['photosCount'] as int? ?? 0;
+          final currentStreak = data['currentStreak'] as int? ?? 0;
+          final isPremium = data['isPremium'] as bool? ?? false;
+
+          // Detectar subida de nivel
+          final currentLevel = LevelService.calcularNivel(totalXP);
+          if (_previousLevel != null && currentLevel > _previousLevel!) {
+            // Disparar celebración después del renderizado
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showLevelUpDialog(currentLevel);
+            });
+          }
+          // Actualizar referencia para la próxima comparación
+          if (_previousLevel != currentLevel) {
+            _previousLevel = currentLevel;
+          }
+
+          return _buildProfileContent(context, totalXP, diaryCount, photoCount,
+              currentStreak, isPremium);
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileContent(BuildContext context, int totalXP, int diaryCount,
+      int photoCount, int currentStreak, bool isPremium) {
+    final level = LevelService.calcularNivel(totalXP);
+    final title = LevelService.obtenerTitulo(level);
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // 1. ENCABEZADO CON PERFIL Y BARRA DE XP
+          _buildHeader(context, totalXP, currentStreak, isPremium),
+
+          // 2. BANNER PREMIUM O BARRA DE NIVEL ESTÁNDAR
+          if (isPremium)
+            PremiumBanner(nivel: level, titulo: title)
+          else
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: XpBarWidget(totalXP: totalXP)),
+
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 2. TARJETA DE ESTADÍSTICAS RÁPIDAS
+                _buildQuickStats(diaryCount, photoCount, level),
+                const SizedBox(height: 30),
+
+                // 3. LA VITRINA DE LOGROS (El Widget que hicimos antes)
+                const Text(
+                  "Mi Legado de Viajero",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 15),
+                AchievementGrid(isUserPremium: isPremium),
+
+                const SizedBox(height: 30),
+
+                // 4. BOTÓN DE CERRAR SESIÓN
+                _buildLogoutButton(context),
+              ],
+            ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
+    );
+  }
+
+  Widget _buildHeader(
+      BuildContext context, int totalXP, int currentStreak, bool isPremium) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF673AB7), Color(0xFF512DA8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(50)),
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.white,
+            backgroundImage: NetworkImage(
+                user?.photoURL ?? 'https://via.placeholder.com/150'),
+          ),
+          const SizedBox(height: 15),
+          Text(
+            user?.displayName ?? "Explorador Anónimo",
+            style: const TextStyle(
+                color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            user?.email ?? "",
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          const SizedBox(height: 10),
+          // RACHA DE FUEGO
+          StreakBadge(streak: currentStreak),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickStats(int diaryCount, int photoCount, int level) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Avatar
-            Container(
-              color: Colors.deepPurple,
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      border: Border.all(
-                        color: Colors.deepPurple,
-                        width: 3,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.person,
-                      size: 60,
-                      color: Colors.deepPurple,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Juan García',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Miembro desde 2024',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Información personal
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Información Personal',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    'Nombre',
-                    _nameController,
-                    Icons.person,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    'Email',
-                    _emailController,
-                    Icons.email,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    'Teléfono',
-                    _phoneController,
-                    Icons.phone,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Preferencias
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Preferencias',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ListTile(
-                    leading: const Icon(Icons.notifications),
-                    title: const Text('Notificaciones'),
-                    trailing: Switch(
-                      value: true,
-                      onChanged: (_) {},
-                      activeThumbColor: Colors.deepPurple,
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.mail),
-                    title: const Text('Emails de Ofertas'),
-                    trailing: Switch(
-                      value: true,
-                      onChanged: (_) {},
-                      activeThumbColor: Colors.deepPurple,
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.language),
-                    title: const Text('Idioma'),
-                    trailing: DropdownButton<String>(
-                      value: 'Español',
-                      items: ['Español', 'English', 'Français']
-                          .map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {},
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Acciones
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Contraseña cambio iniciado'),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.lock),
-                      label: const Text('Cambiar Contraseña'),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        _showLogoutDialog();
-                      },
-                      icon: const Icon(Icons.logout, color: Colors.red),
-                      label: const Text(
-                        'Cerrar Sesión',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Información legal
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Términos y Condiciones',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Política de Privacidad',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'FeelTrip v1.0.0',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _statItem("Viajes", diaryCount.toString()),
+            _statItem("Fotos", photoCount.toString()),
+            _statItem("Nivel", level.toString()),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    TextEditingController controller,
-    IconData icon,
-  ) {
-    return TextField(
-      controller: controller,
-      enabled: _isEditing,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        filled: !_isEditing,
-        fillColor: !_isEditing ? Colors.grey[100] : null,
+  void _showLevelUpDialog(int newLevel) {
+    HapticFeedback.vibrate();
+    final title = LevelService.obtenerTitulo(newLevel);
+    showDialog(
+      context: context,
+      builder: (_) => AchievementDialog(
+        title: "¡Nivel $newLevel!",
+        icon: Icons.keyboard_double_arrow_up,
+        description: "¡Felicidades! Has ascendido a $title",
       ),
     );
   }
 
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cerrar Sesión'),
-        content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Sesión cerrada'),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Cerrar Sesión'),
-          ),
-        ],
+  Widget _statItem(String label, String value) {
+    return Column(
+      children: [
+        Text(value,
+            style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple)),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return Center(
+      child: TextButton.icon(
+        onPressed: () async {
+          await Get.find<AuthController>().signOut();
+          if (!context.mounted) return;
+          Get.offAll(() => const LoginScreen());
+        },
+        icon: const Icon(Icons.logout, color: Colors.redAccent),
+        label: const Text("Cerrar Sesión",
+            style: TextStyle(color: Colors.redAccent)),
       ),
     );
   }

@@ -80,12 +80,10 @@
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-9067451109299541~8498623187</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Necesitamos acceso a la cÃ¡mara para que puedas tomar fotos para tu diario de viaje.</string>
+	<string>Necesitamos acceso a la cámara para que puedas tomar fotos para tu diario de viaje.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Necesitamos acceso a tu galerÃ­a para que puedas seleccionar fotos para tu diario de viaje.</string>
+	<string>Necesitamos acceso a tu galería para que puedas seleccionar fotos para tu diario de viaje.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Necesitamos tu ubicaciÃ³n para encontrar experiencias y destinos cercanos a ti.</string>
+	<string>Necesitamos tu ubicación para encontrar experiencias y destinos cercanos a ti.</string>
 </dict>
 </plist>
-
-

@@ -22,6 +22,16 @@ class RevenueCatService {
         'ADVERTENCIA: REVENUECAT_API_KEY no configurada en .env',
         name: 'RevenueCatService',
       );
+      return key;
+    }
+
+    final isPublicKey = key.startsWith('appl_') || key.startsWith('goog_');
+    if (!isPublicKey) {
+      developer.log(
+        'ERROR: REVENUECAT_API_KEY inválida para cliente móvil. Usa public key (appl_/goog_).',
+        name: 'RevenueCatService',
+      );
+      return '';
     }
     return key;
   }

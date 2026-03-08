@@ -2,6 +2,7 @@
 import 'package:geocoding/geocoding.dart';
 import 'dart:developer' as developer;
 
+import 'analytics_events.dart';
 import 'observability_service.dart';
 
 class RouteStop {
@@ -48,14 +49,14 @@ class EmotionService {
       developer.log(
           'Usando resultado en caché para: "${texto.substring(0, 10)}..."');
       // Registrar evento de caché hit para análisis de costos
-      await ObservabilityService.logEvent('ai_cache_hit');
+      await ObservabilityService.logEvent(AnalyticsEvents.aiCacheHit);
       return _cache[texto];
     }
 
     try {
       // Registrar inicio de llamada costosa
       final stopwatch = Stopwatch()..start();
-      await ObservabilityService.logEvent('ai_request_start');
+      await ObservabilityService.logEvent(AnalyticsEvents.aiRequestStart);
 
       HttpsCallable callable = _functions.httpsCallable('analyzeDiaryEntry');
       final results = await callable.call({'text': texto});
@@ -122,7 +123,7 @@ class EmotionService {
       _cache[texto] = resultado;
       
       stopwatch.stop();
-      await ObservabilityService.logEvent('ai_request_success', parameters: {
+      await ObservabilityService.logEvent(AnalyticsEvents.aiRequestSuccess, parameters: {
         'duration_ms': stopwatch.elapsedMilliseconds,
         'emotions_count': resultado.emociones.length,
       });
@@ -134,7 +135,7 @@ class EmotionService {
         error: e,
         stackTrace: st,
       );
-      await ObservabilityService.logEvent('ai_request_error', parameters: {'error': e.toString()});
+      await ObservabilityService.logEvent(AnalyticsEvents.aiRequestError, parameters: {'error': e.toString()});
       return null;
     }
   }

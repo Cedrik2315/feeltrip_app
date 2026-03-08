@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 
@@ -7,12 +8,13 @@ import 'package:feeltrip_app/controllers/auth_controller.dart';
 import 'package:feeltrip_app/controllers/diary_controller.dart';
 import 'package:feeltrip_app/screens/historial_screen.dart';
 import 'package:feeltrip_app/screens/login_screen.dart';
+import 'package:feeltrip_app/screens/diario_screen.dart';
 import 'package:feeltrip_app/services/auth_service.dart';
+import 'package:feeltrip_app/services/achievements_service.dart';
 import 'package:feeltrip_app/services/database_service.dart';
 import 'package:feeltrip_app/services/emotion_service.dart';
 import 'package:feeltrip_app/services/location_service.dart';
 import 'package:feeltrip_app/services/storage_service.dart';
-import 'package:feeltrip_app/screens/diary_screen.dart';
 
 class MockAuthService extends Mock implements AuthService {}
 
@@ -24,14 +26,36 @@ class MockLocationService extends Mock implements LocationService {}
 
 class MockStorageService extends Mock implements StorageService {}
 
+class MockDiaryAchievementsService extends Mock
+    implements DiaryAchievementsService {}
+
+class MockAchievementService extends Mock implements AchievementService {}
+
+// Mock para AuthController que extiende GetxController para ser compatible con Get.put
+class MockAuthController extends GetxController
+    with Mock
+    implements AuthController {}
+
 void main() {
+  late MockAuthController mockAuthController;
+
+  setUp(() {
+    mockAuthController = MockAuthController();
+    // Registramos el AuthController en GetX para que LoginScreen pueda encontrarlo
+    Get.put<AuthController>(mockAuthController);
+  });
+
+  tearDown(() {
+    Get.reset();
+  });
+
   testWidgets('smoke LoginScreen renderiza', (tester) async {
     final authService = MockAuthService();
 
     await tester.pumpWidget(
       MultiProvider(
         providers: [
-          Provider<AuthController>(create: (_) => AuthController(authService)),
+          Provider<AuthService>.value(value: authService),
         ],
         child: const MaterialApp(home: LoginScreen()),
       ),
@@ -39,7 +63,7 @@ void main() {
 
     await tester.pump();
 
-    expect(find.text('Iniciar sesión'), findsOneWidget);
+    expect(find.text('Iniciar Sesión'), findsOneWidget);
     expect(find.byType(TextField), findsAtLeastNWidgets(2));
   });
 
@@ -49,6 +73,8 @@ void main() {
     final databaseService = MockDatabaseService();
     final locationService = MockLocationService();
     final storageService = MockStorageService();
+    final diaryAchievementsService = MockDiaryAchievementsService();
+    final achievementService = MockAchievementService();
 
     when(() => emotionService.analizarTexto(any())).thenAnswer((_) async =>
         AnalisisResultado(
@@ -81,21 +107,21 @@ void main() {
               databaseService: databaseService,
               locationService: locationService,
               storageService: storageService,
+              diaryAchievementsService: diaryAchievementsService,
+              achievementService: achievementService,
             ),
           ),
         ],
-        child: MaterialApp(
-          home: DiaryScreen(
-            databaseService: databaseService,
-            enableCamera: false,
-          ),
+        child: const MaterialApp(
+          home: DiarioScreen(enableAds: false),
         ),
       ),
     );
 
     await tester.pump();
 
-    expect(find.text('Mi Diario Emocional'), findsOneWidget);
+    // Check for the translate icon which is present in the AppBar actions of DiarioScreen
+    expect(find.byIcon(Icons.translate), findsOneWidget);
   });
 
   testWidgets('smoke HistorialScreen renderiza vacío', (tester) async {

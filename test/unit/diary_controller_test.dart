@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:feeltrip_app/controllers/diary_controller.dart';
+import 'package:feeltrip_app/services/achievements_service.dart';
 import 'package:feeltrip_app/services/database_service.dart';
 import 'package:feeltrip_app/services/emotion_service.dart';
 import 'package:feeltrip_app/services/location_service.dart';
@@ -15,11 +16,17 @@ class _MockLocationService extends Mock implements LocationService {}
 
 class _MockStorageService extends Mock implements StorageService {}
 
+class _MockDiaryAchievementsService extends Mock implements DiaryAchievementsService {}
+
+class _MockAchievementService extends Mock implements AchievementService {}
+
 void main() {
   late _MockEmotionService emotionService;
   late _MockDatabaseService databaseService;
   late _MockLocationService locationService;
   late _MockStorageService storageService;
+  late _MockDiaryAchievementsService diaryAchievementsService;
+  late _MockAchievementService achievementService;
   late DiaryController controller;
 
   setUp(() {
@@ -27,11 +34,15 @@ void main() {
     databaseService = _MockDatabaseService();
     locationService = _MockLocationService();
     storageService = _MockStorageService();
+    diaryAchievementsService = _MockDiaryAchievementsService();
+    achievementService = _MockAchievementService();
     controller = DiaryController(
       emotionService: emotionService,
       databaseService: databaseService,
       locationService: locationService,
       storageService: storageService,
+      diaryAchievementsService: diaryAchievementsService,
+      achievementService: achievementService,
     );
   });
 

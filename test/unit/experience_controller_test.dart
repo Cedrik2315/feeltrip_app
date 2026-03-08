@@ -4,6 +4,7 @@ import 'package:feeltrip_app/controllers/experience_controller.dart';
 import 'package:feeltrip_app/services/story_service.dart';
 import 'package:feeltrip_app/services/diary_service.dart';
 import 'package:feeltrip_app/models/experience_model.dart';
+import 'package:feeltrip_app/services/storage_service.dart';
 
 // Mocks de los servicios
 class MockStoryService extends Mock implements StoryService {}
@@ -13,12 +14,15 @@ class MockDiaryService extends Mock implements DiaryService {}
 // Fakes para argumentos complejos
 class FakeTravelerStory extends Fake implements TravelerStory {}
 
+class MockStorageService extends Mock implements StorageService {}
+
 class FakeDiaryEntry extends Fake implements DiaryEntry {}
 
 void main() {
   late ExperienceController controller;
   late MockStoryService mockStoryService;
   late MockDiaryService mockDiaryService;
+  late MockStorageService mockStorageService;
 
   setUpAll(() {
     // Registrar valores por defecto para argumentos tipados
@@ -29,11 +33,13 @@ void main() {
   setUp(() {
     mockStoryService = MockStoryService();
     mockDiaryService = MockDiaryService();
+    mockStorageService = MockStorageService();
 
     // Inyectamos los mocks en el controlador
     controller = ExperienceController(
       storyService: mockStoryService,
       diaryService: mockDiaryService,
+      storageService: mockStorageService,
     );
   });
 
@@ -80,8 +86,7 @@ void main() {
       verify(() => mockStoryService.createStory(userId, any())).called(1);
       expect(controller.stories.length, 1);
       expect(controller.stories.first.title, 'Test Title');
-      expect(controller.isSavingStory, false);
-      expect(controller.successMessage.isNotEmpty, true);
+      expect(controller.successMessage.value?.isNotEmpty, true);
     });
 
     test('createDiaryEntry guarda entrada y recarga estadísticas', () async {

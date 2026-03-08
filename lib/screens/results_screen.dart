@@ -1,7 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../constants/strings.dart';
-import 'diary_screen.dart';
 
 class ResultsScreen extends StatelessWidget {
   const ResultsScreen({super.key, required this.answers});
@@ -14,6 +13,7 @@ class ResultsScreen extends StatelessWidget {
 
     if (emotion.contains('Lágrima') && season == 'Invierno') {
       return {
+        'tripId': 'trip_1',
         'title': 'Auroras en Tromsø',
         'description':
             '5 días para llorar de emoción bajo las auroras boreales',
@@ -23,6 +23,7 @@ class ResultsScreen extends StatelessWidget {
       };
     } else if (emotion.contains('Abrazo')) {
       return {
+        'tripId': 'trip_2',
         'title': 'Cocina con Nonna',
         'description': '7 días de abrazos italianos y pasta casera',
         'price': 'EUR 980',
@@ -36,6 +37,7 @@ class ResultsScreen extends StatelessWidget {
       };
     } else if (emotion.contains('Boom')) {
       return {
+        'tripId': 'trip_3',
         'title': 'Aventura en Queenstown',
         'description': '6 días de adrenalina pura en Nueva Zelanda',
         'price': 'EUR 1,450',
@@ -45,6 +47,7 @@ class ResultsScreen extends StatelessWidget {
     }
 
     return {
+      'tripId': 'trip_4',
       'title': 'Meditación en Bali',
       'description': '8 días de paz profunda y yoga',
       'price': 'EUR 850',
@@ -132,11 +135,13 @@ class ResultsScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Row(
                             children: [
-                              const Icon(Icons.check_circle,
-                                  color: Colors.green, size: 16),
+                              const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 16,
+                              ),
                               const SizedBox(width: 8),
-                              Text(item,
-                                  style: TextStyle(color: Colors.blue[600])),
+                              Text(item, style: TextStyle(color: Colors.blue[600])),
                             ],
                           ),
                         ),
@@ -166,11 +171,10 @@ class ResultsScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushNamed(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const DiaryScreen(),
-                        ),
+                        '/trip-details',
+                        arguments: trip['tripId'],
                       );
                     },
                     child: const Text(

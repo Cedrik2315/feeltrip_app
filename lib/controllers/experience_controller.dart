@@ -1,40 +1,35 @@
-import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import 'dart:io';
 import 'package:uuid/uuid.dart';
 
 import '../core/app_logger.dart';
 import '../models/experience_model.dart';
 import '../services/diary_service.dart';
 import '../services/story_service.dart';
+import '../services/storage_service.dart';
+import 'base_controller.dart';
 
-class ExperienceController extends ChangeNotifier {
+class ExperienceController extends BaseController {
   final StoryService _storyService;
   final DiaryService _diaryService;
+  final StorageService _storageService;
 
   ExperienceController({
     required StoryService storyService,
     required DiaryService diaryService,
+    required StorageService storageService,
   })  : _storyService = storyService,
-        _diaryService = diaryService;
+        _diaryService = diaryService,
+        _storageService = storageService;
 
   // State
-  List<TravelerStory> _stories = [];
-  List<DiaryEntry> _diaryEntries = [];
-  Map<String, dynamic> _diaryStats = {};
-  bool _isLoading = false;
-  bool _isSavingStory = false;
-  bool _isSavingDiary = false;
-  String _errorMessage = '';
-  String _successMessage = '';
+  final stories = <TravelerStory>[].obs;
+  final diaryEntries = <DiaryEntry>[].obs;
+  final diaryStats = <String, dynamic>{}.obs;
+  final successMessage = Rx<String?>(null);
 
   // Getters
-  List<TravelerStory> get stories => _stories;
-  List<DiaryEntry> get diaryEntries => _diaryEntries;
-  Map<String, dynamic> get diaryStats => _diaryStats;
-  bool get isLoading => _isLoading;
-  bool get isSavingStory => _isSavingStory;
-  bool get isSavingDiary => _isSavingDiary;
-  String get errorMessage => _errorMessage;
-  String get successMessage => _successMessage;
+  // isLoading y errorMessage vienen de BaseController
 
   // Variables
   String? userId;
@@ -48,23 +43,13 @@ class ExperienceController extends ChangeNotifier {
 
   Future<void> loadAllData() async {
     if (userId == null) return;
-    try {
-      _isLoading = true;
-      _errorMessage = '';
-      notifyListeners();
-
-      await Future.wait([
+    await runBusyFuture(
+      Future.wait([
         loadStories(),
         loadDiaryEntries(),
         loadDiaryStats(),
-      ]);
-    } catch (e) {
-      _errorMessage = 'Error: $e';
-      AppLogger.debug('Error loading data: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+      ]),
+    );
   }
 
   // ============ STORIES ============
@@ -72,12 +57,10 @@ class ExperienceController extends ChangeNotifier {
   Future<void> loadStories() async {
     try {
       final fetchedStories = await _storyService.getPublicStories();
-      _stories = fetchedStories;
-      notifyListeners();
+      stories.assignAll(fetchedStories);
     } catch (e) {
       AppLogger.debug('Error loading stories: $e');
-      _errorMessage = 'Error cargando historias';
-      notifyListeners();
+      setError('Error cargando historias');
     }
   }
 
@@ -91,21 +74,24 @@ class ExperienceController extends ChangeNotifier {
     required String story,
     required List<String> emotionalHighlights,
     required double rating,
+    File? imageFile,
   }) async {
-    if (!_validateStoryInput(title, story)) {
+    final validationError = _validateStoryInput(title, story);
+    if (validationError != null) {
+      setError(validationError);
       return;
     }
 
     if (userId == null) {
-      _errorMessage = 'Usuario no autenticado';
-      notifyListeners();
+      setError('Usuario no autenticado');
       return;
     }
 
-    try {
-      _isSavingStory = true;
-      _errorMessage = '';
-      notifyListeners();
+    await runBusyFuture(() async {
+      String? imageUrl;
+      if (imageFile != null) {
+        imageUrl = await _storageService.uploadStoryImage(imageFile, userId!);
+      }
 
       final newStory = TravelerStory(
         id: const Uuid().v4(),
@@ -116,32 +102,26 @@ class ExperienceController extends ChangeNotifier {
         likes: 0,
         rating: rating,
         createdAt: DateTime.now(),
+        imageUrl: imageUrl,
       );
 
       await _storyService.createStory(userId!, newStory);
-      _stories.insert(0, newStory);
-      _successMessage = 'Historia compartida exitosamente!';
+      stories.insert(0, newStory);
+      successMessage.value = 'Historia compartida exitosamente!';
       AppLogger.debug('Story created: ${newStory.id}');
-    } catch (e) {
-      _errorMessage = 'Error: $e';
-      AppLogger.debug('Error creating story: $e');
-    } finally {
-      _isSavingStory = false;
-      notifyListeners();
-    }
+    }());
   }
 
   Future<void> likeStory(String storyId) async {
     try {
       await _storyService.likeStory(storyId);
-      final index = _stories.indexWhere((s) => s.id == storyId);
+      final index = stories.indexWhere((s) => s.id == storyId);
       if (index != -1) {
-        _stories[index].likes++;
-        notifyListeners();
+        stories[index].likes++;
+        stories.refresh();
       }
       AppLogger.debug('Story liked: $storyId');
     } catch (e) {
-      _errorMessage = 'Error: $e';
       AppLogger.debug('Error liking story: $e');
     }
   }
@@ -149,14 +129,13 @@ class ExperienceController extends ChangeNotifier {
   Future<void> unlikeStory(String storyId) async {
     try {
       await _storyService.unlikeStory(storyId);
-      final index = _stories.indexWhere((s) => s.id == storyId);
+      final index = stories.indexWhere((s) => s.id == storyId);
       if (index != -1) {
-        _stories[index].likes--;
-        notifyListeners();
+        stories[index].likes--;
+        stories.refresh();
       }
       AppLogger.debug('Story unliked: $storyId');
     } catch (e) {
-      _errorMessage = 'Error: $e';
       AppLogger.debug('Error unliking story: $e');
     }
   }
@@ -165,30 +144,20 @@ class ExperienceController extends ChangeNotifier {
     if (userId == null) return;
     try {
       await _storyService.deleteStory(userId!, storyId);
-      _stories.removeWhere((s) => s.id == storyId);
-      _successMessage = 'Historia eliminada';
+      stories.removeWhere((s) => s.id == storyId);
+      successMessage.value = 'Historia eliminada';
       AppLogger.debug('Story deleted: $storyId');
-      notifyListeners();
     } catch (e) {
-      _errorMessage = 'Error: $e';
       AppLogger.debug('Error deleting story: $e');
-      notifyListeners();
+      setError('Error eliminando historia');
     }
   }
 
   Future<void> searchStoriesByEmotion(String emotion) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
+    await runBusyFuture(() async {
       final results = await _storyService.searchStoriesByEmotion(emotion);
-      _stories = results;
-    } catch (e) {
-      _errorMessage = 'Error buscando historias';
-      AppLogger.debug('Error searching stories: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+      stories.assignAll(results);
+    }());
   }
 
   // ============ DIARY ============
@@ -197,12 +166,10 @@ class ExperienceController extends ChangeNotifier {
     if (userId == null) return;
     try {
       final entries = await _diaryService.getDiaryEntries(userId!);
-      _diaryEntries = entries;
-      notifyListeners();
+      diaryEntries.assignAll(entries);
     } catch (e) {
       AppLogger.debug('Error loading diary entries: $e');
-      _errorMessage = 'Error cargando diario';
-      notifyListeners();
+      setError('Error cargando diario');
     }
   }
 
@@ -218,22 +185,16 @@ class ExperienceController extends ChangeNotifier {
     required int reflectionDepth,
   }) async {
     if (content.trim().length < 10) {
-      _errorMessage = 'El contenido es muy breve. Expresate mas!';
-      notifyListeners();
+      setError('El contenido es muy breve. Expresate mas!');
       return;
     }
 
     if (userId == null) {
-      _errorMessage = 'Usuario no autenticado';
-      notifyListeners();
+      setError('Usuario no autenticado');
       return;
     }
 
-    try {
-      _isSavingDiary = true;
-      _errorMessage = '';
-      notifyListeners();
-
+    await runBusyFuture(() async {
       final entry = DiaryEntry(
         id: const Uuid().v4(),
         location: location,
@@ -244,18 +205,12 @@ class ExperienceController extends ChangeNotifier {
       );
 
       await _diaryService.createDiaryEntry(userId!, entry);
-      _diaryEntries.insert(0, entry);
+      diaryEntries.insert(0, entry);
       await loadDiaryStats();
 
-      _successMessage = 'Entrada guardada!';
+      successMessage.value = 'Entrada guardada!';
       AppLogger.debug('Diary entry created: ${entry.id}');
-    } catch (e) {
-      _errorMessage = 'Error: $e';
-      AppLogger.debug('Error creating diary entry: $e');
-    } finally {
-      _isSavingDiary = false;
-      notifyListeners();
-    }
+    }());
   }
 
   Future<void> updateDiaryEntry(
@@ -267,10 +222,7 @@ class ExperienceController extends ChangeNotifier {
   }) async {
     if (userId == null) return;
 
-    try {
-      _isSavingDiary = true;
-      notifyListeners();
-
+    await runBusyFuture(() async {
       final updates = {
         'location': location,
         'content': content,
@@ -280,44 +232,35 @@ class ExperienceController extends ChangeNotifier {
 
       await _diaryService.updateDiaryEntry(userId!, entryId, updates);
 
-      final index = _diaryEntries.indexWhere((e) => e.id == entryId);
+      final index = diaryEntries.indexWhere((e) => e.id == entryId);
       if (index != -1) {
-        _diaryEntries[index] = DiaryEntry(
+        diaryEntries[index] = DiaryEntry(
           id: entryId,
           location: location,
           content: content,
           emotions: emotions,
           reflectionDepth: reflectionDepth,
-          createdAt: _diaryEntries[index].createdAt,
+          createdAt: diaryEntries[index].createdAt,
         );
-        notifyListeners();
       }
 
       await loadDiaryStats();
-      _successMessage = 'Entrada actualizada';
+      successMessage.value = 'Entrada actualizada';
       AppLogger.debug('Diary entry updated: $entryId');
-    } catch (e) {
-      _errorMessage = 'Error: $e';
-      AppLogger.debug('Error updating diary entry: $e');
-    } finally {
-      _isSavingDiary = false;
-      notifyListeners();
-    }
+    }());
   }
 
   Future<void> deleteDiaryEntry(String entryId) async {
     if (userId == null) return;
     try {
       await _diaryService.deleteDiaryEntry(userId!, entryId);
-      _diaryEntries.removeWhere((e) => e.id == entryId);
+      diaryEntries.removeWhere((e) => e.id == entryId);
       await loadDiaryStats();
-      _successMessage = 'Entrada eliminada';
+      successMessage.value = 'Entrada eliminada';
       AppLogger.debug('Diary entry deleted: $entryId');
-      notifyListeners();
     } catch (e) {
-      _errorMessage = 'Error: $e';
       AppLogger.debug('Error deleting diary entry: $e');
-      notifyListeners();
+      setError('Error eliminando entrada');
     }
   }
 
@@ -327,8 +270,7 @@ class ExperienceController extends ChangeNotifier {
     if (userId == null) return;
     try {
       final stats = await _diaryService.getDiaryStats(userId!);
-      _diaryStats = stats;
-      notifyListeners();
+      diaryStats.value = stats;
     } catch (e) {
       AppLogger.debug('Error loading diary stats: $e');
     }
@@ -336,28 +278,28 @@ class ExperienceController extends ChangeNotifier {
 
   Map<String, dynamic> getDiaryStats() {
     return {
-      'totalEntries': _diaryStats['totalEntries'] ?? 0,
-      'totalWords': _diaryStats['totalWords'] ?? 0,
-      'avgReflectionDepth': _diaryStats['avgReflectionDepth'] ?? 0,
-      'emotionsTracked': _diaryStats['emotionsTracked'] ?? [],
-      'lastEntryDate': _diaryStats['lastEntryDate'],
+      'totalEntries': diaryStats['totalEntries'] ?? 0,
+      'totalWords': diaryStats['totalWords'] ?? 0,
+      'avgReflectionDepth': diaryStats['avgReflectionDepth'] ?? 0,
+      'emotionsTracked': diaryStats['emotionsTracked'] ?? [],
+      'lastEntryDate': diaryStats['lastEntryDate'],
     };
   }
 
   int getTotalEntries() {
-    return _diaryEntries.length;
+    return diaryEntries.length;
   }
 
   double getAverageDepth() {
-    if (_diaryEntries.isEmpty) return 0;
+    if (diaryEntries.isEmpty) return 0;
     final sum =
-        _diaryEntries.map((e) => e.reflectionDepth).reduce((a, b) => a + b);
-    return sum / _diaryEntries.length;
+        diaryEntries.map((e) => e.reflectionDepth).reduce((a, b) => a + b);
+    return sum / diaryEntries.length;
   }
 
   Set<String> getUniqueEmotions() {
     final emotions = <String>{};
-    for (var entry in _diaryEntries) {
+    for (var entry in diaryEntries) {
       emotions.addAll(entry.emotions);
     }
     return emotions;
@@ -365,7 +307,7 @@ class ExperienceController extends ChangeNotifier {
 
   Map<String, int> getEmotionFrequency() {
     final frequency = <String, int>{};
-    for (var entry in _diaryEntries) {
+    for (var entry in diaryEntries) {
       for (var emotion in entry.emotions) {
         frequency[emotion] = (frequency[emotion] ?? 0) + 1;
       }
@@ -377,64 +319,44 @@ class ExperienceController extends ChangeNotifier {
 
   Future<void> filterByEmotion(String emotion) async {
     if (userId == null) return;
-    try {
-      _isLoading = true;
-      notifyListeners();
+    await runBusyFuture(() async {
       final entries = await _diaryService.getEntriesByEmotion(userId!, emotion);
-      _diaryEntries = entries;
-    } catch (e) {
-      _errorMessage = 'Error filtrando';
-      AppLogger.debug('Error filtering: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+      diaryEntries.assignAll(entries);
+    }());
   }
 
   Future<void> filterByDateRange(DateTime startDate, DateTime endDate) async {
     if (userId == null) return;
-    try {
-      _isLoading = true;
-      notifyListeners();
+    await runBusyFuture(() async {
       final entries = await _diaryService.getEntriesByDateRange(
         userId!,
         startDate,
         endDate,
       );
-      _diaryEntries = entries;
-    } catch (e) {
-      _errorMessage = 'Error filtrando';
-      AppLogger.debug('Error filtering by date: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+      diaryEntries.assignAll(entries);
+    }());
   }
 
   // ============ CLEANUP ============
 
   void clearData() {
-    _stories.clear();
-    _diaryEntries.clear();
-    _diaryStats.clear();
+    stories.clear();
+    diaryEntries.clear();
+    diaryStats.clear();
     userId = null;
-    _errorMessage = '';
-    _successMessage = '';
-    notifyListeners();
+    setError(null);
+    successMessage.value = null;
   }
 
   // ============ VALIDATIONS ============
 
-  bool _validateStoryInput(String title, String story) {
+  String? _validateStoryInput(String title, String story) {
     if (title.trim().length < 5) {
-      _errorMessage = 'El titulo es demasiado corto';
-      return false;
+      return 'El titulo es demasiado corto';
     }
     if (story.trim().length < 50) {
-      _errorMessage =
-          'Cuentanos mas, la historia es muy breve (min. 50 caracteres)';
-      return false;
+      return 'Cuentanos mas, la historia es muy breve (min. 50 caracteres)';
     }
-    return true;
+    return null;
   }
 }

@@ -23,18 +23,19 @@ class FacebookLoginButton extends StatelessWidget {
         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
       onPressed: () async {
-        final user = await _auth.iniciarSesionConFacebook();
-        if (!context.mounted) return;
-
-        if (user != null) {
-          Navigator.pushReplacementNamed(context, '/home');
-        } else {
+        try {
+          await _auth.signInWithFacebook();
+        } catch (_) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Error al iniciar sesión con Facebook'),
             ),
           );
+          return;
         }
+        if (!context.mounted) return;
+        Navigator.pushReplacementNamed(context, '/home');
       },
     );
   }

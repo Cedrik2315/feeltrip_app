@@ -1,17 +1,21 @@
-﻿import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../services/auth_service.dart';
+
+enum AuthAction { login, register, resetPassword }
 
 class AuthController {
   AuthController(this._authService);
 
   final AuthService _authService;
 
+  User? get user => FirebaseAuth.instance.currentUser;
+
   Future<void> login({required String email, required String password}) async {
     try {
       await _authService.signInWithEmail(email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      throw Exception(_messageFromCode(e.code));
+      throw Exception(_messageFromCode(e.code, AuthAction.login));
     }
   }
 
@@ -19,7 +23,7 @@ class AuthController {
     try {
       await _authService.signInWithGoogle();
     } on FirebaseAuthException catch (e) {
-      throw Exception(_messageFromCode(e.code));
+      throw Exception(_messageFromCode(e.code, AuthAction.login));
     } catch (e) {
       rethrow;
     }
@@ -29,7 +33,7 @@ class AuthController {
     try {
       await _authService.signInWithFacebook();
     } on FirebaseAuthException catch (e) {
-      throw Exception(_messageFromCode(e.code));
+      throw Exception(_messageFromCode(e.code, AuthAction.login));
     } catch (e) {
       rethrow;
     }
@@ -47,7 +51,7 @@ class AuthController {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      throw Exception(_messageFromCode(e.code, register: true));
+      throw Exception(_messageFromCode(e.code, AuthAction.register));
     }
   }
 
@@ -55,12 +59,12 @@ class AuthController {
     try {
       await _authService.sendPasswordResetEmail(email);
     } on FirebaseAuthException catch (e) {
-      throw Exception(_messageFromCode(e.code, reset: true));
+      throw Exception(_messageFromCode(e.code, AuthAction.resetPassword));
     }
   }
 
-  String _messageFromCode(String code, {bool register = false, bool reset = false}) {
-    if (register) {
+  String _messageFromCode(String code, AuthAction action) {
+    if (action == AuthAction.register) {
       switch (code) {
         case 'email-already-in-use':
           return 'Ese email ya está registrado';
@@ -73,7 +77,7 @@ class AuthController {
       }
     }
 
-    if (reset) {
+    if (action == AuthAction.resetPassword) {
       switch (code) {
         case 'user-not-found':
           return 'No existe una cuenta con ese email';
@@ -96,5 +100,9 @@ class AuthController {
       default:
         return 'No se pudo iniciar sesión';
     }
+  }
+
+  Future<void> signOut() async {
+    await _authService.signOut();
   }
 }

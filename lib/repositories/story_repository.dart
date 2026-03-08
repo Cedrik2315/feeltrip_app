@@ -1,6 +1,8 @@
 ﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../config/firebase_config.dart';
+import '../models/comment_model.dart';
 import '../models/experience_model.dart';
 
 class StoryRepository {
@@ -16,7 +18,9 @@ class StoryRepository {
         .limit(limit)
         .get();
 
-    return snapshot.docs.map((doc) => TravelerStory.fromFirestore(doc)).toList();
+    return snapshot.docs
+        .map((doc) => TravelerStory.fromFirestore(doc))
+        .toList();
   }
 
   Future<List<TravelerStory>> getUserStories(String userId) async {
@@ -27,7 +31,9 @@ class StoryRepository {
         .orderBy(FirebaseConfig.createdAtField, descending: true)
         .get();
 
-    return snapshot.docs.map((doc) => TravelerStory.fromFirestore(doc)).toList();
+    return snapshot.docs
+        .map((doc) => TravelerStory.fromFirestore(doc))
+        .toList();
   }
 
   Future<TravelerStory?> getStory(String storyId) async {
@@ -127,7 +133,9 @@ class StoryRepository {
         .orderBy(FirebaseConfig.createdAtField, descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => TravelerStory.fromFirestore(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TravelerStory.fromFirestore(doc))
+            .toList());
   }
 
   Stream<List<TravelerStory>> getUserStoriesStream(String userId) {
@@ -137,7 +145,9 @@ class StoryRepository {
         .collection(FirebaseConfig.storiesSubcollection)
         .orderBy(FirebaseConfig.createdAtField, descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => TravelerStory.fromFirestore(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TravelerStory.fromFirestore(doc))
+            .toList());
   }
 
   Future<List<TravelerStory>> searchStoriesByTitle(String query) async {
@@ -147,7 +157,9 @@ class StoryRepository {
         .where('title', isLessThan: '${query}z')
         .get();
 
-    return snapshot.docs.map((doc) => TravelerStory.fromFirestore(doc)).toList();
+    return snapshot.docs
+        .map((doc) => TravelerStory.fromFirestore(doc))
+        .toList();
   }
 
   Future<List<TravelerStory>> searchStoriesByEmotion(String emotion) async {
@@ -157,6 +169,40 @@ class StoryRepository {
         .orderBy(FirebaseConfig.createdAtField, descending: true)
         .get();
 
-    return snapshot.docs.map((doc) => TravelerStory.fromFirestore(doc)).toList();
+    return snapshot.docs
+        .map((doc) => TravelerStory.fromFirestore(doc))
+        .toList();
+  }
+
+  Future<List<Comment>> getCommentsForStory(String storyId) async {
+    final snapshot = await _firestore
+        .collection(FirebaseConfig.storiesCollection)
+        .doc(storyId)
+        .collection('comments')
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    return snapshot.docs.map((doc) => Comment.fromFirestore(doc)).toList();
+  }
+
+  Future<void> addComment(
+      {required String storyId, required String content}) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('Debes iniciar sesión para comentar');
+
+    await _firestore
+        .collection(FirebaseConfig.storiesCollection)
+        .doc(storyId)
+        .collection('comments')
+        .add({
+      'storyId': storyId,
+      'userId': user.uid,
+      'userName': user.displayName ?? 'Viajero',
+      'userAvatar': user.photoURL ?? '',
+      'content': content,
+      'reactions': [],
+      'likes': 0,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 }

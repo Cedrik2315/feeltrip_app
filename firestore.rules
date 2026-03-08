@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- 1. FUNCIONES DE AYUDA (COMBINADAS) ---
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Verifica que el usuario sea el dueño del documento (para editar/borrar)
+    function isResourceOwner() {
+      return isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Verifica que al crear, el usuario se asigne a sí mismo
+    function isAssigningSelf() {
+      return isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // --- 2. VALIDACIONES DE DATOS (DEL NUEVO SET) ---
+    function isValidString(text, min, max) {
+      return text is string && text.size() >= min && text.size() <= max;
+    }
+
+    function isValidRating(rating) {
+      return (rating is number || rating is int) && rating >= 0 && rating <= 5;
+    }
+
+    // --- 3. LÓGICA DE INTERACCIÓN (DEL SET ACTUAL) ---
+    
+    // Permite actualizar SOLO el campo 'likes' (para que otros usuarios den like)
+    // y asegura que no se cambie el dueño de la historia
+    function onlyStoryLikeMutation() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes']) &&
+        request.resource.data.userId == resource.data.userId;
+    }
+
+    // Permite actualizar SOLO 'likes' y 'reactions' en comentarios
+    function onlyCommentReactionMutation() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes', 'reactions']) &&
+        request.resource.data.userId == resource.data.userId;
+    }
+
+    // --- REGLAS DE COLECCIONES ---
+
+    // 1. USUARIOS (Perfil, Diario, Carrito)
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      match /diaryEntries/{entryId} {
+        allow read, write: if isOwner(userId);
+      }
+      // Mantenemos cartItems del set actual (CRÍTICO PARA LA TIENDA)
+      match /cartItems/{itemId} {
+        allow read, write: if isOwner(userId);
+      }
+      // Mantenemos private del set actual
+      match /private/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // 2. HISTORIAS (Stories)
+    match /stories/{storyId} {
+      allow read: if true;
+      
+      // Crear: Validamos datos (título, largo, rating)
+      allow create: if isAssigningSelf()
+                    && isValidString(request.resource.data.title, 3, 100)
+                    && isValidString(request.resource.data.story, 10, 5000)
+                    && isValidRating(request.resource.data.rating);
+                    
+      // Actualizar: Si es el dueño (validando datos) O si es otro usuario dando Like
+      allow update: if (isResourceOwner()
+                        && isValidString(request.resource.data.title, 3, 100)
+                        && isValidString(request.resource.data.story, 10, 5000))
+                    || (isAuthenticated() && onlyStoryLikeMutation());
+                    
+      allow delete: if isResourceOwner();
+
+      // 2.1 Comentarios
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isAssigningSelf()
+                      && isValidString(request.resource.data.content, 1, 1000);
+        
+        // Actualizar: Dueño O Reacciones de otros
+        allow update: if isResourceOwner() || (isAuthenticated() && onlyCommentReactionMutation());
+        allow delete: if isResourceOwner();
+      }
+    }
+
+    // 3. AGENCIAS Y EXPERIENCIAS (Lectura pública, escritura protegida)
+    match /agencies/{agencyId} {
+      allow read: if true;
+      allow write: if false; // Solo admin desde consola por ahora
+    }
+
+    match /experiences/{experienceId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Bloquear todo lo demás
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

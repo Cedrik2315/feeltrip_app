@@ -11,16 +11,16 @@ class SharingService {
   }) async {
     try {
       final message =
-          'ðŸ“¸ $storyTitle\n\n$storyDescription\n\nâœ¨ Descubre mÃ¡s historias en FeelTrip:\n$deepLink';
+          '📸 $storyTitle\n\n$storyDescription\n\n✨ Descubre más historias en FeelTrip:\n$deepLink';
 
       await Share.share(
         message,
-        subject: 'Â¡Mira esta historia en FeelTrip!',
+        subject: '¡Mira esta historia en FeelTrip!',
       );
 
-      AppLogger.debug('âœ… Compartido a WhatsApp exitosamente');
+      AppLogger.debug('Compartido a WhatsApp exitosamente');
     } catch (e) {
-      AppLogger.debug('âŒ Error compartiendo: $e');
+      AppLogger.debug('Error compartiendo: $e');
       rethrow;
     }
   }
@@ -33,16 +33,16 @@ class SharingService {
   }) async {
     try {
       final message =
-          'ðŸŒ $storyTitle\n\n$storyDescription\n\nðŸŽ’ FeelTrip: Conecta con viajeros\n$deepLink';
+          '🌍 $storyTitle\n\n$storyDescription\n\n🎒 FeelTrip: Conecta con viajeros\n$deepLink';
 
       await Share.share(
         message,
-        subject: 'Â¡Comparte esta aventura!',
+        subject: '¡Comparte esta aventura!',
       );
 
-      AppLogger.debug('âœ… Compartido a Facebook exitosamente');
+      AppLogger.debug('Compartido a Facebook exitosamente');
     } catch (e) {
-      AppLogger.debug('âŒ Error compartiendo: $e');
+      AppLogger.debug('Error compartiendo: $e');
       rethrow;
     }
   }
@@ -53,13 +53,13 @@ class SharingService {
     required String deepLink,
   }) async {
     try {
-      final message = 'ðŸŽ¬ $storyTitle\n\nMira esto en FeelTrip:\n$deepLink';
+      final message = '🎬 $storyTitle\n\nMira esto en FeelTrip:\n$deepLink';
 
-      await Share.share(message, subject: 'Â¡Mira en FeelTrip!');
+      await Share.share(message, subject: '¡Mira en FeelTrip!');
 
-      AppLogger.debug('âœ… Compartido a TikTok exitosamente');
+      AppLogger.debug('Compartido a TikTok exitosamente');
     } catch (e) {
-      AppLogger.debug('âŒ Error compartiendo: $e');
+      AppLogger.debug('Error compartiendo: $e');
       rethrow;
     }
   }
@@ -78,9 +78,9 @@ class SharingService {
         subject: 'Comparte desde FeelTrip',
       );
 
-      AppLogger.debug('âœ… Compartido exitosamente');
+      AppLogger.debug('Compartido exitosamente');
     } catch (e) {
-      AppLogger.debug('âŒ Error compartiendo: $e');
+      AppLogger.debug('Error compartiendo: $e');
       rethrow;
     }
   }

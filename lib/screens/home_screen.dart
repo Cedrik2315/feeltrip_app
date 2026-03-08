@@ -1,15 +1,26 @@
-﻿import 'package:flutter/material.dart';
+﻿// home_screen.dart
+import 'dart:io';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:uni_links/uni_links.dart' as uni_links;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../constants/home_content.dart';
 import '../constants/strings.dart';
+import '../controllers/auth_controller.dart';
 import '../controllers/experience_controller.dart';
 import '../controllers/home_controller.dart';
 import '../models/experience_model.dart';
 import '../models/trip_model.dart';
+import '../services/emotion_service.dart';
+import '../services/vision_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,38 +34,275 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Trip> _featuredTrips = [];
   bool _isLoadingTrips = true;
   String? _errorMessage;
-  
-  late final ExperienceController _experienceController;
+  final TextEditingController _transformSearchController =
+      TextEditingController();
+  StreamSubscription? _sub;
+  DateTimeRange? _travelDates;
+  int _travelers = 2;
+  final _imagePicker = ImagePicker();
+  late final VisionService _visionService;
+
   late final HomeController _homeController;
 
   @override
   void initState() {
     super.initState();
-    _experienceController = context.read<ExperienceController>();
     _homeController = context.read<HomeController>();
-    _experienceController.addListener(_onControllerUpdate);
+    _visionService = VisionService();
     _loadFeaturedTrips();
+    _initDeepLinkListener();
   }
 
   @override
   void dispose() {
-    _experienceController.removeListener(_onControllerUpdate);
+    _transformSearchController.dispose();
     super.dispose();
+    _sub?.cancel();
   }
 
-  void _onControllerUpdate() {
-    // Protección contra fugas de memoria: solo actualizar si el widget está montado
-    if (mounted) {
-      setState(() {});
-    }
+  Future<void> _pickDates() async {
+    final now = DateTime.now();
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365 * 2)),
+      initialDateRange: _travelDates,
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _travelDates = picked);
   }
+
+  Future<void> _pickTravelers() async {
+    int local = _travelers;
+    final picked = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cantidad de viajeros'),
+        content: StatefulBuilder(
+          builder: (context, setDialogState) => Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed:
+                    local > 1 ? () => setDialogState(() => local--) : null,
+                icon: const Icon(Icons.remove_circle_outline),
+              ),
+              Text('$local',
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold)),
+              IconButton(
+                onPressed:
+                    local < 12 ? () => setDialogState(() => local++) : null,
+                icon: const Icon(Icons.add_circle_outline),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar')),
+          ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, local),
+              child: const Text('Aceptar')),
+        ],
+      ),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _travelers = picked);
+  }
+
+  Future<void> _openAiDestinationChat() async {
+    final raw = _transformSearchController.text.trim();
+    if (raw.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Escribe cómo te quieres sentir al viajar.')),
+      );
+      return;
+    }
+
+    final emotionService = context.read<EmotionService>();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Asistente de destinos'),
+        content: FutureBuilder(
+          future: emotionService.analizarTexto(raw),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                height: 100,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            final result = snapshot.data;
+            if (result == null) {
+              return const Text(
+                'No pude generar una sugerencia ahora. Intenta con más contexto emocional.',
+              );
+            }
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Destino sugerido: ${result.destino}',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(result.explicacion),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 6,
+                  children: result.emociones
+                      .map((e) => Chip(
+                          label: Text(e), visualDensity: VisualDensity.compact))
+                      .toList(),
+                ),
+              ],
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cerrar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              Navigator.pushNamed(context, '/search');
+            },
+            child: const Text('Buscar viajes'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String get _dateButtonLabel {
+    if (_travelDates == null) return AppStrings.homeDates;
+    final f = DateFormat('dd/MM');
+    return '${f.format(_travelDates!.start)} - ${f.format(_travelDates!.end)}';
+  }
+
+  Future<void> _initDeepLinkListener() async {
+    _sub = uni_links.uriLinkStream.listen((Uri? uri) {
+      if (!mounted) return;
+      if (uri != null && uri.scheme == 'feeltrip') {
+        if (uri.host == 'pago-exitoso' || uri.host == 'success') {
+          _celebrarPagoExitoso();
+        } else if (uri.host == 'pago-fallido' || uri.host == 'failure') {
+          Get.snackbar(
+            'Pago Fallido',
+            'Tu pago no pudo ser procesado. Por favor, inténtalo de nuevo.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        } else if (uri.host == 'pago-pendiente' || uri.host == 'pending') {
+          Get.snackbar(
+            'Pago Pendiente',
+            'Tu pago está siendo procesado. Te avisaremos cuando se complete.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
+        }
+      }
+    }, onError: (err) {
+      if (!mounted) return;
+      debugPrint("Error en Deep Link: $err");
+    });
+  }
+
+  void _celebrarPagoExitoso() {
+    final userId = Get.find<AuthController>().user?.uid;
+    if (userId == null) {
+      debugPrint("Error: Usuario no autenticado para celebrar el pago.");
+      return;
+    }
+
+    Get.snackbar(
+      '¡Pago Exitoso!',
+      '¡Gracias! Ahora eres un Mecenas de Rutas y ganaste 500 XP.',
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
+
+    FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'isPremium': true,
+      'totalXP': FieldValue.increment(500),
+    });
+  }
+
+  Future<void> _escanearMundo(BuildContext context) async {
+    // 1. Pick image from camera
+    final XFile? imageFile = await _imagePicker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1024, // Reduce image size for faster upload
+      imageQuality: 70,
+    );
+
+    if (imageFile == null || !context.mounted) return;
+
+    // 2. Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Descifrando el asombro..."),
+          ],
+        ),
+      ),
+    );
+
+    // 3. Call AI service
+    final poeticMessage =
+        await _visionService.getPoeticMessageFromImage(File(imageFile.path));
+
+    if (!context.mounted) return;
+    Navigator.of(context).pop(); // Close loading dialog
+
+    // 4. Show result dialog
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.auto_awesome, color: Colors.amber),
+            SizedBox(width: 10),
+            Text("Voz del Viaje"),
+          ],
+        ),
+        content: Text(
+          poeticMessage ?? "No se pudo obtener una respuesta.",
+          style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cerrar"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String get _travelersButtonLabel => '$_travelers viajeros';
 
   Future<void> _loadFeaturedTrips() async {
     // Si ya está cargando o montado, actualizamos estado local
     if (mounted) setState(() => _isLoadingTrips = true);
 
     try {
-      final trips = await _homeController.loadFeaturedTrips();
+      final result = await _homeController.loadFeaturedTrips();
+      final trips = result.getOrElse(<Trip>[]);
       // Verificación crítica antes de usar setState después de un await
       if (!mounted) return;
       setState(() {
@@ -65,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       setState(() {
         _isLoadingTrips = false;
-        _errorMessage = 'Error al cargar viajes: ${e.toString()}';
+        _errorMessage = 'No se pudieron cargar los viajes en este momento.';
       });
     }
   }
@@ -81,6 +329,34 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text(AppStrings.homeTitle),
         elevation: 0,
         backgroundColor: Colors.deepPurple,
+        actions: [
+          IconButton(
+            tooltip: 'Buscar',
+            onPressed: () => Navigator.pushNamed(context, '/search'),
+            icon: const Icon(Icons.search),
+          ),
+          IconButton(
+            tooltip: 'Carrito',
+            onPressed: () => Navigator.pushNamed(context, '/cart'),
+            icon: const Icon(Icons.shopping_cart_outlined),
+          ),
+          IconButton(
+            tooltip: 'Reservas',
+            onPressed: () => Navigator.pushNamed(context, '/bookings'),
+            icon: const Icon(Icons.calendar_today_outlined),
+          ),
+          IconButton(
+            tooltip: 'Perfil',
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
+            icon: const Icon(Icons.person_outline),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _escanearMundo(context),
+        label: const Text("ESCANEAR ASOMBRO"),
+        icon: const Icon(Icons.auto_awesome),
+        backgroundColor: Colors.amber,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -110,8 +386,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 20),
                   TextField(
+                    controller: _transformSearchController,
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: (_) => _openAiDestinationChat(),
                     decoration: InputDecoration(
-                      hintText: AppStrings.homeSearchHint,
+                      hintText: 'Busca un destino transformador',
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -119,6 +398,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderSide: BorderSide.none,
                       ),
                       prefixIcon: const Icon(Icons.location_on),
+                      suffixIcon: IconButton(
+                        tooltip: 'Consultar IA',
+                        onPressed: _openAiDestinationChat,
+                        icon: const Icon(Icons.auto_awesome),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -126,9 +410,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: _pickDates,
                           icon: const Icon(Icons.calendar_today),
-                          label: const Text(AppStrings.homeDates),
+                          label: Text(_dateButtonLabel),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: Colors.deepPurple,
@@ -138,9 +422,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: _pickTravelers,
                           icon: const Icon(Icons.people),
-                          label: const Text(AppStrings.homeTravelers),
+                          label: Text(_travelersButtonLabel),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: Colors.deepPurple,
@@ -349,15 +633,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Consumer<ExperienceController>(
-                      builder: (context, controller, child) {
-                    if (controller.stories.isEmpty) {
-                      return const SizedBox();
-                    }
-                    return Column(
-                      children: controller.stories.take(2).map((story) => _buildStoryPreviewCard(story)).toList(),
-                    );
-                  }),
+                  Obx(
+                    () {
+                      final controller = Get.find<ExperienceController>();
+                      if (controller.stories.isEmpty) {
+                        return const SizedBox(); // O un loading/empty state
+                      }
+                      return Column(
+                        children: controller.stories
+                            .take(2)
+                            .map((story) => _buildStoryPreviewCard(story))
+                            .toList(),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -387,7 +676,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             homeQuickAccessItems[i].title,
                             homeQuickAccessItems[i].subtitle,
                             () {
-                              Navigator.pushNamed(context, homeQuickAccessItems[i].route);
+                              Navigator.pushNamed(
+                                  context, homeQuickAccessItems[i].route);
                             },
                           ),
                         ),
@@ -453,7 +743,11 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 CircleAvatar(
                   backgroundColor: Colors.deepPurple[200],
-                  child: Text(story.author[0]),
+                  child: Text(
+                    story.author.isNotEmpty
+                        ? story.author[0].toUpperCase()
+                        : '?',
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -566,30 +860,36 @@ class TripCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/trip-details', arguments: trip.id),
+      onTap: () =>
+          Navigator.pushNamed(context, '/trip-details', arguments: trip.id),
       child: Card(
         margin: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             trip.images.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: trip.images.first,
-                    height: 150,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      height: 150,
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                ? ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
                     ),
-                    errorWidget: (context, url, error) => Container(
+                    child: CachedNetworkImage(
+                      imageUrl: trip.images.first,
                       height: 150,
-                      color: Colors.grey[300],
-                      child:
-                          Icon(Icons.image, size: 50, color: Colors.grey[600]),
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        height: 150,
+                        color: Colors.grey[300],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        height: 150,
+                        color: Colors.grey[300],
+                        child: Icon(Icons.image,
+                            size: 50, color: Colors.grey[600]),
+                      ),
                     ),
                   )
                 : Container(

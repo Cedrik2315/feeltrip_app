@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 import '../constants/strings.dart';
 import '../controllers/auth_controller.dart';
@@ -58,11 +58,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await context.read<AuthController>().register(
-            name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          );
+      await Get.find<AuthController>().register(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
 
       if (!mounted) return;
       Navigator.of(context).pop();
@@ -117,8 +117,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 labelText: AppStrings.passwordLabel,
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  icon: Icon(_obscurePassword
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
             ),
@@ -130,14 +133,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 labelText: AppStrings.confirmPasswordLabel,
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                  icon: Icon(_obscureConfirmPassword
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () => setState(
+                      () => _obscureConfirmPassword = !_obscureConfirmPassword),
                 ),
               ),
             ),
             CheckboxListTile(
               value: _agreedToTerms,
-              onChanged: _isLoading ? null : (v) => setState(() => _agreedToTerms = v ?? false),
+              onChanged: _isLoading
+                  ? null
+                  : (v) => setState(() => _agreedToTerms = v ?? false),
               title: const Text(AppStrings.acceptTerms),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
