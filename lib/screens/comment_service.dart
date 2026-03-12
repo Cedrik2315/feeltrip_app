@@ -36,7 +36,7 @@ class CommentService {
         .collection('stories')
         .doc(storyId)
         .collection('comments')
-        .add(comment.toFirestore());
+        .add(comment.toMap());
   }
 
   Future<void> deleteComment(String storyId, String commentId) async {
