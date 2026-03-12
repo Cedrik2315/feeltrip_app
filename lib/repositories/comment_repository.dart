@@ -141,7 +141,7 @@ class FirestoreCommentRepository implements CommentRepository {
         .doc(storyId)
         .collection('comments')
         .doc(commentId)
-        .set(comment.toFirestore());
+        .set(comment.toMap());
   }
 
   @override

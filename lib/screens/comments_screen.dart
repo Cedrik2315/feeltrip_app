@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+ 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:feeltrip_app/services/comment_service.dart';
 import 'package:feeltrip_app/models/comment_model.dart';
@@ -11,7 +11,7 @@ class CommentsScreen extends StatefulWidget {
   const CommentsScreen({Key? key, required this.storyId}) : super(key: key);
 
   @override
-  _CommentsScreenState createState() => _CommentsScreenState();
+  State<CommentsScreen> createState() => _CommentsScreenState();
 }
 
 class _CommentsScreenState extends State<CommentsScreen> {
