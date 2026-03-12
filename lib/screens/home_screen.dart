@@ -333,6 +333,27 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadFeaturedTrips();
   }
 
+  Widget _buildAppBarAction({
+    required String tooltip,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.20),
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          tooltip: tooltip,
+          onPressed: onPressed,
+          icon: Icon(icon),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -343,28 +364,43 @@ class _HomeScreenState extends State<HomeScreen> {
           fit: BoxFit.contain,
         ),
         elevation: 0,
-        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.deepPurple,
+                Colors.purple[700]!,
+              ],
+            ),
+          ),
+        ),
         actions: [
-          IconButton(
+          _buildAppBarAction(
             tooltip: 'Buscar',
+            icon: Icons.search,
             onPressed: () => Navigator.pushNamed(context, '/search'),
-            icon: const Icon(Icons.search),
           ),
-          IconButton(
+          _buildAppBarAction(
             tooltip: 'Carrito',
+            icon: Icons.shopping_cart_outlined,
             onPressed: () => Navigator.pushNamed(context, '/cart'),
-            icon: const Icon(Icons.shopping_cart_outlined),
           ),
-          IconButton(
+          _buildAppBarAction(
             tooltip: 'Reservas',
+            icon: Icons.calendar_today_outlined,
             onPressed: () => Navigator.pushNamed(context, '/bookings'),
-            icon: const Icon(Icons.calendar_today_outlined),
           ),
-          IconButton(
+          _buildAppBarAction(
             tooltip: 'Perfil',
+            icon: Icons.person_outline,
             onPressed: () => Navigator.pushNamed(context, '/profile'),
-            icon: const Icon(Icons.person_outline),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -377,73 +413,123 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             // Hero Banner - Experiencias Vivenciales
-            Container(
-              color: Colors.deepPurple,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            SizedBox(
+              width: double.infinity,
+              child: Stack(
                 children: [
-                  const Text(
-                    AppStrings.homeHeroTitle,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    AppStrings.homeHeroSubtitle,
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _transformSearchController,
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (_) => _openAiDestinationChat(),
-                    decoration: InputDecoration(
-                      hintText: 'Busca un destino transformador',
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      prefixIcon: const Icon(Icons.location_on),
-                      suffixIcon: IconButton(
-                        tooltip: 'Consultar IA',
-                        onPressed: _openAiDestinationChat,
-                        icon: const Icon(Icons.auto_awesome),
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image: AssetImage('assets/images/tromso_aurora.png'),
+                          fit: BoxFit.cover,
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.deepPurple,
+                            Colors.purple[900]!,
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _pickDates,
-                          icon: const Icon(Icons.calendar_today),
-                          label: Text(_dateButtonLabel),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.deepPurple,
-                          ),
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.40),
+                            Colors.black.withValues(alpha: 0.55),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _pickTravelers,
-                          icon: const Icon(Icons.people),
-                          label: Text(_travelersButtonLabel),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.deepPurple,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          AppStrings.homeHeroTitle,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        const Text(
+                          AppStrings.homeHeroSubtitle,
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: _transformSearchController,
+                          textInputAction: TextInputAction.search,
+                          onSubmitted: (_) => _openAiDestinationChat(),
+                          decoration: InputDecoration(
+                            hintText: 'Busca un destino transformador',
+                            filled: true,
+                            fillColor: Colors.white.withValues(alpha: 0.96),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 14,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: const Icon(Icons.location_on),
+                            suffixIcon: IconButton(
+                              tooltip: 'Consultar IA',
+                              onPressed: _openAiDestinationChat,
+                              icon: const Icon(Icons.auto_awesome),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: _pickDates,
+                                icon: const Icon(Icons.calendar_today),
+                                label: Text(_dateButtonLabel),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.white.withValues(alpha: 0.96),
+                                  foregroundColor: Colors.deepPurple,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: _pickTravelers,
+                                icon: const Icon(Icons.people),
+                                label: Text(_travelersButtonLabel),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.white.withValues(alpha: 0.96),
+                                  foregroundColor: Colors.deepPurple,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -723,17 +809,32 @@ class _HomeScreenState extends State<HomeScreen> {
   ) {
     return Container(
       width: 140,
+      height: 160,
       margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withValues(alpha: 0.24),
+            color.withValues(alpha: 0.06),
+          ],
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withValues(alpha: 0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(12),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 28)),
+          Text(emoji, style: const TextStyle(fontSize: 36)),
           const SizedBox(height: 8),
           Text(
             title,
@@ -750,6 +851,31 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showStoryDetails(TravelerStory story) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(story.title),
+        content: SingleChildScrollView(
+          child: Text(story.story),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cerrar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pushNamed(context, '/comments', arguments: story.id);
+            },
+            child: const Text('Comentarios'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStoryPreviewCard(TravelerStory story) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -758,9 +884,34 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (story.imageUrl.trim().isNotEmpty) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CachedNetworkImage(
+                  imageUrl: story.imageUrl,
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, _) => Container(
+                    height: 160,
+                    color: Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, _, __) => Container(
+                    height: 160,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(Icons.image_not_supported_outlined),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             Row(
               children: [
                 CircleAvatar(
+                  radius: 24,
                   backgroundColor: Colors.deepPurple[200],
                   child: Text(
                     story.author.isNotEmpty
@@ -809,7 +960,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   .map(
                     (emotion) => Chip(
                       label: Text(emotion),
-                      backgroundColor: Colors.purple[50],
+                      backgroundColor: Colors.purple[100],
                       labelStyle: const TextStyle(fontSize: 11),
                     ),
                   )
@@ -823,6 +974,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text('${story.likes}', style: const TextStyle(fontSize: 12)),
               ],
             ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => _showStoryDetails(story),
+                child: const Text('Ver más'),
+              ),
+            ),
           ],
         ),
       ),
@@ -835,30 +994,53 @@ class _HomeScreenState extends State<HomeScreen> {
     String subtitle,
     VoidCallback onTap,
   ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 28)),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+    final accent = switch (title.trim().toLowerCase()) {
+      'mi diario' => Colors.deepPurple,
+      'mi impacto' => Colors.teal,
+      'comunidad' => Colors.purple,
+      _ => Colors.deepPurple,
+    };
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                accent.withValues(alpha: 0.08),
+              ],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 28)),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11, color: Colors.grey[700]),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -873,52 +1055,99 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () =>
-          Navigator.pushNamed(context, '/trip-details', arguments: trip.id),
-      child: Card(
-        margin: const EdgeInsets.all(8),
+    final formattedPrice = NumberFormat.currency(
+      locale: 'es_CL',
+      symbol: '\$',
+      decimalDigits: 0,
+    ).format(trip.price).replaceAll('\u00A0', '');
+
+    return Card(
+      margin: const EdgeInsets.all(8),
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: () =>
+            Navigator.pushNamed(context, '/trip-details', arguments: trip.id),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            trip.images.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
-                    child: CachedNetworkImage(
-                      imageUrl: trip.images.first,
-                      height: 150,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        height: 150,
+            Stack(
+              children: [
+                trip.images.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: trip.images.first,
+                        height: 180,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          height: 180,
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          height: 180,
+                          color: Colors.grey[300],
+                          child: Icon(
+                            Icons.image,
+                            size: 50,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      )
+                    : Container(
+                        height: 180,
+                        width: double.infinity,
                         color: Colors.grey[300],
-                        child: const Center(child: CircularProgressIndicator()),
+                        child: Center(
+                          child: Icon(
+                            Icons.image,
+                            size: 50,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 150,
-                        color: Colors.grey[300],
-                        child: Icon(
-                          Icons.image,
-                          size: 50,
-                          color: Colors.grey[600],
+                if (trip.isTransformative)
+                  Positioned(
+                    left: 12,
+                    top: 12,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.purple[100],
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 10,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('✨ ', style: TextStyle(fontSize: 12)),
+                            Text(
+                              AppStrings.homeTransformativeExperience,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.purple[900],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  )
-                : Container(
-                    height: 150,
-                    width: double.infinity,
-                    color: Colors.grey[300],
-                    child: Center(
-                      child: Icon(
-                        Icons.image,
-                        size: 50,
-                        color: Colors.grey[600],
-                      ),
-                    ),
                   ),
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
@@ -931,44 +1160,46 @@ class TripCard extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  if (trip.isTransformative)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.purple[100],
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        AppStrings.homeTransformativeExperience,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.purple[800],
-                        ),
-                      ),
-                    ),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '\$${trip.price}',
+                        formattedPrice,
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.deepPurple,
                         ),
                       ),
-                      Row(
-                        children: [
-                          const Icon(Icons.star, size: 16, color: Colors.amber),
-                          const SizedBox(width: 4),
-                          Text('${trip.rating}'),
-                        ],
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.amber[300],
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                size: 16,
+                                color: Colors.black87,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${trip.rating}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
