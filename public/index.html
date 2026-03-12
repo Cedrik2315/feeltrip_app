@@ -1,0 +1,46 @@
+<![CDATA[<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>FeelTrip</title>
+  <!-- Open Graph meta tags (will be updated by JS) -->
+  <meta property="og:title" content="FeelTrip">
+  <meta property="og:description" content="Descubre experiencias de viaje en FeelTrip">
+  <meta property="og:image" content="https://feeltrip.app/assets/og-image.png">
+  <meta property="og:url" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <script>
+    // Detect the path and build the appropriate deep link
+    (function() {
+      const path = window.location.pathname;
+      const parts = path.split('/').filter(Boolean);
+      if (parts.length >= 2) {
+        const type = parts[0];
+        const id = parts[1];
+        const deepLink = `feeltrip://${type}/${id}`;
+        // Update Open Graph URL to the current page
+        const ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) {
+          ogUrl.setAttribute('content', window.location.href);
+        }
+        // Redirect to the app after a short delay (2 seconds)
+        setTimeout(() => {
+          window.location.href = deepLink;
+        }, 2000);
+      }
+    })();
+  </script>
+  <style>
+    body {font-family: Arial, sans-serif; text-align: center; padding: 2rem;}
+    a {margin: 0 0.5rem;}
+  </style>
+</head>
+<body>
+  <h1>FeelTrip</h1>
+  <p>Redirigiendo a la aplicación…</p>
+  <p>Si la app no está instalada, puedes descargarla:</p>
+  <a href="https://play.google.com/store/apps/details?id=com.example.feeltrip_app" target="_blank">Google Play</a>
+  |
+  <a href="https://apps.apple.com/app/feeltrip-app/id123456789" target="_blank">App Store</a>
+</body>
+</html>]]>
