@@ -43,9 +43,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Comentarios'),
+        title: const Text('Comentarios'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
       ),
@@ -56,15 +56,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
               stream: _commentService.getComments(widget.storyId),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error al cargar comentarios'));
+                  return const Center(child: Text('Error al cargar comentarios'));
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No hay comentarios aún'));
+                  return const Center(child: Text('No hay comentarios aún'));
                 }
 
                 return ListView.builder(
@@ -72,9 +72,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   itemBuilder: (context, index) {
                     final comment = snapshot.data![index];
                     return Card(
-                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                       child: Padding(
-                        padding: EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -88,30 +88,30 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                       ? Text(comment.userName[0])
                                       : null,
                                 ),
-                                SizedBox(width: 8),
-                                Text(
+                                const SizedBox(width: 8),
+Text(
                                   comment.userName,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 Text(
                                   _formatDate(comment.createdAt),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.grey,
                                     fontSize: 12,
                                   ),
                                 ),
                               ],
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(comment.content),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Row(
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.favorite),
+                                  icon: const Icon(Icons.favorite),
                                   onPressed: () => _commentService
                                       .likeComment(widget.storyId, comment.id)
                                       .catchError((e) => Get.snackbar(
@@ -120,9 +120,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                           )),
                                 ),
                                 Text(comment.likes.toString()),
-                                SizedBox(width: 8),
+                                const SizedBox(width: 8),
                                 IconButton(
-                                  icon: Icon(Icons.mood),
+                                  icon: const Icon(Icons.mood),
                                   onPressed: () => _commentService
                                       .addReaction(
                                           widget.storyId, comment.id, '👍')
@@ -133,11 +133,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                 ),
                                 if (comment.reactions.isNotEmpty)
                                   Text(comment.reactions.join(' ')),
-                                Spacer(),
+                                const Spacer(),
                                 if (FirebaseAuth.instance.currentUser?.uid ==
                                     comment.userId)
                                   IconButton(
-                                    icon: Icon(Icons.delete),
+                                    icon: const Icon(Icons.delete),
                                     onPressed: () => _commentService
                                         .deleteComment(
                                             widget.storyId, comment.id)
@@ -158,21 +158,21 @@ class _CommentsScreenState extends State<CommentsScreen> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _commentController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Escribe un comentario...',
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
                   onPressed: () {
                     if (_commentController.text.isNotEmpty) {
                       _commentService
