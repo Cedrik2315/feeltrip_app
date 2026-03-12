@@ -184,7 +184,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -476,7 +476,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           colors: [
                             Colors.amber,
                             Colors.orange,
@@ -502,7 +502,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                           });
                         },
                         child: Padding(
-                          padding: EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
                           child: Icon(
                             _isPlaying ? Icons.pause : Icons.play_arrow,
                             color: Colors.white,
@@ -526,7 +526,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Flexible(
           child: Text(
@@ -579,7 +579,7 @@ class _SlideOverlay extends StatelessWidget {
                     emotion,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -607,7 +607,7 @@ class _SlideOverlay extends StatelessWidget {
               ),
               IconButton(
                 tooltip: 'Compartir',
-                icon: Icon(Icons.share, color: Colors.white),
+                icon: const Icon(Icons.share, color: Colors.white),
                 onPressed: onShare,
               ),
             ],

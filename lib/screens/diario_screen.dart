@@ -36,10 +36,9 @@ class _DiarioScreenState extends State<DiarioScreen> {
       body: _buildDiaryListWithSlivers(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Get.toNamed('/smart-camera'),
-        backgroundColor: const Color(0xFF1A237E),
+        backgroundColor: const Color(0xFF00838F),
         icon: const Icon(Icons.auto_awesome, color: Colors.white),
-        label:
-            const Text("NUEVO MOMENTO", style: TextStyle(color: Colors.white)),
+        label: const Text("NUEVO MOMENTO", style: TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -56,17 +55,44 @@ class _DiarioScreenState extends State<DiarioScreen> {
             expandedHeight: 120.0,
             floating: false,
             pinned: true,
-            backgroundColor: const Color(0xFF1A237E),
+            backgroundColor: const Color(0xFF00838F),
             flexibleSpace: FlexibleSpaceBar(
               title: const Text(
                 'MI BITÁCORA',
                 style: TextStyle(
-                  fontFamily: 'Serif', // O una fuente elegante que tengas
+                  fontFamily: 'Serif',
                   fontWeight: FontWeight.bold,
                   letterSpacing: 3,
                 ),
               ),
-              background: Container(color: const Color(0xFF1A237E)),
+              background: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF009688), Color(0xFF00796B)],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              color: const Color(0xFFE0F2F1),
+              padding: const EdgeInsets.all(16),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '3 entradas este mes',
+                    style: TextStyle(
+                      color: Color(0xFF00796B),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           if (_controller.diaryEntries.isEmpty)
@@ -77,19 +103,39 @@ class _DiarioScreenState extends State<DiarioScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.note_alt_outlined,
-                          size: 64, color: Colors.grey[400]),
+                      Icon(Icons.book_outlined,
+                          size: 96, color: Colors.grey[300]),
                       const SizedBox(height: 16),
                       const Text(
-                        'Aún no tienes entradas',
+                        'Tu diario está vacío',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Presiona "NUEVO MOMENTO" para capturar tus pensamientos y emociones.',
+                        '¡Empieza a registrar tus momentos!',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () => Get.toNamed('/smart-camera'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00838F),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'COMENZAR AHORA',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -120,88 +166,87 @@ class DiaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      height: 300,
+      height: 120,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          children: [
-            // IMAGEN DE FONDO
-            CachedNetworkImage(
-              imageUrl: entry.imageUrl,
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(color: Colors.grey[300]),
-              errorWidget: (context, url, error) =>
-                  const Icon(Icons.image_not_supported_outlined),
-            ),
-
-            // GRADIENTE PARA LEER TEXTO
+      child: Row(
+        children: [
+          // IMAGEN A LA IZQUIERTA
+          if (entry.imageUrl.isNotEmpty)
             Container(
+              width: 80,
+              height: 120,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.7),
-                  ],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
+                image: DecorationImage(
+                  image: CachedNetworkImageProvider(entry.imageUrl),
+                  fit: BoxFit.cover,
                 ),
               ),
+            )
+          else
+            Container(
+              width: 80,
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
+                color: Colors.grey[300],
+              ),
+              child: const Icon(Icons.image_not_supported_outlined,
+                  color: Colors.grey, size: 32),
             ),
 
-            // CONTENIDO DEL TEXTO
-            Padding(
-              padding: const EdgeInsets.all(20.0),
+          // CONTENIDO
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+                color: Colors.white,
+              ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    DateFormat('dd MMMM, yyyy', 'es')
-                        .format(entry.createdAt)
-                        .toUpperCase(),
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 12, letterSpacing: 1),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    entry.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+                  // CHIP DE EMOCIÓN
                   Row(
                     children: [
-                      const Icon(Icons.favorite,
-                          color: Colors.redAccent, size: 18),
-                      const SizedBox(width: 5),
-                      Text(
-                        entry.emotions.isNotEmpty
-                            ? entry.emotions.first
-                            : 'Sin emoción',
-                        style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _getEmotionColor(entry.emotions.first),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _getEmotionIcon(entry.emotions.first),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                       const Spacer(),
                       // BOTÓN COMPARTIR RÁPIDO
                       IconButton(
                         icon: const Icon(Icons.share_outlined,
-                            color: Colors.white),
+                            color: Color(0xFF00838F)),
                         onPressed: () async {
                           await SharingService.shareDiaryEntry(
                             title: entry.title,
@@ -211,12 +256,92 @@ class DiaryCard extends StatelessWidget {
                       ),
                     ],
                   ),
+
+                  // FECHA
+                  Text(
+                    _formatDate(entry.createdAt),
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  // TÍTULO
+                  Text(
+                    entry.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  // PREVIEW DEL CONTENIDO
+                  const SizedBox(height: 4),
+                  Text(
+                    entry.content,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
+
+    if (difference == 0) {
+      return 'Hoy';
+    } else if (difference == 1) {
+      return 'Ayer';
+    } else if (difference < 7) {
+      return 'Hace $difference días';
+    } else {
+      return DateFormat('dd MMMM, yyyy', 'es').format(date);
+    }
+  }
+
+  Color _getEmotionColor(String emotion) {
+    switch (emotion) {
+      case 'Alegría':
+        return const Color(0xFFFFEB3B); // Amarillo
+      case 'Tristeza':
+        return const Color(0xFF64B5F6); // Azul
+      case 'Enojo':
+        return const Color(0xFFF44336); // Rojo
+      case 'Paz':
+        return const Color(0xFF4CAF50); // Verde
+      default:
+        return const Color(0xFF9E9E9E); // Gris
+    }
+  }
+
+  String _getEmotionIcon(String emotion) {
+    switch (emotion) {
+      case 'Alegría':
+        return '😊';
+      case 'Tristeza':
+        return '😢';
+      case 'Enojo':
+        return '😤';
+      case 'Paz':
+        return '😌';
+      default:
+        return '🙂';
+    }
   }
 }

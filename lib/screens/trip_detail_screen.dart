@@ -154,7 +154,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
               _isDescriptionExpanded ? 'Ver menos' : 'Ver más',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.deepPurple,
                 fontWeight: FontWeight.bold,
               ),
