@@ -6,7 +6,9 @@ import '../repositories/agency_repository.dart';
 class AgencyService {
   AgencyService({AgencyRepository? repository})
       : _repository = repository ??
-            (useMockData ? MockAgencyRepository() : FirestoreAgencyRepository());
+            (useMockData
+                ? MockAgencyRepository()
+                : FirestoreAgencyRepository());
 
   final AgencyRepository _repository;
 
@@ -14,7 +16,8 @@ class AgencyService {
     try {
       return await _repository.createAgency(agency);
     } catch (e, st) {
-      AppLogger.error('Error en AgencyService.createAgency', error: e, stackTrace: st, name: 'AgencyService');
+      AppLogger.error('Error en AgencyService.createAgency',
+          error: e, stackTrace: st, name: 'AgencyService');
       rethrow;
     }
   }
@@ -23,7 +26,8 @@ class AgencyService {
     try {
       return await _repository.getAgencyById(agencyId);
     } catch (e, st) {
-      AppLogger.error('Error en AgencyService.getAgencyById', error: e, stackTrace: st, name: 'AgencyService');
+      AppLogger.error('Error en AgencyService.getAgencyById',
+          error: e, stackTrace: st, name: 'AgencyService');
       return null;
     }
   }
@@ -44,7 +48,8 @@ class AgencyService {
     try {
       await _repository.updateAgency(agencyId, data);
     } catch (e, st) {
-      AppLogger.error('Error en AgencyService.updateAgency', error: e, stackTrace: st, name: 'AgencyService');
+      AppLogger.error('Error en AgencyService.updateAgency',
+          error: e, stackTrace: st, name: 'AgencyService');
       rethrow;
     }
   }
@@ -54,9 +59,11 @@ class AgencyService {
     required String experienceId,
   }) async {
     try {
-      await _repository.addExperienceToAgency(agencyId: agencyId, experienceId: experienceId);
+      await _repository.addExperienceToAgency(
+          agencyId: agencyId, experienceId: experienceId);
     } catch (e, st) {
-      AppLogger.error('Error en AgencyService.addExperienceToAgency', error: e, stackTrace: st, name: 'AgencyService');
+      AppLogger.error('Error en AgencyService.addExperienceToAgency',
+          error: e, stackTrace: st, name: 'AgencyService');
       rethrow;
     }
   }
@@ -65,8 +72,61 @@ class AgencyService {
     try {
       await _repository.followAgency(agencyId);
     } catch (e, st) {
-      AppLogger.error('Error en AgencyService.followAgency', error: e, stackTrace: st, name: 'AgencyService');
+      AppLogger.error('Error en AgencyService.followAgency',
+          error: e, stackTrace: st, name: 'AgencyService');
       rethrow;
+    }
+  }
+
+  Future<void> followAgencyWithUser({
+    required String userId,
+    required String agencyId,
+  }) async {
+    try {
+      await _repository.followAgencyWithUser(
+          userId: userId, agencyId: agencyId);
+    } catch (e, st) {
+      AppLogger.error('Error en AgencyService.followAgencyWithUser',
+          error: e, stackTrace: st, name: 'AgencyService');
+      rethrow;
+    }
+  }
+
+  Future<void> unfollowAgencyWithUser({
+    required String userId,
+    required String agencyId,
+  }) async {
+    try {
+      await _repository.unfollowAgencyWithUser(
+          userId: userId, agencyId: agencyId);
+    } catch (e, st) {
+      AppLogger.error('Error en AgencyService.unfollowAgencyWithUser',
+          error: e, stackTrace: st, name: 'AgencyService');
+      rethrow;
+    }
+  }
+
+  Future<bool> isFollowingAgency({
+    required String userId,
+    required String agencyId,
+  }) async {
+    try {
+      return await _repository.isFollowingAgency(
+          userId: userId, agencyId: agencyId);
+    } catch (e, st) {
+      AppLogger.error('Error en AgencyService.isFollowingAgency',
+          error: e, stackTrace: st, name: 'AgencyService');
+      return false;
+    }
+  }
+
+  Future<List<String>> getFollowingAgencies(String userId) async {
+    try {
+      return await _repository.getFollowingAgencies(userId);
+    } catch (e, st) {
+      AppLogger.error('Error en AgencyService.getFollowingAgencies',
+          error: e, stackTrace: st, name: 'AgencyService');
+      return [];
     }
   }
 
@@ -75,9 +135,11 @@ class AgencyService {
     required double newRating,
   }) async {
     try {
-      await _repository.updateAgencyRating(agencyId: agencyId, newRating: newRating);
+      await _repository.updateAgencyRating(
+          agencyId: agencyId, newRating: newRating);
     } catch (e, st) {
-      AppLogger.error('Error en AgencyService.updateAgencyRating', error: e, stackTrace: st, name: 'AgencyService');
+      AppLogger.error('Error en AgencyService.updateAgencyRating',
+          error: e, stackTrace: st, name: 'AgencyService');
       rethrow;
     }
   }
@@ -86,7 +148,8 @@ class AgencyService {
     try {
       await _repository.deleteAgency(agencyId);
     } catch (e, st) {
-      AppLogger.error('Error en AgencyService.deleteAgency', error: e, stackTrace: st, name: 'AgencyService');
+      AppLogger.error('Error en AgencyService.deleteAgency',
+          error: e, stackTrace: st, name: 'AgencyService');
       rethrow;
     }
   }

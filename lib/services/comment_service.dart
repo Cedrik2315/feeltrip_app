@@ -1,98 +1,103 @@
-﻿import '../config/app_flags.dart';
-import '../core/app_logger.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart';
 import '../models/comment_model.dart';
-import '../repositories/comment_repository.dart';
 
 class CommentService {
-  CommentService({CommentRepository? repository})
-      : _repository = repository ??
-            (useMockData ? MockCommentRepository() : FirestoreCommentRepository());
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  final CommentRepository _repository;
-
-  Future<void> addComment({
-    required String storyId,
-    required String userId,
-    required String userName,
-    required String userAvatar,
-    required String content,
-  }) async {
+  Future<void> addComment(String storyId, String content) async {
     try {
-      await _repository.addComment(
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not logged in');
+
+      final commentId = const Uuid().v4();
+      final comment = Comment(
+        id: commentId,
         storyId: storyId,
-        userId: userId,
-        userName: userName,
-        userAvatar: userAvatar,
+        userId: user.uid,
+        userName: user.displayName ?? 'Anonymous',
+        userAvatar: user.photoURL ?? '',
         content: content,
+        reactions: [],
+        likes: 0,
+        createdAt: DateTime.now(),
       );
-    } catch (e, st) {
-      AppLogger.error(
-        'Error en CommentService.addComment',
-        error: e,
-        stackTrace: st,
-        name: 'CommentService',
-      );
-      rethrow;
+
+      await _firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('comments')
+          .doc(commentId)
+          .set(comment.toMap());
+    } catch (e) {
+      throw Exception('Failed to add comment: \$e');
     }
   }
 
   Stream<List<Comment>> getComments(String storyId) {
-    return _repository.getComments(storyId);
+    return _firestore
+        .collection('stories')
+        .doc(storyId)
+        .collection('comments')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Comment.fromFirestore(doc))
+            .toList());
   }
 
-  Future<void> addReaction({
-    required String storyId,
-    required String commentId,
-    required String reaction,
-  }) async {
+  Future<void> likeComment(String storyId, String commentId) async {
     try {
-      await _repository.addReaction(
-        storyId: storyId,
-        commentId: commentId,
-        reaction: reaction,
-      );
-    } catch (e, st) {
-      AppLogger.error(
-        'Error en CommentService.addReaction',
-        error: e,
-        stackTrace: st,
-        name: 'CommentService',
-      );
-      rethrow;
+      await _firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('comments')
+          .doc(commentId)
+          .update({
+            'likes': FieldValue.increment(1),
+          });
+    } catch (e) {
+      throw Exception('Failed to like comment: \$e');
     }
   }
 
-  Future<void> likeComment({
-    required String storyId,
-    required String commentId,
-  }) async {
+  Future<void> addReaction(String storyId, String commentId, String emoji) async {
     try {
-      await _repository.likeComment(storyId: storyId, commentId: commentId);
-    } catch (e, st) {
-      AppLogger.error(
-        'Error en CommentService.likeComment',
-        error: e,
-        stackTrace: st,
-        name: 'CommentService',
-      );
-      rethrow;
+      await _firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('comments')
+          .doc(commentId)
+          .update({
+            'reactions': FieldValue.arrayUnion([emoji]),
+          });
+    } catch (e) {
+      throw Exception('Failed to add reaction: \$e');
     }
   }
 
-  Future<void> deleteComment({
-    required String storyId,
-    required String commentId,
-  }) async {
+  Future<void> deleteComment(String storyId, String commentId) async {
     try {
-      await _repository.deleteComment(storyId: storyId, commentId: commentId);
-    } catch (e, st) {
-      AppLogger.error(
-        'Error en CommentService.deleteComment',
-        error: e,
-        stackTrace: st,
-        name: 'CommentService',
-      );
-      rethrow;
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not logged in');
+
+      final doc = await _firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('comments')
+          .doc(commentId)
+          .get();
+
+      final comment = Comment.fromFirestore(doc);
+      if (comment.userId != user.uid) {
+        throw Exception('You can only delete your own comments');
+      }
+
+      await doc.reference.delete();
+    } catch (e) {
+      throw Exception('Failed to delete comment: \$e');
     }
   }
 }

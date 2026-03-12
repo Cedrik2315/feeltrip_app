@@ -1,0 +1,7 @@
+[
+  { "elementType": "geometry", "stylers": [ { "color": "#f0f4f0" } ] },
+  { "featureType": "landscape.natural", "stylers": [ { "color": "#d0e0d0" } ] },
+  { "featureType": "poi.park", "stylers": [ { "color": "#b0d0b0" } ] },
+  { "featureType": "water", "stylers": [ { "color": "#a0c0e0" } ] },
+  { "featureType": "road", "stylers": [ { "visibility": "simplified" } ] }
+]

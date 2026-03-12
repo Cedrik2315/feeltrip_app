@@ -16,6 +16,19 @@ abstract class AgencyRepository {
     required String experienceId,
   });
   Future<void> followAgency(String agencyId);
+  Future<void> followAgencyWithUser({
+    required String userId,
+    required String agencyId,
+  });
+  Future<void> unfollowAgencyWithUser({
+    required String userId,
+    required String agencyId,
+  });
+  Future<bool> isFollowingAgency({
+    required String userId,
+    required String agencyId,
+  });
+  Future<List<String>> getFollowingAgencies(String userId);
   Future<void> updateAgencyRating({
     required String agencyId,
     required double newRating,
@@ -58,13 +71,15 @@ class MockAgencyRepository implements AgencyRepository {
 
   @override
   Stream<List<TravelAgency>> getAllAgencies() {
-    final agencies = MockData.getAgencies()..sort((a, b) => b.rating.compareTo(a.rating));
+    final agencies = MockData.getAgencies()
+      ..sort((a, b) => b.rating.compareTo(a.rating));
     return Stream.value(agencies);
   }
 
   @override
   Stream<List<TravelAgency>> getAgenciesByCity(String city) {
-    final agencies = MockData.getAgenciesByCity(city)..sort((a, b) => b.rating.compareTo(a.rating));
+    final agencies = MockData.getAgenciesByCity(city)
+      ..sort((a, b) => b.rating.compareTo(a.rating));
     return Stream.value(agencies);
   }
 
@@ -79,17 +94,21 @@ class MockAgencyRepository implements AgencyRepository {
 
   @override
   Future<void> updateAgency(String agencyId, Map<String, dynamic> data) async {
-    final agency = MockData.mockAgencies.firstWhere((a) => a['id'] == agencyId, orElse: () => {});
+    final agency = MockData.mockAgencies
+        .firstWhere((a) => a['id'] == agencyId, orElse: () => {});
     if (agency.isNotEmpty) {
       agency.addAll(data);
     }
   }
 
   @override
-  Future<void> addExperienceToAgency({required String agencyId, required String experienceId}) async {
-    final agency = MockData.mockAgencies.firstWhere((a) => a['id'] == agencyId, orElse: () => {});
+  Future<void> addExperienceToAgency(
+      {required String agencyId, required String experienceId}) async {
+    final agency = MockData.mockAgencies
+        .firstWhere((a) => a['id'] == agencyId, orElse: () => {});
     if (agency.isNotEmpty) {
-      final experiences = List<String>.from(agency['experiences'] ?? const <String>[]);
+      final experiences =
+          List<String>.from(agency['experiences'] ?? const <String>[]);
       experiences.add(experienceId);
       agency['experiences'] = experiences;
     }
@@ -97,15 +116,66 @@ class MockAgencyRepository implements AgencyRepository {
 
   @override
   Future<void> followAgency(String agencyId) async {
-    final agency = MockData.mockAgencies.firstWhere((a) => a['id'] == agencyId, orElse: () => {});
+    final agency = MockData.mockAgencies
+        .firstWhere((a) => a['id'] == agencyId, orElse: () => {});
     if (agency.isNotEmpty) {
       agency['followers'] = (agency['followers'] ?? 0) + 1;
     }
   }
 
   @override
-  Future<void> updateAgencyRating({required String agencyId, required double newRating}) async {
-    final agency = MockData.mockAgencies.firstWhere((a) => a['id'] == agencyId, orElse: () => {});
+  Future<void> followAgencyWithUser({
+    required String userId,
+    required String agencyId,
+  }) async {
+    // Inicializar followingAgencies si no existe
+    if (!MockData.mockUsersFollowing.containsKey(userId)) {
+      MockData.mockUsersFollowing[userId] = [];
+    }
+    final following = MockData.mockUsersFollowing[userId]!;
+    if (!following.contains(agencyId)) {
+      following.add(agencyId);
+    }
+    // También incrementar seguidores de la agencia
+    await followAgency(agencyId);
+  }
+
+  @override
+  Future<void> unfollowAgencyWithUser({
+    required String userId,
+    required String agencyId,
+  }) async {
+    final following = MockData.mockUsersFollowing[userId];
+    if (following != null && following.contains(agencyId)) {
+      following.remove(agencyId);
+    }
+    // Decrementar seguidores de la agencia
+    final agency = MockData.mockAgencies
+        .firstWhere((a) => a['id'] == agencyId, orElse: () => {});
+    if (agency.isNotEmpty) {
+      agency['followers'] = ((agency['followers'] ?? 1) as int) - 1;
+    }
+  }
+
+  @override
+  Future<bool> isFollowingAgency({
+    required String userId,
+    required String agencyId,
+  }) async {
+    final following = MockData.mockUsersFollowing[userId];
+    return following?.contains(agencyId) ?? false;
+  }
+
+  @override
+  Future<List<String>> getFollowingAgencies(String userId) async {
+    return MockData.mockUsersFollowing[userId] ?? [];
+  }
+
+  @override
+  Future<void> updateAgencyRating(
+      {required String agencyId, required double newRating}) async {
+    final agency = MockData.mockAgencies
+        .firstWhere((a) => a['id'] == agencyId, orElse: () => {});
     if (agency.isEmpty) return;
 
     final totalReviews = (agency['reviewCount'] ?? 0) as int;
@@ -133,7 +203,10 @@ class FirestoreAgencyRepository implements AgencyRepository {
   Future<String> createAgency(TravelAgency agency) async {
     final agencyId = const Uuid().v4();
     final newAgency = agency.copyWith(id: agencyId);
-    await _firestore.collection('agencies').doc(agencyId).set(newAgency.toFirestore());
+    await _firestore
+        .collection('agencies')
+        .doc(agencyId)
+        .set(newAgency.toFirestore());
     return agencyId;
   }
 
@@ -150,7 +223,9 @@ class FirestoreAgencyRepository implements AgencyRepository {
         .collection('agencies')
         .orderBy('rating', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => TravelAgency.fromFirestore(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TravelAgency.fromFirestore(doc))
+            .toList());
   }
 
   @override
@@ -160,7 +235,9 @@ class FirestoreAgencyRepository implements AgencyRepository {
         .where('city', isEqualTo: city)
         .orderBy('rating', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => TravelAgency.fromFirestore(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TravelAgency.fromFirestore(doc))
+            .toList());
   }
 
   @override
@@ -170,7 +247,9 @@ class FirestoreAgencyRepository implements AgencyRepository {
         .where('specialties', arrayContains: specialty)
         .orderBy('rating', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => TravelAgency.fromFirestore(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TravelAgency.fromFirestore(doc))
+            .toList());
   }
 
   @override
@@ -179,11 +258,11 @@ class FirestoreAgencyRepository implements AgencyRepository {
   }
 
   @override
-  Future<void> addExperienceToAgency({required String agencyId, required String experienceId}) {
-    return _firestore
-        .collection('agencies')
-        .doc(agencyId)
-        .update({'experiences': FieldValue.arrayUnion([experienceId])});
+  Future<void> addExperienceToAgency(
+      {required String agencyId, required String experienceId}) {
+    return _firestore.collection('agencies').doc(agencyId).update({
+      'experiences': FieldValue.arrayUnion([experienceId])
+    });
   }
 
   @override
@@ -195,7 +274,55 @@ class FirestoreAgencyRepository implements AgencyRepository {
   }
 
   @override
-  Future<void> updateAgencyRating({required String agencyId, required double newRating}) async {
+  Future<void> followAgencyWithUser({
+    required String userId,
+    required String agencyId,
+  }) async {
+    // 1. Agregar la agencia al array followingAgencies del usuario
+    await _firestore.collection('users').doc(userId).update({
+      'followingAgencies': FieldValue.arrayUnion([agencyId]),
+    });
+    // 2. Incrementar el contador de seguidores de la agencia
+    await followAgency(agencyId);
+  }
+
+  @override
+  Future<void> unfollowAgencyWithUser({
+    required String userId,
+    required String agencyId,
+  }) async {
+    // 1. Remover la agencia del array followingAgencies del usuario
+    await _firestore.collection('users').doc(userId).update({
+      'followingAgencies': FieldValue.arrayRemove([agencyId]),
+    });
+    // 2. Decrementar el contador de seguidores de la agencia
+    await _firestore.collection('agencies').doc(agencyId).update({
+      'followers': FieldValue.increment(-1),
+    });
+  }
+
+  @override
+  Future<bool> isFollowingAgency({
+    required String userId,
+    required String agencyId,
+  }) async {
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) return false;
+    final followingAgencies =
+        List<String>.from(userDoc.get('followingAgencies') ?? []);
+    return followingAgencies.contains(agencyId);
+  }
+
+  @override
+  Future<List<String>> getFollowingAgencies(String userId) async {
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) return [];
+    return List<String>.from(userDoc.get('followingAgencies') ?? []);
+  }
+
+  @override
+  Future<void> updateAgencyRating(
+      {required String agencyId, required double newRating}) async {
     final agency = await getAgencyById(agencyId);
     if (agency == null) throw Exception('Agencia no encontrada');
 

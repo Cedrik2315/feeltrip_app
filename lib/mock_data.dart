@@ -1,5 +1,6 @@
 ﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'models/agency_model.dart';
+import 'models/experience_model.dart';
 import 'models/comment_model.dart';
 import 'models/trip_model.dart';
 import 'models/booking_model.dart';
@@ -278,8 +279,9 @@ class MockData {
     {
       'id': 'story_001',
       'title': 'Mi aventura en Patagonia',
-      'story': 'Fue increíble caminar entre los glaciares. La naturaleza es majestuosa. '
-          'Vi pingüinos y una ballena azul desde la orilla del fiordo.',
+      'story':
+          'Fue increíble caminar entre los glaciares. La naturaleza es majestuosa. '
+              'Vi pingüinos y una ballena azul desde la orilla del fiordo.',
       'author': 'Juan Pérez',
       'userId': 'user123',
       'rating': 4.8,
@@ -291,8 +293,9 @@ class MockData {
     {
       'id': 'story_002',
       'title': 'Atardecer en Bali',
-      'story': 'El atardecer fue mágico. Miles de turistas en las playas, pero el momento '
-          'fue único. Compré souvenirs locales y probé comida tradicional balinesa.',
+      'story':
+          'El atardecer fue mágico. Miles de turistas en las playas, pero el momento '
+              'fue único. Compré souvenirs locales y probé comida tradicional balinesa.',
       'author': 'María García',
       'userId': 'user456',
       'rating': 4.9,
@@ -325,8 +328,9 @@ class MockData {
         'userId': 'user456',
         'userName': 'María García',
         'userAvatar': 'https://via.placeholder.com/40',
-        'content': '¡Qué hermosa aventura! Me encantaría ir a Patagonia algún día.',
-        'reactions': ['❤️', '❤️', '�Y~�'],
+        'content':
+            '¡Qué hermosa aventura! Me encantaría ir a Patagonia algún día.',
+        'reactions': ['❤️', '❤️', '👍'],
         'createdAt': Timestamp.now(),
         'likes': 3,
       },
@@ -336,8 +340,9 @@ class MockData {
         'userId': 'user789',
         'userName': 'Carlos López',
         'userAvatar': 'https://via.placeholder.com/40',
-        'content': 'Los glaciares son impresionantes. El cambio climático es real.',
-        'reactions': ['�Y"�'],
+        'content':
+            'Los glaciares son impresionantes. El cambio climático es real.',
+        'reactions': ['🤔'],
         'createdAt': Timestamp.now(),
         'likes': 1,
       },
@@ -350,7 +355,7 @@ class MockData {
         'userName': 'Juan Pérez',
         'userAvatar': 'https://via.placeholder.com/40',
         'content': 'Bali es un paraíso. ¿Qué hotel recomendarías?',
-        'reactions': ['�Y~�', '�Y~�'],
+        'reactions': ['👍', '👍'],
         'createdAt': Timestamp.now(),
         'likes': 2,
       },
@@ -363,7 +368,7 @@ class MockData {
         'userName': 'María García',
         'userAvatar': 'https://via.placeholder.com/40',
         'content': 'Machu Picchu es de otro mundo. Inspirador 100%',
-        'reactions': ['❤️', '❤️', '❤️', '�Y~�'],
+        'reactions': ['❤️', '❤️', '❤️', '👍'],
         'createdAt': Timestamp.now(),
         'likes': 4,
       },
@@ -375,8 +380,9 @@ class MockData {
     {
       'id': 'agency_001',
       'name': 'FeelTrip Adventures',
-      'description': 'Agencia especializada en aventuras de naturaleza y experiencias transformadoras. '
-          'Con más de 10 años de experiencia en turismo responsable.',
+      'description':
+          'Agencia especializada en aventuras de naturaleza y experiencias transformadoras. '
+              'Con más de 10 años de experiencia en turismo responsable.',
       'logo': 'https://via.placeholder.com/200',
       'city': 'Buenos Aires',
       'country': 'Argentina',
@@ -390,14 +396,18 @@ class MockData {
       'phoneNumber': '+54 11 1234 5678',
       'email': 'info@feeltrip.com',
       'website': 'www.feeltrip.com',
-      'socialMedia': ['https://instagram.com/feeltrip', 'https://facebook.com/feeltrip'],
+      'socialMedia': [
+        'https://instagram.com/feeltrip',
+        'https://facebook.com/feeltrip'
+      ],
       'createdAt': Timestamp.now(),
     },
     {
       'id': 'agency_002',
       'name': 'Wanderlust Experiences',
-      'description': 'Tours personalizados a los destinos más exóticos del mundo. '
-          'Nuestro equipo te acompañará en cada paso de tu viaje.',
+      'description':
+          'Tours personalizados a los destinos más exóticos del mundo. '
+              'Nuestro equipo te acompañará en cada paso de tu viaje.',
       'logo': 'https://via.placeholder.com/200',
       'city': 'Lima',
       'country': 'Perú',
@@ -411,14 +421,18 @@ class MockData {
       'phoneNumber': '+51 1 456 7890',
       'email': 'contact@wanderlust.pe',
       'website': 'www.wanderlustexperiences.pe',
-      'socialMedia': ['https://instagram.com/wanderlust', 'https://tiktok.com/@wanderlust'],
+      'socialMedia': [
+        'https://instagram.com/wanderlust',
+        'https://tiktok.com/@wanderlust'
+      ],
       'createdAt': Timestamp.now(),
     },
     {
       'id': 'agency_003',
       'name': 'Bali Dreams Travel',
-      'description': 'Especialistas en destinos asiáticos. Desde playas hasta templos, '
-          'te llevamos a los lugares más especiales de Indonesia.',
+      'description':
+          'Especialistas en destinos asiáticos. Desde playas hasta templos, '
+              'te llevamos a los lugares más especiales de Indonesia.',
       'logo': 'https://via.placeholder.com/200',
       'city': 'Denpasar',
       'country': 'Indonesia',
@@ -438,71 +452,39 @@ class MockData {
   ];
 
   /// Obtener todas las historias (simulando Firestore)
-  static List<Trip> getStories() {
+  static List<TravelerStory> getStories() {
     return mockStories.map((data) {
-      return Trip(
+      return TravelerStory(
         id: data['id'],
         title: data['title'],
-        description: data['story'],
-        destination: data['author'],
-        country: 'Argentina',
-        price: 0.0,
-        rating: data['rating'],
-        reviews: 0,
-        duration: 5,
-        difficulty: 'Fácil',
-        images: [data['imageUrl']],
-        highlights: data['emotionalHighlights'],
-        startDate: (data['createdAt'] as Timestamp).toDate(),
-        endDate: (data['createdAt'] as Timestamp).toDate(),
-        maxParticipants: 30,
-        currentParticipants: 0,
-        category: 'Aventura',
-        amenities: [],
-        guide: '',
-        isFeatured: true,
-        experienceType: 'adventure',
-        emotions: [],
-        learnings: [],
-        transformationMessage: '',
-        culturalConnections: [],
-        isTransformative: false,
+        story: data['story'],
+        author: data['author'],
+        userId: data['userId'],
+        rating: (data['rating'] as num).toDouble(),
+        likes: data['likes'],
+        emotionalHighlights: List<String>.from(data['emotionalHighlights']),
+        createdAt: (data['createdAt'] as Timestamp).toDate(),
+        imageUrl: data['imageUrl'],
       );
     }).toList();
   }
 
   /// Obtener historia por ID
-  static Trip? getStoryById(String id) {
+  static TravelerStory? getStoryById(String id) {
     try {
       final data = mockStories.firstWhere((story) => story['id'] == id);
-      return Trip(
-      id: data['id'],
-      title: data['title'],
-      description: data['story'],
-      destination: data['author'],
-      country: 'Argentina',
-      price: 0.0,
-      rating: data['rating'],
-      reviews: 0,
-      duration: 5,
-      difficulty: 'Fácil',
-      images: [data['imageUrl']],
-      highlights: data['emotionalHighlights'],
-      startDate: (data['createdAt'] as Timestamp).toDate(),
-      endDate: (data['createdAt'] as Timestamp).toDate(),
-      maxParticipants: 30,
-      currentParticipants: 0,
-      category: 'Aventura',
-      amenities: [],
-      guide: '',
-      isFeatured: true,
-      experienceType: 'adventure',
-      emotions: [],
-      learnings: [],
-      transformationMessage: '',
-      culturalConnections: [],
-      isTransformative: false,
-    );
+      return TravelerStory(
+        id: data['id'],
+        title: data['title'],
+        story: data['story'],
+        author: data['author'],
+        userId: data['userId'],
+        rating: (data['rating'] as num).toDouble(),
+        likes: data['likes'],
+        emotionalHighlights: List<String>.from(data['emotionalHighlights']),
+        createdAt: (data['createdAt'] as Timestamp).toDate(),
+        imageUrl: data['imageUrl'],
+      );
     } on StateError {
       return null;
     }
@@ -519,8 +501,8 @@ class MockData {
         userName: data['userName'],
         userAvatar: data['userAvatar'],
         content: data['content'],
-        reactions: List<String>.from(data['reactions']),
-        createdAt: data['createdAt'],
+        reactions: List<String>.from(data['reactions'] as List),
+        createdAt: (data['createdAt'] as Timestamp).toDate(),
         likes: data['likes'],
       );
     }).toList();
@@ -548,8 +530,8 @@ class MockData {
         website: data['website'],
         address: '${data['city']}, ${data['country']}',
         socialMedia: List<String>.from(data['socialMedia'] ?? []),
-        experiences: [],
-        createdAt: data['createdAt'],
+        experiences: const [],
+        createdAt: (data['createdAt'] as Timestamp).toDate(),
       );
     }).toList();
   }
@@ -559,27 +541,27 @@ class MockData {
     try {
       final data = mockAgencies.firstWhere((agency) => agency['id'] == id);
       return TravelAgency(
-      id: data['id'],
-      name: data['name'],
-      description: data['description'],
-      logo: data['logo'],
-      city: data['city'],
-      country: data['country'],
-      latitude: data['latitude'],
-      longitude: data['longitude'],
-      specialties: List<String>.from(data['specialties']),
-      rating: data['rating'].toDouble(),
-      reviewCount: data['reviewCount'],
-      followers: data['followers'],
-      verified: data['verified'],
-      phoneNumber: data['phoneNumber'],
-      email: data['email'],
-      website: data['website'],
-      address: '${data['city']}, ${data['country']}',
-      socialMedia: List<String>.from(data['socialMedia'] ?? []),
-      experiences: [],
-      createdAt: data['createdAt'],
-    );
+        id: data['id'],
+        name: data['name'],
+        description: data['description'],
+        logo: data['logo'],
+        city: data['city'],
+        country: data['country'],
+        latitude: data['latitude'],
+        longitude: data['longitude'],
+        specialties: List<String>.from(data['specialties']),
+        rating: data['rating'].toDouble(),
+        reviewCount: data['reviewCount'],
+        followers: data['followers'],
+        verified: data['verified'],
+        phoneNumber: data['phoneNumber'],
+        email: data['email'],
+        website: data['website'],
+        address: '${data['city']}, ${data['country']}',
+        socialMedia: List<String>.from(data['socialMedia'] ?? []),
+        experiences: const [],
+        createdAt: (data['createdAt'] as Timestamp).toDate(),
+      );
     } on StateError {
       return null;
     }
@@ -588,7 +570,8 @@ class MockData {
   /// Obtener agencias por ciudad
   static List<TravelAgency> getAgenciesByCity(String city) {
     return mockAgencies
-        .where((agency) => agency['city'].toLowerCase().contains(city.toLowerCase()))
+        .where((agency) =>
+            agency['city'].toLowerCase().contains(city.toLowerCase()))
         .map((data) {
       return TravelAgency(
         id: data['id'],
@@ -609,11 +592,15 @@ class MockData {
         website: data['website'],
         address: '${data['city']}, ${data['country']}',
         socialMedia: List<String>.from(data['socialMedia'] ?? []),
-        experiences: [],
-        createdAt: data['createdAt'],
+        experiences: const [],
+        createdAt: (data['createdAt'] as Timestamp).toDate(),
       );
     }).toList();
   }
+
+  // ===== SEGUIMIENTOS DE USUARIOS A AGENCIAS (para el sistema de follow) =====
+  // Estructura: {userId: [agencyId1, agencyId2, ...]}
+  static final Map<String, List<String>> mockUsersFollowing = {};
 }
 
 // Función para usar en pruebas

@@ -1,404 +1,140 @@
-import 'dart:convert';
-import 'dart:developer' as developer;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-
-import '../screens/streak_service.dart';
-
-enum DiarySaveStrategy {
-  cloudOnly,
-  localOnly,
-  cloudWithLocalFallback,
-}
-
-class DiarioRegistro {
-  DiarioRegistro({
-    required this.id,
-    required this.texto,
-    required this.emociones,
-    required this.fecha,
-    this.destino,
-    this.explicacion,
-    this.lat,
-    this.lng,
-    this.rutaDetallada,
-  });
-
-  final String id;
-  final String texto;
-  final List<String> emociones;
-  final DateTime fecha;
-  final String? destino;
-  final String? explicacion;
-  final double? lat;
-  final double? lng;
-  final List<Map<String, dynamic>>? rutaDetallada;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'texto': texto,
-      'emociones': emociones,
-      'fecha': fecha.toIso8601String(),
-      'destino': destino,
-      'explicacion': explicacion,
-      'lat': lat,
-      'lng': lng,
-      'rutaDetallada': rutaDetallada,
-    };
-  }
-
-  factory DiarioRegistro.fromJson(Map<String, dynamic> json) {
-    return DiarioRegistro(
-      id: (json['id'] ?? '').toString(),
-      texto: (json['texto'] ?? '').toString(),
-      emociones: List<String>.from(json['emociones'] ?? const <String>[]),
-      fecha:
-          DateTime.tryParse((json['fecha'] ?? '').toString()) ?? DateTime.now(),
-      destino: json['destino']?.toString(),
-      explicacion: json['explicacion']?.toString(),
-      lat: json['lat']?.toDouble(),
-      lng: json['lng']?.toDouble(),
-      rutaDetallada: json['rutaDetallada'] != null
-          ? List<Map<String, dynamic>>.from(json['rutaDetallada'])
-          : null,
-    );
-  }
-
-  factory DiarioRegistro.fromFirestore(Map<String, dynamic> data, String id) {
-    return DiarioRegistro(
-      id: id,
-      texto: (data['texto'] ?? '').toString(),
-      emociones: List<String>.from(data['emociones'] ?? const <String>[]),
-      fecha: (data['fecha'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      destino: data['destino']?.toString(),
-      explicacion: data['explicacion']?.toString(),
-      lat: data['lat']?.toDouble(),
-      lng: data['lng']?.toDouble(),
-      rutaDetallada: data['rutaDetallada'] != null
-          ? List<Map<String, dynamic>>.from(data['rutaDetallada'])
-          : null,
-    );
-  }
-}
+import 'package:flutter/foundation.dart';
+import '../models/experience_model.dart';
 
 class DatabaseService {
-  DatabaseService({
-    this.strategy = DiarySaveStrategy.cloudWithLocalFallback,
-    FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
-    Future<SharedPreferences> Function()? prefsFactory,
-  })  : _db = firestore,
-        _auth = auth ?? FirebaseAuth.instance,
-        _prefsFactory = prefsFactory ?? SharedPreferences.getInstance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  final FirebaseFirestore? _db;
-  final FirebaseAuth _auth;
-  final Future<SharedPreferences> Function() _prefsFactory;
-  final DiarySaveStrategy strategy;
+  // Getter for current user ID
+  String? get currentUserId => FirebaseAuth.instance.currentUser?.uid;
 
-  static const String _localDiaryPrefix = 'diary_entries_';
+  String? get uid => FirebaseAuth.instance.currentUser?.uid;
 
-  static const String _pendingSyncKey = 'pending_sync_entries';
-
-  FirebaseFirestore get _firestore => _db ?? FirebaseFirestore.instance;
-  String? get currentUserId => _auth.currentUser?.uid;
-
+  // GUARDAR UNA NUEVA ENTRADA (guardarEntrada)
   Future<void> guardarEntrada({
     required String texto,
     required List<String> emociones,
     String? destino,
-    String? explicacion,
     double? lat,
     double? lng,
+    String? explicacion,
     List<Map<String, dynamic>>? rutaDetallada,
   }) async {
-    final user = _auth.currentUser;
-
-    // Verificar conectividad
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    bool isOnline = connectivityResult != ConnectivityResult.none;
-
-    // Si no hay internet y la estrategia permite local, guardar para sync
-    bool forceLocal = !isOnline && strategy != DiarySaveStrategy.cloudOnly;
-
     try {
-      if (strategy == DiarySaveStrategy.localOnly || forceLocal) {
-        final tempId = DateTime.now().millisecondsSinceEpoch.toString();
-        await _guardarEntradaLocal(user?.uid, tempId, texto, emociones,
-            DateTime.now(), destino, explicacion, lat, lng, rutaDetallada);
-
-        if (forceLocal && user != null) {
-          await _marcarParaSincronizacion(user.uid, {
-            'id': tempId,
-            'texto': texto,
-            'emociones': emociones,
-            'fecha': DateTime.now().toIso8601String(),
-            'destino': destino,
-            'explicacion': explicacion,
-            'lat': lat,
-            'lng': lng,
-            'rutaDetallada': rutaDetallada,
-          });
-        }
-        return;
+      final userId = currentUserId;
+      if (userId == null) {
+        throw Exception('User not authenticated');
       }
 
-      if (user == null) {
-        if (strategy == DiarySaveStrategy.cloudOnly) {
-          throw Exception('Debes iniciar sesion para guardar en la nube.');
-        }
-        await _guardarEntradaLocal(
-            null,
-            DateTime.now().millisecondsSinceEpoch.toString(),
-            texto,
-            emociones,
-            DateTime.now(),
-            destino,
-            explicacion,
-            lat,
-            lng,
-            rutaDetallada);
-        return;
-      }
-
-      final docRef = _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('diaryEntries')
-          .doc();
-
-      await docRef.set({
-        'id': docRef.id,
+      final entryData = {
         'texto': texto,
         'emociones': emociones,
-        'fecha': FieldValue.serverTimestamp(),
         'destino': destino,
-        'explicacion': explicacion,
         'lat': lat,
         'lng': lng,
+        'explicacion': explicacion,
         'rutaDetallada': rutaDetallada,
-      });
+        'userId': userId,
+        'createdAt': FieldValue.serverTimestamp(),
+      };
 
-      final photoCount = rutaDetallada
-              ?.where((stop) =>
-                  stop['imagePath'] != null &&
-                  (stop['imagePath'] as String).isNotEmpty)
-              .length ??
-          0;
-
-      // Fórmula de Crecimiento:
-      // Base por viaje: 100 XP
-      // Por cada foto: 50 XP
-      final int xpGanada = 100 + (photoCount * 50);
-
-      // Incrementa la XP del usuario por guardar un viaje/diario.
-      await _firestore.collection('users').doc(user.uid).set(
-        {
-          'totalXP': FieldValue.increment(xpGanada),
-          'diaryEntriesCount': FieldValue.increment(1),
-          if (photoCount > 0) 'photosCount': FieldValue.increment(photoCount),
-        },
-        SetOptions(merge: true),
-      );
-
-      // Actualizar Racha de Fuego
-      await StreakService().actualizarRacha(user.uid);
-
-      // Mantiene un cache local minimo para continuidad offline.
-      await _guardarEntradaLocal(user.uid, docRef.id, texto, emociones,
-          DateTime.now(), destino, explicacion, lat, lng, rutaDetallada);
-    } catch (e, st) {
-      developer.log(
-        'Error en DatabaseService.guardarEntrada',
-        name: 'DatabaseService',
-        error: e,
-        stackTrace: st,
-      );
-
-      if (strategy == DiarySaveStrategy.cloudWithLocalFallback) {
-        await _guardarEntradaLocal(
-            user?.uid,
-            DateTime.now().millisecondsSinceEpoch.toString(),
-            texto,
-            emociones,
-            DateTime.now(),
-            destino,
-            explicacion,
-            lat,
-            lng,
-            rutaDetallada);
-        return;
-      }
-
+      await _db.collection('entries').add(entryData);
+      debugPrint("¡Recuerdo guardado con éxito!");
+    } catch (e) {
+      debugPrint("Error al guardar: $e");
       rethrow;
     }
   }
 
-  Future<void> _marcarParaSincronizacion(
-      String uid, Map<String, dynamic> entry) async {
-    final prefs = await _prefsFactory();
-    final key = '${_pendingSyncKey}_$uid';
-    final currentRaw = prefs.getString(key);
-    final currentList = currentRaw == null
-        ? <Map<String, dynamic>>[]
-        : List<Map<String, dynamic>>.from(jsonDecode(currentRaw));
-
-    currentList.add(entry);
-    await prefs.setString(key, jsonEncode(currentList));
-  }
-
-  Future<void> sincronizarPendientes() async {
-    final user = _auth.currentUser;
-    if (user == null) return;
-
-    final prefs = await _prefsFactory();
-    final key = '${_pendingSyncKey}_${user.uid}';
-    final raw = prefs.getString(key);
-    if (raw == null || raw.isEmpty) return;
-
-    final pendingList = List<Map<String, dynamic>>.from(jsonDecode(raw));
-    if (pendingList.isEmpty) return;
-
-    final batch = _firestore.batch();
-    final collection =
-        _firestore.collection('users').doc(user.uid).collection('diaryEntries');
-
-    for (var entry in pendingList) {
-      final docRef = collection.doc();
-      // Convertir fecha string a Timestamp si es necesario o dejar que Firestore lo maneje
-      // Aquí asumimos que guardamos como serverTimestamp al sincronizar
-      batch.set(docRef, {
-        ...entry,
-        'id': docRef.id,
-        'fecha': FieldValue.serverTimestamp(), // Actualizamos fecha al subir
-      });
+  // Stream de entradas (obtenerEntradas)
+  Stream<List<DiaryEntry>> obtenerEntradas() {
+    final currentUid = uid;
+    if (currentUid == null) {
+      return Stream.value([]);
     }
 
-    try {
-      await batch.commit();
-      // Limpiar pendientes tras éxito
-      await prefs.remove(key);
-      developer.log(
-          'Sincronización completada: ${pendingList.length} entradas subidas.');
-    } catch (e) {
-      developer.log('Error en sincronización: $e');
-      // No borramos la lista para reintentar luego
-    }
-  }
-
-  Stream<List<DiarioRegistro>> obtenerEntradas() {
-    final user = _auth.currentUser;
-
-    if (strategy == DiarySaveStrategy.localOnly) {
-      return _obtenerEntradasLocal(user?.uid);
-    }
-
-    if (user == null) {
-      if (strategy == DiarySaveStrategy.cloudOnly) {
-        return const Stream<List<DiarioRegistro>>.empty();
-      }
-      return _obtenerEntradasLocal(null);
-    }
-
-    return _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('diaryEntries')
-        .orderBy('fecha', descending: true)
+    return _db
+        .collection('entries')
+        .where('userId', isEqualTo: currentUid)
+        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) {
-      final registros = snapshot.docs
-          .map((doc) => DiarioRegistro.fromFirestore(doc.data(), doc.id))
-          .toList();
-      _guardarSnapshotLocal(user.uid, registros);
-      return registros;
-    });
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              return DiaryEntry(
+                id: doc.id,
+                userId: data['userId'] ?? '',
+                imageUrl: data['imageUrl'] ?? '',
+                title: data['title'] ?? data['texto'] ?? '',
+                content: data['content'] ?? data['texto'] ?? '',
+                emotions: List<String>.from(
+                    data['emotions'] ?? data['emociones'] ?? []),
+                reflectionDepth: data['reflectionDepth'] ?? 3,
+                createdAt: (data['createdAt'] as Timestamp?)?.toDate() ??
+                    DateTime.now(),
+              );
+            }).toList());
   }
 
-  Future<void> _guardarSnapshotLocal(
-      String? uid, List<DiarioRegistro> registros) async {
-    final prefs = await _prefsFactory();
-    final payload = registros.map((e) => e.toJson()).toList();
-    await prefs.setString(
-        '$_localDiaryPrefix${uid ?? 'anon'}', jsonEncode(payload));
-  }
-
-  Future<void> _guardarEntradaLocal(
-    String? uid,
-    String id,
-    String texto,
-    List<String> emociones,
-    DateTime fecha,
-    String? destino,
-    String? explicacion,
-    double? lat,
-    double? lng,
-    List<Map<String, dynamic>>? rutaDetallada,
-  ) async {
-    final prefs = await _prefsFactory();
-    final key = '$_localDiaryPrefix${uid ?? 'anon'}';
-    final currentRaw = prefs.getString(key);
-    final currentList = currentRaw == null
-        ? <Map<String, dynamic>>[]
-        : List<Map<String, dynamic>>.from(jsonDecode(currentRaw));
-
-    currentList.insert(0, {
-      'id': id,
-      'texto': texto,
-      'emociones': emociones,
-      'fecha': fecha.toIso8601String(),
-      'destino': destino,
-      'explicacion': explicacion,
-      'lat': lat,
-      'lng': lng,
-      'rutaDetallada': rutaDetallada,
-    });
-
-    await prefs.setString(key, jsonEncode(currentList));
-  }
-
-  Stream<List<DiarioRegistro>> _obtenerEntradasLocal(String? uid) async* {
-    final prefs = await _prefsFactory();
-    final key = '$_localDiaryPrefix${uid ?? 'anon'}';
-    final raw = prefs.getString(key);
-
-    if (raw == null || raw.isEmpty) {
-      yield <DiarioRegistro>[];
-      return;
-    }
-
-    final decoded = List<Map<String, dynamic>>.from(jsonDecode(raw));
-    yield decoded.map(DiarioRegistro.fromJson).toList();
-  }
-
+  // Obtener estadísticas semanales (obtenerEstadisticasSemanales)
   Future<Map<String, int>> obtenerEstadisticasSemanales() async {
-    final user = _auth.currentUser;
-    if (user == null) return {};
+    try {
+      final userId = currentUserId;
+      if (userId == null) return {};
 
-    DateTime haceUnaSemana = DateTime.now().subtract(const Duration(days: 7));
+      final now = DateTime.now();
+      final weekAgo = now.subtract(const Duration(days: 7));
 
-    // Consultamos Firestore filtrando por fecha
-    QuerySnapshot snapshot = await _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('diaryEntries')
-        .where('fecha', isGreaterThan: haceUnaSemana)
-        .get();
+      final snapshot = await _db
+          .collection('entries')
+          .where('userId', isEqualTo: userId)
+          .where('createdAt',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(weekAgo))
+          .get();
 
-    Map<String, int> conteoEmociones = {};
+      // Count emotions from entries
+      final emotionCounts = <String, int>{};
 
-    for (var doc in snapshot.docs) {
-      final data = doc.data() as Map<String, dynamic>;
-      List emociones = data['emociones'] ?? [];
-      for (var emocion in emociones) {
-        final key = emocion.toString();
-        conteoEmociones[key] = (conteoEmociones[key] ?? 0) + 1;
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final emociones = List<String>.from(data['emociones'] ?? []);
+        for (var emotion in emociones) {
+          emotionCounts[emotion] = (emotionCounts[emotion] ?? 0) + 1;
+        }
       }
+
+      return emotionCounts;
+    } catch (e) {
+      debugPrint("Error getting stats: $e");
+      return {};
     }
-    return conteoEmociones;
+  }
+
+  // GUARDAR UNA NUEVA ENTRADA (alias for saveEntry)
+  Future<void> saveEntry(DiaryEntry entry) async {
+    try {
+      await _db.collection('entries').add(entry.toMap());
+      debugPrint("¡Recuerdo guardado con éxito!");
+    } catch (e) {
+      debugPrint("Error al guardar: $e");
+      rethrow;
+    }
+  }
+
+  // LEER TODAS LAS ENTRADAS (Para tu Diario de Lujo)
+  Stream<List<DiaryEntry>> get entries {
+    final currentUid = uid;
+    if (currentUid == null) {
+      return Stream.value([]);
+    }
+
+    return _db
+        .collection('entries')
+        .where('userId', isEqualTo: currentUid)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return DiaryEntry.fromFirestore(doc);
+            }).toList());
   }
 }

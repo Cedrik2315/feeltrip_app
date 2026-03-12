@@ -1,15 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../constants/strings.dart';
 
-class ResultsScreen extends StatelessWidget {
+class ResultsScreen extends StatefulWidget {
   const ResultsScreen({super.key, required this.answers});
 
   final List<String> answers;
 
+  @override
+  State<ResultsScreen> createState() => _ResultsScreenState();
+}
+
+class _ResultsScreenState extends State<ResultsScreen> {
+  final ScreenshotController _screenshotController = ScreenshotController();
+  bool _isSharing = false;
+
   Map<String, dynamic> getRecommendedTrip() {
-    final emotion = answers[0];
-    final season = answers[3];
+    final emotion = widget.answers[0];
+    final season = widget.answers[3];
 
     if (emotion.contains('Lágrima') && season == 'Invierno') {
       return {
@@ -56,6 +69,159 @@ class ResultsScreen extends StatelessWidget {
     };
   }
 
+  String _backgroundAssetForTrip(String tripId) {
+    switch (tripId) {
+      case 'trip_1':
+        return 'assets/images/tromso_aurora.png';
+      case 'trip_2':
+        return 'assets/images/tuscana_nonna.png';
+      case 'trip_3':
+        return 'assets/images/queenstown_adventure.png';
+      case 'trip_4':
+      default:
+        return 'assets/images/bali_yoga.png';
+    }
+  }
+
+  String _profileLabelForTrip(String tripId) {
+    switch (tripId) {
+      case 'trip_1':
+        return 'EMOTIVO';
+      case 'trip_2':
+        return 'CÁLIDO';
+      case 'trip_3':
+        return 'AVENTURERO';
+      case 'trip_4':
+      default:
+        return 'CONTEMPLATIVO';
+    }
+  }
+
+  Widget _buildShareableCard(Map<String, dynamic> trip) {
+    final tripId = trip['tripId'] as String? ?? 'trip_4';
+    final profile = _profileLabelForTrip(tripId);
+    final title = (trip['title'] as String?) ?? 'FeelTrip';
+    final recommendation = (trip['description'] as String?) ?? '';
+    final backgroundAsset = _backgroundAssetForTrip(tripId);
+
+    return SizedBox(
+      width: 1080,
+      height: 1920,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(backgroundAsset),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Stack(
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.85),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 150),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset('assets/images/logo.png', height: 120),
+                  const SizedBox(height: 20),
+                  Text(
+                    'SOY UN VIAJERO $profile',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 54,
+                      fontWeight: FontWeight.bold,
+                      height: 1.05,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 40,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    recommendation,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 32,
+                      fontStyle: FontStyle.italic,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 100),
+                  const Text(
+                    'Descubre tu viaje emocional en FeelTrip App',
+                    style: TextStyle(color: Colors.white54, fontSize: 24),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'https://feeltrip.app',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _shareResult(Map<String, dynamic> trip) async {
+    if (_isSharing) return;
+    setState(() => _isSharing = true);
+
+    try {
+      final imageBytes = await _screenshotController.capture();
+      if (imageBytes == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo generar la imagen.')),
+        );
+        return;
+      }
+
+      final directory = await getTemporaryDirectory();
+      final file = File(
+        '${directory.path}/feeltrip_emotional_profile_${DateTime.now().millisecondsSinceEpoch}.png',
+      );
+      await file.writeAsBytes(imageBytes);
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text:
+            '¡Acabo de descubrir mi perfil emocional en FeelTrip! 🌍✈️ #FeelTrip #Travel\nhttps://feeltrip.app',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al compartir: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isSharing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final trip = getRecommendedTrip();
@@ -87,6 +253,20 @@ class ResultsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(22),
+                  child: AspectRatio(
+                    aspectRatio: 9 / 16,
+                    child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: Screenshot(
+                        controller: _screenshotController,
+                        child: _buildShareableCard(trip),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
                 Text(
                   trip['emotion'],
                   style: TextStyle(
@@ -141,7 +321,10 @@ class ResultsScreen extends StatelessWidget {
                                 size: 16,
                               ),
                               const SizedBox(width: 8),
-                              Text(item, style: TextStyle(color: Colors.blue[600])),
+                              Text(
+                                item,
+                                style: TextStyle(color: Colors.blue[600]),
+                              ),
                             ],
                           ),
                         ),
@@ -180,6 +363,37 @@ class ResultsScreen extends StatelessWidget {
                     child: const Text(
                       AppStrings.resultsBook,
                       style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[800],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed: _isSharing ? null : () => _shareResult(trip),
+                    icon: _isSharing
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.share_outlined),
+                    label: Text(
+                      _isSharing
+                          ? 'Generando...'
+                          : 'Compartir mi perfil emocional',
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),

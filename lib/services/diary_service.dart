@@ -62,7 +62,7 @@ class DiaryService {
       final now = DateTime.now();
       final entryData = {
         'id': entry.id,
-        'location': entry.location,
+        'imageUrl': entry.imageUrl,
         'content': entry.content,
         'emotions': entry.emotions,
         'reflectionDepth': entry.reflectionDepth,

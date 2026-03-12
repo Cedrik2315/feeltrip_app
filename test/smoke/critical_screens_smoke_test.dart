@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:feeltrip_app/controllers/auth_controller.dart';
 import 'package:feeltrip_app/controllers/diary_controller.dart';
+import 'package:feeltrip_app/models/experience_model.dart';
 import 'package:feeltrip_app/screens/historial_screen.dart';
 import 'package:feeltrip_app/screens/login_screen.dart';
 import 'package:feeltrip_app/screens/diario_screen.dart';
@@ -84,16 +85,8 @@ void main() {
             lat: null,
             lng: null,
             ruta: []));
-    when(() => databaseService.guardarEntrada(
-        texto: any(named: 'texto'),
-        emociones: any(named: 'emociones'),
-        destino: any(named: 'destino'),
-        lat: any(named: 'lat'),
-        lng: any(named: 'lng'),
-        explicacion: any(named: 'explicacion'),
-        rutaDetallada: any(named: 'rutaDetallada'))).thenAnswer((_) async {});
     when(() => databaseService.obtenerEntradas())
-        .thenAnswer((_) => Stream.value(const <DiarioRegistro>[]));
+        .thenAnswer((_) => Stream.value(<DiaryEntry>[]));
     when(() => authService.signOut()).thenAnswer((_) async {});
 
     // Usar ChangeNotifierProvider en lugar de Provider para DiaryController
@@ -113,7 +106,7 @@ void main() {
           ),
         ],
         child: const MaterialApp(
-          home: DiarioScreen(enableAds: false),
+          home: DiarioScreen(),
         ),
       ),
     );
@@ -127,7 +120,7 @@ void main() {
   testWidgets('smoke HistorialScreen renderiza vacío', (tester) async {
     final databaseService = MockDatabaseService();
     when(() => databaseService.obtenerEntradas())
-        .thenAnswer((_) => Stream.value(const <DiarioRegistro>[]));
+        .thenAnswer((_) => Stream.value(<DiaryEntry>[]));
 
     await tester.pumpWidget(
       MultiProvider(

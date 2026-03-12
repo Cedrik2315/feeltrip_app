@@ -1,4 +1,4 @@
-﻿// home_screen.dart
+// home_screen.dart
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -8,7 +8,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:uni_links/uni_links.dart' as uni_links;
+
+import 'package:app_links/app_links.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -21,6 +22,7 @@ import '../models/experience_model.dart';
 import '../models/trip_model.dart';
 import '../services/emotion_service.dart';
 import '../services/vision_service.dart';
+import 'custom_map_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,11 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _errorMessage;
   final TextEditingController _transformSearchController =
       TextEditingController();
-  StreamSubscription? _sub;
   DateTimeRange? _travelDates;
   int _travelers = 2;
   final _imagePicker = ImagePicker();
   late final VisionService _visionService;
+  StreamSubscription<Uri>? _linkSubscription;
 
   late final HomeController _homeController;
 
@@ -50,14 +52,39 @@ class _HomeScreenState extends State<HomeScreen> {
     _homeController = context.read<HomeController>();
     _visionService = VisionService();
     _loadFeaturedTrips();
-    _initDeepLinkListener();
+    _initDeepLinks();
   }
 
   @override
   void dispose() {
     _transformSearchController.dispose();
+    _linkSubscription?.cancel();
     super.dispose();
-    _sub?.cancel();
+  }
+
+  Future<void> _initDeepLinks() async {
+    final appLinks = AppLinks();
+
+    // Handle initial link when app is opened from a terminated state
+    final initialUri = await appLinks.getInitialLink();
+    if (initialUri != null) {
+      if (!mounted) return;
+      _handleDeepLink(initialUri);
+    }
+
+    // Listen for new links when app is already running
+    _linkSubscription = appLinks.uriLinkStream.listen((uri) {
+      if (!mounted) return;
+      _handleDeepLink(uri);
+    });
+  }
+
+  void _handleDeepLink(Uri uri) {
+    debugPrint('Deep link received: $uri');
+    if (uri.scheme == 'feeltrip' && uri.host == 'pago-exitoso') {
+      _celebrarPagoExitoso();
+    }
+    // You can also handle other hosts like 'pago-fallido' here.
   }
 
   Future<void> _pickDates() async {
@@ -87,9 +114,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     local > 1 ? () => setDialogState(() => local--) : null,
                 icon: const Icon(Icons.remove_circle_outline),
               ),
-              Text('$local',
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(
+                '$local',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               IconButton(
                 onPressed:
                     local < 12 ? () => setDialogState(() => local++) : null,
@@ -100,11 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
           ElevatedButton(
-              onPressed: () => Navigator.pop(ctx, local),
-              child: const Text('Aceptar')),
+            onPressed: () => Navigator.pop(ctx, local),
+            child: const Text('Aceptar'),
+          ),
         ],
       ),
     );
@@ -117,7 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (raw.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Escribe cómo te quieres sentir al viajar.')),
+          content: Text('Escribe cómo te quieres sentir al viajar.'),
+        ),
       );
       return;
     }
@@ -146,16 +180,22 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Destino sugerido: ${result.destino}',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  'Destino sugerido: ${result.destino}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Text(result.explicacion),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 6,
                   children: result.emociones
-                      .map((e) => Chip(
-                          label: Text(e), visualDensity: VisualDensity.compact))
+                      .map(
+                        (e) => Chip(
+                          label: Text(e),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      )
                       .toList(),
                 ),
               ],
@@ -183,36 +223,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_travelDates == null) return AppStrings.homeDates;
     final f = DateFormat('dd/MM');
     return '${f.format(_travelDates!.start)} - ${f.format(_travelDates!.end)}';
-  }
-
-  Future<void> _initDeepLinkListener() async {
-    _sub = uni_links.uriLinkStream.listen((Uri? uri) {
-      if (!mounted) return;
-      if (uri != null && uri.scheme == 'feeltrip') {
-        if (uri.host == 'pago-exitoso' || uri.host == 'success') {
-          _celebrarPagoExitoso();
-        } else if (uri.host == 'pago-fallido' || uri.host == 'failure') {
-          Get.snackbar(
-            'Pago Fallido',
-            'Tu pago no pudo ser procesado. Por favor, inténtalo de nuevo.',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-          );
-        } else if (uri.host == 'pago-pendiente' || uri.host == 'pending') {
-          Get.snackbar(
-            'Pago Pendiente',
-            'Tu pago está siendo procesado. Te avisaremos cuando se complete.',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.orange,
-            colorText: Colors.white,
-          );
-        }
-      }
-    }, onError: (err) {
-      if (!mounted) return;
-      debugPrint("Error en Deep Link: $err");
-    });
   }
 
   void _celebrarPagoExitoso() {
@@ -262,8 +272,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     // 3. Call AI service
-    final poeticMessage =
-        await _visionService.getPoeticMessageFromImage(File(imageFile.path));
+    final poeticMessage = await _visionService.getPoeticMessageFromImage(
+      File(imageFile.path),
+    );
 
     if (!context.mounted) return;
     Navigator.of(context).pop(); // Close loading dialog
@@ -326,7 +337,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.homeTitle),
+        title: Image.asset(
+          'assets/images/logo.png', // Asegúrate de que esta ruta sea correcta
+          height: 35, // Ajusta la altura según necesites
+          fit: BoxFit.contain,
+        ),
         elevation: 0,
         backgroundColor: Colors.deepPurple,
         actions: [
@@ -379,10 +394,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 8),
                   const Text(
                     AppStrings.homeHeroSubtitle,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   const SizedBox(height: 20),
                   TextField(
@@ -463,16 +475,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     const Text(
                       AppStrings.homeQuizSubtitle,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white70,
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.white70),
                     ),
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () => Navigator.pushNamed(context, '/quiz'),
+                        onPressed: () async {
+                          // Navegamos al quiz y esperamos un resultado (la personalidad).
+                          final navigator = Navigator.of(context);
+                          final personality =
+                              await navigator.pushNamed('/quiz');
+
+                          // Verificamos que el widget siga montado antes de usar el BuildContext.
+                          if (!mounted) return;
+
+                          // Si obtenemos una personalidad, navegamos a la pantalla del mapa.
+                          if (personality is String) {
+                            navigator.push(
+                              MaterialPageRoute(
+                                builder: (_) => CustomMapScreen(
+                                    userPersonality: personality),
+                              ),
+                            );
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.deepPurple,
@@ -494,10 +521,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Text(
                     AppStrings.homeExperienceTypes,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   SingleChildScrollView(
@@ -528,10 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Text(
                     AppStrings.homeFeaturedTrips,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   if (_isLoadingTrips)
@@ -547,8 +568,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           children: [
-                            Icon(Icons.error_outline,
-                                size: 48, color: Colors.red[300]),
+                            Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: Colors.red[300],
+                            ),
                             const SizedBox(height: 8),
                             Text(
                               'Error al cargar los viajes',
@@ -633,20 +657,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Obx(
-                    () {
-                      final controller = Get.find<ExperienceController>();
-                      if (controller.stories.isEmpty) {
-                        return const SizedBox(); // O un loading/empty state
-                      }
-                      return Column(
-                        children: controller.stories
-                            .take(2)
-                            .map((story) => _buildStoryPreviewCard(story))
-                            .toList(),
-                      );
-                    },
-                  ),
+                  Obx(() {
+                    final controller = Get.find<ExperienceController>();
+                    if (controller.stories.isEmpty) {
+                      return const SizedBox(); // O un loading/empty state
+                    }
+                    return Column(
+                      children: controller.stories
+                          .take(2)
+                          .map((story) => _buildStoryPreviewCard(story))
+                          .toList(),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -660,10 +682,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Text(
                     AppStrings.homeMyExperience,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -677,7 +696,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             homeQuickAccessItems[i].subtitle,
                             () {
                               Navigator.pushNamed(
-                                  context, homeQuickAccessItems[i].route);
+                                context,
+                                homeQuickAccessItems[i].route,
+                              );
                             },
                           ),
                         ),
@@ -695,7 +716,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildArchetypeCard(
-      String emoji, String title, String description, Color color) {
+    String emoji,
+    String title,
+    String description,
+    Color color,
+  ) {
     return Container(
       width: 140,
       margin: const EdgeInsets.only(right: 12),
@@ -712,19 +737,13 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           Text(
             title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           ),
           const SizedBox(height: 6),
           Text(
             description,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey[700],
-            ),
+            style: TextStyle(fontSize: 11, color: Colors.grey[700]),
           ),
         ],
       ),
@@ -760,10 +779,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Text(
                         story.title,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -804,10 +820,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 const Icon(Icons.favorite, size: 16, color: Colors.red),
                 const SizedBox(width: 4),
-                Text(
-                  '${story.likes}',
-                  style: const TextStyle(fontSize: 12),
-                ),
+                Text('${story.likes}', style: const TextStyle(fontSize: 12)),
               ],
             ),
           ],
@@ -817,7 +830,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildQuickAccessCard(
-      String emoji, String title, String subtitle, VoidCallback onTap) {
+    String emoji,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -839,10 +856,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -880,15 +894,16 @@ class TripCard extends StatelessWidget {
                       placeholder: (context, url) => Container(
                         height: 150,
                         color: Colors.grey[300],
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        child: const Center(child: CircularProgressIndicator()),
                       ),
                       errorWidget: (context, url, error) => Container(
                         height: 150,
                         color: Colors.grey[300],
-                        child: Icon(Icons.image,
-                            size: 50, color: Colors.grey[600]),
+                        child: Icon(
+                          Icons.image,
+                          size: 50,
+                          color: Colors.grey[600],
+                        ),
                       ),
                     ),
                   )
@@ -897,8 +912,11 @@ class TripCard extends StatelessWidget {
                     width: double.infinity,
                     color: Colors.grey[300],
                     child: Center(
-                      child:
-                          Icon(Icons.image, size: 50, color: Colors.grey[600]),
+                      child: Icon(
+                        Icons.image,
+                        size: 50,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ),
             Padding(
@@ -917,7 +935,9 @@ class TripCard extends StatelessWidget {
                   if (trip.isTransformative)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.purple[100],
                         borderRadius: BorderRadius.circular(4),

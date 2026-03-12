@@ -7,6 +7,7 @@ import '../models/experience_model.dart';
 import '../controllers/experience_controller.dart';
 import '../controllers/auth_controller.dart';
 import '../services/sharing_service.dart';
+import '../widgets/social_share_sheet.dart';
 import 'comments_screen.dart';
 
 class StoriesScreen extends StatefulWidget {
@@ -275,12 +276,54 @@ class _StoriesScreenState extends State<StoriesScreen> {
     );
   }
 
-  void _shareStory(TravelerStory story) {
-    final deepLink = SharingService.generateStoryDeepLink(story.id);
-    SharingService.shareGeneral(
-      title: story.title,
-      description: story.story,
-      deepLink: deepLink,
+  void _shareStory(TravelerStory story) async {
+    await showSocialShareSheet(
+      context: context,
+      title: 'Compartir historia',
+      actions: [
+        SocialShareAction(
+          icon: Icons.chat_bubble_outline,
+          iconColor: const Color(0xFF25D366),
+          label: 'WhatsApp',
+          onTap: () => SharingService.shareToWhatsApp(
+            storyTitle: story.title,
+            storyDescription: story.story,
+            storyId: story.id,
+          ),
+        ),
+        SocialShareAction(
+          icon: Icons.facebook,
+          iconColor: const Color(0xFF1877F2),
+          label: 'Facebook',
+          onTap: () => SharingService.shareToFacebook(
+            storyTitle: story.title,
+            storyDescription: story.story,
+            storyId: story.id,
+          ),
+        ),
+        SocialShareAction(
+          icon: Icons.music_video,
+          iconColor: const Color(0xFF000000),
+          label: 'TikTok',
+          onTap: () => SharingService.shareToTikTok(
+            storyTitle: story.title,
+            storyId: story.id,
+          ),
+        ),
+        SocialShareAction(
+          icon: Icons.share_outlined,
+          label: 'Más opciones',
+          onTap: () async {
+            final deepLink =
+                await SharingService.generateStoryDeepLink(story.id);
+            await SharingService.shareGeneral(
+              title: story.title,
+              description: story.story,
+              deepLink: deepLink,
+            );
+          },
+        ),
+      ],
     );
   }
 

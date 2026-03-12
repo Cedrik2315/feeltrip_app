@@ -2,12 +2,109 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/agency_model.dart';
 import '../services/agency_service.dart';
+import '../services/auth_service.dart';
 
-class AgencyProfileScreen extends StatelessWidget {
+class AgencyProfileScreen extends StatefulWidget {
   final String agencyId;
-  final AgencyService _agencyService = AgencyService();
 
-  AgencyProfileScreen({super.key, required this.agencyId});
+  const AgencyProfileScreen({super.key, required this.agencyId});
+
+  @override
+  State<AgencyProfileScreen> createState() => _AgencyProfileScreenState();
+}
+
+class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
+  final AgencyService _agencyService = AgencyService();
+  final AuthService _authService = AuthService();
+
+  bool _isFollowing = false;
+  bool _isLoadingFollow = true;
+  late Future<TravelAgency?> _agencyFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _agencyFuture = _agencyService.getAgencyById(widget.agencyId);
+    _checkFollowStatus();
+  }
+
+  Future<void> _checkFollowStatus() async {
+    final user = _authService.user;
+    if (user != null) {
+      final isFollowing = await _agencyService.isFollowingAgency(
+        userId: user.uid,
+        agencyId: widget.agencyId,
+      );
+      if (mounted) {
+        setState(() {
+          _isFollowing = isFollowing;
+          _isLoadingFollow = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoadingFollow = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _toggleFollow() async {
+    final user = _authService.user;
+    if (user == null) {
+      // Usuario no logueado - mostrar mensaje o redirigir a login
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Inicia sesión para seguir a esta agencia'),
+            action: SnackBarAction(
+              label: 'Login',
+              onPressed: () => Navigator.pushNamed(context, '/login'),
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isLoadingFollow = true;
+    });
+
+    try {
+      if (_isFollowing) {
+        await _agencyService.unfollowAgencyWithUser(
+          userId: user.uid,
+          agencyId: widget.agencyId,
+        );
+      } else {
+        await _agencyService.followAgencyWithUser(
+          userId: user.uid,
+          agencyId: widget.agencyId,
+        );
+      }
+
+      // Recargar datos de la agencia para actualizar el contador de seguidores
+      _agencyFuture = _agencyService.getAgencyById(widget.agencyId);
+
+      setState(() {
+        _isFollowing = !_isFollowing;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingFollow = false;
+        });
+      }
+    }
+  }
 
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
@@ -21,7 +118,7 @@ class AgencyProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Perfil de Agencia')),
       body: FutureBuilder<TravelAgency?>(
-        future: _agencyService.getAgencyById(agencyId),
+        future: _agencyFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -110,14 +207,7 @@ class AgencyProfileScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _agencyService.followAgency(agencyId),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Seguir Agencia'),
-                  ),
+                  child: _buildFollowButton(),
                 ),
               ],
             ),
@@ -125,6 +215,41 @@ class AgencyProfileScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Widget _buildFollowButton() {
+    if (_isLoadingFollow) {
+      return const ElevatedButton(
+        onPressed: null,
+        child: SizedBox(
+          height: 20,
+          width: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+
+    if (_isFollowing) {
+      return ElevatedButton.icon(
+        onPressed: _toggleFollow,
+        icon: const Icon(Icons.check),
+        label: const Text('Siguiendo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
+      );
+    } else {
+      return ElevatedButton.icon(
+        onPressed: _toggleFollow,
+        icon: const Icon(Icons.person_add),
+        label: const Text('Seguir Agencia'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+        ),
+      );
+    }
   }
 
   Widget _buildInfoRow(IconData icon, String text) {
