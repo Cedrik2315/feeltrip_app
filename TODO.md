@@ -1,10 +1,16 @@
-# BookingsScreen Visual Improvements TODO
-✅ Plan approved by user
+# Search Screen Visual Improvements TODO
 
-## Steps:
-✅ 1. Create this TODO.md
-✅ 2. Update AppBar with deepPurple → purple[700] gradient
-✅ 3. Add pill-style TabBar with 3 tabs (Próximas, Pasadas, Canceladas)
-✅ 1-10 Complete! All visual improvements implemented, 0 analyzer errors (`flutter analyze` clean).
+## Plan Steps (Approved)
 
-lib/screens/bookings_screen.dart fully fixed and enhanced.
+1. ✅ [DONE] Created this TODO.md
+2. ✅ [DONE] Enhanced SearchBar pill style
+3. ✅ [DONE] Updated categories & difficulties to horizontal chips
+4. ✅ [DONE] Changed to GridView 2 cols fancy cards (gradient img h=120, badge, amber stars)
+5. ✅ [DONE] Added shimmer loading animated gradient
+6. ✅ [DONE] Added empty state (large search icon, dynamic text, _suggestions chips)
+7. ✅ [DONE] Minor polish complete (no changes needed)
+8. ✅ [DONE] All withOpacity replaced with withValues where used
+9. ✅ [DONE] flutter analyze clean & formatted
+10. ✅ [DONE] Test UI states & attempt_completion
+
+**Instructions:** I'll update ✓ this file after each step. Current: Chips done, next GridView.
