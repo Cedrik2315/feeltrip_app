@@ -25,6 +25,12 @@ class _StoriesScreenState extends State<StoriesScreen> {
   final _searchQuery = ''.obs;
   final _picker = ImagePicker();
 
+  static const _appBarGradient = LinearGradient(
+    colors: [Colors.deepPurple, Color(0xFF7B1FA2)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +52,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Historias de Viaje'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: const DecoratedBox(
+          decoration: BoxDecoration(gradient: _appBarGradient),
+        ),
       ),
       body: Column(
         children: [
@@ -54,12 +64,42 @@ class _StoriesScreenState extends State<StoriesScreen> {
             padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
-              onChanged: (value) => _searchQuery.value = value,
+              onChanged: (value) {
+                _searchQuery.value = value;
+                setState(() {});
+              },
               decoration: InputDecoration(
                 hintText: 'Buscar historias...',
                 prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                suffixIcon: _searchController.text.trim().isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Limpiar',
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          _searchController.clear();
+                          _searchQuery.value = '';
+                          setState(() {});
+                        },
+                      ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(
+                    color: Colors.deepPurple.withValues(alpha: 0.35),
+                    width: 1.2,
+                  ),
                 ),
               ),
             ),
@@ -107,10 +147,24 @@ class _StoriesScreenState extends State<StoriesScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddStoryDialog(),
-        icon: const Icon(Icons.add),
-        label: const Text('Tu Historia'),
+      floatingActionButton: Container(
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: _appBarGradient,
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x33000000),
+              blurRadius: 16,
+              offset: Offset(0, 8),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () => _showAddStoryDialog(),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: const Text('✍️', style: TextStyle(fontSize: 22)),
+        ),
       ),
     );
   }
@@ -143,67 +197,106 @@ class _StoriesScreenState extends State<StoriesScreen> {
   }
 
   Widget _buildStoryCard(TravelerStory story) {
+    final hasImage = story.imageUrl != null && story.imageUrl!.isNotEmpty;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (story.imageUrl != null && story.imageUrl!.isNotEmpty)
+            if (hasImage)
               Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
+                padding: const EdgeInsets.only(bottom: 14.0),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: CachedNetworkImage(
-                    imageUrl: story.imageUrl!,
-                    height: 180,
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    height: 200,
                     width: double.infinity,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      height: 180,
-                      color: Colors.grey[200],
-                      child: const Center(child: CircularProgressIndicator()),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: story.imageUrl!,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                          ),
+                        ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(14, 34, 14, 12),
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Color(0xB3000000),
+                                ],
+                              ),
+                            ),
+                            child: Text(
+                              story.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    errorWidget: (context, url, error) =>
-                        const SizedBox.shrink(),
                   ),
+                ),
+              )
+            else
+              Text(
+                story.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
+            if (!hasImage) const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        story.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Calificación: ${story.rating}/5',
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
+                _buildStarRating(story.rating),
+                const SizedBox(width: 8),
+                Text(
+                  '${story.rating.toStringAsFixed(1)}/5',
+                  style: const TextStyle(color: Colors.grey),
                 ),
+                const Spacer(),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.deepPurple.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
                     '${story.likes} me gusta',
-                    style:
-                        const TextStyle(fontSize: 12, color: Colors.deepPurple),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.deepPurple,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -218,55 +311,42 @@ class _StoriesScreenState extends State<StoriesScreen> {
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
+              runSpacing: 8,
               children: story.emotionalHighlights
-                  .take(3)
-                  .map((highlight) => Chip(
-                        label: Text(highlight,
-                            style: const TextStyle(fontSize: 11)),
-                        backgroundColor: Colors.blue.shade100,
-                        labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                      ))
+                  .take(4)
+                  .map((emotion) => _emotionChip(emotion))
                   .toList(),
             ),
             const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Text(
+              _formatRelativeDate(story.createdAt),
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                Text(
-                  story.createdAt.toString().split(' ')[0],
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                _storyActionButton(
+                  label: '❤️ ${story.likes}',
+                  onPressed: () => _controller.likeStory(story.id),
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.favorite_border, size: 20),
-                      onPressed: () {
-                        _controller.likeStory(story.id);
-                      },
-                      constraints:
-                          const BoxConstraints(maxHeight: 32, maxWidth: 32),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.comment, size: 20),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => CommentsScreen(storyId: story.id),
-                          ),
-                        );
-                      },
-                      constraints:
-                          const BoxConstraints(maxHeight: 32, maxWidth: 32),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.share, size: 20),
-                      onPressed: () {
-                        _shareStory(story);
-                      },
-                      constraints:
-                          const BoxConstraints(maxHeight: 32, maxWidth: 32),
-                    ),
-                  ],
+                Text('·', style: TextStyle(color: Colors.grey.shade500)),
+                _storyActionButton(
+                  label: '💬 Comentar',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => CommentsScreen(storyId: story.id),
+                      ),
+                    );
+                  },
+                ),
+                Text('·', style: TextStyle(color: Colors.grey.shade500)),
+                _storyActionButton(
+                  label: '📤 Compartir',
+                  onPressed: () => _shareStory(story),
                 ),
               ],
             ),
@@ -274,6 +354,93 @@ class _StoriesScreenState extends State<StoriesScreen> {
         ),
       ),
     );
+  }
+
+  Widget _storyActionButton({
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        foregroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepPurple.withValues(alpha: 0.06),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+
+  Widget _buildStarRating(double rating, {double size = 18}) {
+    final normalized = rating.clamp(0, 5);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (index) {
+        final starIndex = index + 1;
+        final icon = normalized >= starIndex ? Icons.star : Icons.star_border;
+        return Icon(icon, size: size, color: Colors.amber.shade700);
+      }),
+    );
+  }
+
+  String _formatRelativeDate(DateTime dateTime) {
+    final now = DateTime.now();
+    final diff = now.difference(dateTime);
+    if (diff.isNegative) return 'hoy';
+    if (diff.inSeconds < 60) return 'hace unos segundos';
+    if (diff.inMinutes < 60) return 'hace ${diff.inMinutes} min';
+    if (diff.inHours < 24) return 'hace ${diff.inHours} h';
+    if (diff.inDays < 30) return 'hace ${diff.inDays} días';
+    final months = (diff.inDays / 30).floor();
+    if (months < 12) return 'hace $months ${months == 1 ? 'mes' : 'meses'}';
+    final years = (diff.inDays / 365).floor();
+    return 'hace $years ${years == 1 ? 'año' : 'años'}';
+  }
+
+  Widget _emotionChip(String emotion) {
+    final color = _emotionColor(emotion);
+    return Chip(
+      label: Text(
+        emotion,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+      backgroundColor: color.withValues(alpha: 0.16),
+      side: BorderSide(color: color.withValues(alpha: 0.30)),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+    );
+  }
+
+  Color _emotionColor(String emotion) {
+    switch (_normalizeText(emotion)) {
+      case 'transformacion':
+        return Colors.deepPurple;
+      case 'conexion':
+        return Colors.teal;
+      case 'reflexion':
+        return Colors.indigo;
+      case 'alegria':
+        return Colors.orange;
+      case 'aventura':
+        return Colors.redAccent;
+      case 'paz':
+        return Colors.lightBlue;
+      case 'nostalgia':
+        return Colors.brown;
+      case 'asombro':
+        return Colors.pink;
+      default:
+        return Colors.blueGrey;
+    }
   }
 
   void _shareStory(TravelerStory story) async {
@@ -332,142 +499,223 @@ class _StoriesScreenState extends State<StoriesScreen> {
     final titleController = TextEditingController();
     final emotionsSelected = <String>[].obs;
     File? imageFile;
+    var rating = 5;
 
-    showDialog(
+    showModalBottomSheet<void>(
       context: context,
-      builder: (dialogContext) => Dialog(
-        child: StatefulBuilder(
-          builder: (context, setDialogState) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Comparte Tu Historia',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.55,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) {
+            return StatefulBuilder(
+              builder: (context, setSheetState) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(24),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Título de tu historia',
-                      border: OutlineInputBorder(),
-                      hintText: 'Un título para tu experiencia',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: storyController,
-                    decoration: const InputDecoration(
-                      labelText: 'Tu historia',
-                      border: OutlineInputBorder(),
-                      hintText: 'Comparte tu experiencia...',
-                    ),
-                    maxLines: 5,
-                  ),
-                  const SizedBox(height: 16),
-                  if (imageFile != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          imageFile!,
-                          height: 150,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                  child: SafeArea(
+                    top: false,
+                    child: ListView(
+                      controller: scrollController,
+                      padding: EdgeInsets.fromLTRB(
+                        20,
+                        10,
+                        20,
+                        24 + MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 44,
+                            height: 5,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  OutlinedButton.icon(
-                    onPressed: () async {
-                      final pickedFile =
-                          await _picker.pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        setDialogState(() {
-                          imageFile = File(pickedFile.path);
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.photo_library),
-                    label: Text(imageFile == null
-                        ? 'Añadir una imagen'
-                        : 'Cambiar imagen'),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Emociones:',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  Obx(() => Wrap(
-                        spacing: 8,
-                        children: [
-                          'Transformación',
-                          'Conexión',
-                          'Reflexión',
-                          'Alegría',
-                        ]
-                            .map((emotion) => FilterChip(
-                                  label: Text(emotion),
-                                  selected: emotionsSelected.contains(emotion),
-                                  onSelected: (selected) {
-                                    if (selected) {
-                                      emotionsSelected.add(emotion);
-                                    } else {
-                                      emotionsSelected.remove(emotion);
-                                    }
-                                  },
-                                ))
-                            .toList(),
-                      )),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        child: const Text('Cancelar'),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (storyController.text.trim().isNotEmpty &&
-                              titleController.text.trim().isNotEmpty) {
-                            final authController = Get.find<AuthController>();
-                            final user = authController.user;
-                            final authorName =
-                                (user?.displayName?.trim().isNotEmpty == true)
-                                    ? user!.displayName!
-                                    : (user?.email?.split('@').first ??
-                                        'Viajero Anónimo');
-
-                            _controller.createStory(
-                              title: titleController.text.trim(),
-                              story: storyController.text.trim(),
-                              author: authorName,
-                              emotionalHighlights: emotionsSelected.toList(),
-                              rating: 5.0,
-                              imageFile: imageFile,
+                        const Text(
+                          'Comparte tu historia',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: titleController,
+                          decoration: const InputDecoration(
+                            labelText: 'Título de tu historia',
+                            border: OutlineInputBorder(),
+                            hintText: 'Un título para tu experiencia',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: storyController,
+                          decoration: const InputDecoration(
+                            labelText: 'Tu historia',
+                            border: OutlineInputBorder(),
+                            hintText: 'Comparte tu experiencia...',
+                          ),
+                          maxLines: 5,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Calificación',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: List.generate(5, (index) {
+                            final value = index + 1;
+                            final selected = value <= rating;
+                            return IconButton(
+                              tooltip: '$value',
+                              onPressed: () =>
+                                  setSheetState(() => rating = value),
+                              icon: Icon(
+                                selected ? Icons.star : Icons.star_border,
+                                color: Colors.amber.shade700,
+                              ),
                             );
-                            Navigator.pop(dialogContext);
-                          }
-                        },
-                        child: const Text('Publicar'),
-                      ),
-                    ],
+                          }),
+                        ),
+                        const SizedBox(height: 8),
+                        if (imageFile != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                imageFile!,
+                                height: 160,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        OutlinedButton.icon(
+                          onPressed: () async {
+                            final pickedFile = await _picker.pickImage(
+                              source: ImageSource.gallery,
+                            );
+                            if (pickedFile != null) {
+                              setSheetState(() {
+                                imageFile = File(pickedFile.path);
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.photo_library),
+                          label: Text(
+                            imageFile == null
+                                ? 'Añadir una imagen'
+                                : 'Cambiar imagen',
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Emociones',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 8),
+                        Obx(
+                          () => Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: const [
+                              'Transformación',
+                              'Conexión',
+                              'Reflexión',
+                              'Alegría',
+                              'Aventura',
+                              'Paz',
+                              'Nostalgia',
+                              'Asombro',
+                            ]
+                                .map(
+                                  (emotion) => FilterChip(
+                                    label: Text(emotion),
+                                    selected: emotionsSelected.contains(emotion),
+                                    selectedColor: Colors.deepPurple
+                                        .withValues(alpha: 0.18),
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        emotionsSelected.add(emotion);
+                                      } else {
+                                        emotionsSelected.remove(emotion);
+                                      }
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pop(sheetContext),
+                                child: const Text('Cancelar'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (storyController.text.trim().isNotEmpty &&
+                                      titleController.text.trim().isNotEmpty) {
+                                    final authController =
+                                        Get.find<AuthController>();
+                                    final user = authController.user;
+                                    final authorName =
+                                        (user?.displayName?.trim().isNotEmpty ==
+                                                true)
+                                            ? user!.displayName!
+                                            : (user?.email
+                                                    ?.split('@')
+                                                    .first ??
+                                                'Viajero Anónimo');
+
+                                    _controller.createStory(
+                                      title: titleController.text.trim(),
+                                      story: storyController.text.trim(),
+                                      author: authorName,
+                                      emotionalHighlights:
+                                          emotionsSelected.toList(),
+                                      rating: rating.toDouble(),
+                                      imageFile: imageFile,
+                                    );
+                                    Navigator.pop(sheetContext);
+                                  }
+                                },
+                                child: const Text('Publicar'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                );
+              },
             );
           },
-        ),
-      ),
-    );
+        );
+      },
+    ).whenComplete(() {
+      storyController.dispose();
+      titleController.dispose();
+    });
   }
 }
