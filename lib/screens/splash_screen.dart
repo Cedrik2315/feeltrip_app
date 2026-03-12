@@ -1,85 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../widgets/particle_painter.dart';
+import 'package:get/get.dart';
+import '../widgets/video_background.dart';
+import '../widgets/glass_button.dart';
 
-class FeelTripSplashScreen extends StatefulWidget {
-  const FeelTripSplashScreen({super.key});
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
 
   @override
-  State<FeelTripSplashScreen> createState() => _FeelTripSplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _FeelTripSplashScreenState extends State<FeelTripSplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _SplashScreenState extends State<SplashScreen> {
   double _opacity = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 3))
-          ..forward();
-
-    // Aparece el logo suavemente después de las partículas
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    // Inicia una animación con retardo para dar tiempo a que el video de fondo cargue.
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        setState(() => _opacity = 1.0);
-        HapticFeedback.lightImpact();
+        setState(() {
+          _opacity = 1.0;
+        });
       }
     });
-
-    // Navegar a la Home después de la intro
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/auth_gate');
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1A), // Azul muy oscuro, casi negro
       body: Stack(
-        alignment: Alignment.center,
         children: [
-          CustomPaint(
-            painter: ParticlePainter(_controller),
-            child: Container(),
+          const FeelTripVideoBackground(), // El video de fondo
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.80),
+                  ],
+                ),
+              ),
+            ),
           ),
-          AnimatedOpacity(
-            duration: const Duration(seconds: 2),
-            opacity: _opacity,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Tu logo. Se ajustó la ruta según tu pubspec.yaml
-                Image.asset('assets/images/logo.png', width: 120),
-                const SizedBox(height: 20),
-                const Text(
-                  "FEELTRIP",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 8,
+          SafeArea(
+            child: AnimatedOpacity(
+              opacity: _opacity,
+              duration: const Duration(seconds: 2),
+              curve: Curves.easeIn,
+              child: SizedBox.expand(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Image.asset('assets/images/logo.png', height: 64),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: GlassButton(
+                          text: "EMPEZAR VIAJE",
+                          onPressed: () {
+                            Get.offNamed('/onboarding');
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Text(
-                  "EL MUNDO TE ESPERA",
-                  style: TextStyle(
-                      color: Colors.amber.withValues(alpha: 0.7),
-                      fontSize: 12,
-                      letterSpacing: 2),
-                ),
-              ],
+              ),
             ),
           ),
         ],

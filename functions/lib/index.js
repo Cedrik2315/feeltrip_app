@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.registerAffiliateConversion = exports.getCheckoutOrderStatus = exports.stripeWebhook = exports.createCheckoutSession = exports.createTripReview = exports.analyzeDiaryEntry = void 0;
+exports.facebookDataDeletionStatus = exports.facebookDataDeletionCallback = exports.registerAffiliateConversion = exports.getCheckoutOrderStatus = exports.stripeWebhook = exports.createCheckoutSession = exports.createTripReview = exports.analyzeDiaryEntry = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 const app_1 = require("firebase-admin/app");
@@ -8,6 +8,7 @@ const auth_1 = require("firebase-admin/auth");
 const firestore_1 = require("firebase-admin/firestore");
 const generative_ai_1 = require("@google/generative-ai");
 const stripe_1 = require("stripe");
+const crypto = require("crypto");
 (0, app_1.initializeApp)();
 const db = (0, firestore_1.getFirestore)();
 const RATE_LIMIT_WINDOW_MS = 60000;
@@ -20,6 +21,88 @@ const MAX_CHECKOUT_ITEMS = 20;
 const TAX_RATE_BPS = 1000; // 10.00%
 const DEFAULT_CHECKOUT_SUCCESS_URL = "https://feeltrip.app/checkout/success";
 const DEFAULT_CHECKOUT_CANCEL_URL = "https://feeltrip.app/checkout/cancel";
+function base64UrlToBuffer(input) {
+    const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
+    return Buffer.from(padded, "base64");
+}
+function parseFacebookSignedRequest(signedRequest, appSecret) {
+    const parts = signedRequest.split(".");
+    if (parts.length !== 2)
+        return null;
+    const [encodedSig, encodedPayload] = parts;
+    const sig = base64UrlToBuffer(encodedSig);
+    const expectedSig = crypto
+        .createHmac("sha256", appSecret)
+        .update(encodedPayload)
+        .digest();
+    if (sig.length !== expectedSig.length ||
+        !crypto.timingSafeEqual(sig, expectedSig)) {
+        return null;
+    }
+    const payloadBuffer = base64UrlToBuffer(encodedPayload);
+    try {
+        const payload = JSON.parse(payloadBuffer.toString("utf8"));
+        return payload;
+    }
+    catch (_a) {
+        return null;
+    }
+}
+async function deleteCollectionInBatches(collectionRef, batchSize = 400) {
+    while (true) {
+        const snap = await collectionRef.limit(batchSize).get();
+        if (snap.empty)
+            return;
+        const batch = db.batch();
+        for (const doc of snap.docs) {
+            batch.delete(doc.ref);
+        }
+        await batch.commit();
+    }
+}
+async function deleteQueryInBatches(query, batchSize = 400) {
+    while (true) {
+        const snap = await query.limit(batchSize).get();
+        if (snap.empty)
+            return;
+        const batch = db.batch();
+        for (const doc of snap.docs) {
+            batch.delete(doc.ref);
+        }
+        await batch.commit();
+    }
+}
+async function deleteUserDataByUid(uid) {
+    const userRef = db.collection("users").doc(uid);
+    const knownSubcollections = [
+        "private",
+        "cartItems",
+        "diaryEntries",
+        "achievements",
+        "trips",
+        "impactMetrics",
+        "quizResults",
+        "stories",
+    ];
+    for (const sub of knownSubcollections) {
+        await deleteCollectionInBatches(userRef.collection(sub));
+    }
+    // Delete public stories created by this user (and their comments)
+    const publicStories = await db
+        .collection("stories")
+        .where("userId", "==", uid)
+        .get();
+    for (const storyDoc of publicStories.docs) {
+        await deleteCollectionInBatches(storyDoc.ref.collection("comments"));
+        await storyDoc.ref.delete();
+    }
+    // Delete comments authored by this user across all stories
+    await deleteQueryInBatches(db.collectionGroup("comments").where("userId", "==", uid));
+    // Finally remove the user document and auth user
+    await userRef.delete().catch(() => undefined);
+    await (0, auth_1.getAuth)().deleteUser(uid).catch(() => undefined);
+}
 function getModelName() {
     var _a;
     return ((_a = process.env.GEMINI_MODEL) === null || _a === void 0 ? void 0 : _a.trim()) || DEFAULT_MODEL;
@@ -608,5 +691,107 @@ exports.registerAffiliateConversion = (0, https_1.onRequest)({
         logger.error("Error registrando conversion afiliado", { clickId, error });
         res.status(500).json({ error: "internal-error" });
     }
+});
+exports.facebookDataDeletionCallback = (0, https_1.onRequest)({
+    region: "us-east1",
+    secrets: ["FACEBOOK_APP_SECRET"],
+}, async (req, res) => {
+    var _a, _b, _c, _d;
+    const secret = (_a = process.env.FACEBOOK_APP_SECRET) === null || _a === void 0 ? void 0 : _a.trim();
+    if (!secret) {
+        res.status(500).json({ error: "FACEBOOK_APP_SECRET_not_configured" });
+        return;
+    }
+    const body = req.body;
+    let signedRequest;
+    if (typeof (body === null || body === void 0 ? void 0 : body.signed_request) === "string") {
+        signedRequest = body.signed_request;
+    }
+    else if (typeof req.rawBody === "string") {
+        const params = new URLSearchParams(req.rawBody);
+        signedRequest = (_b = params.get("signed_request")) !== null && _b !== void 0 ? _b : undefined;
+    }
+    else if (req.rawBody instanceof Buffer) {
+        const raw = req.rawBody.toString("utf8");
+        const params = new URLSearchParams(raw);
+        signedRequest = (_c = params.get("signed_request")) !== null && _c !== void 0 ? _c : undefined;
+    }
+    if (!signedRequest) {
+        res.status(400).json({ error: "missing_signed_request" });
+        return;
+    }
+    const payload = parseFacebookSignedRequest(signedRequest, secret);
+    const facebookUserId = (_d = payload === null || payload === void 0 ? void 0 : payload.user_id) === null || _d === void 0 ? void 0 : _d.trim();
+    if (!facebookUserId) {
+        res.status(400).json({ error: "invalid_signed_request" });
+        return;
+    }
+    const confirmationCode = crypto.randomBytes(16).toString("hex");
+    const projectId = process.env.GCLOUD_PROJECT || "unknown-project";
+    const statusUrl = `https://us-east1-${projectId}.cloudfunctions.net/facebookDataDeletionStatus?code=${confirmationCode}`;
+    await db
+        .collection("_facebookDataDeletion")
+        .doc(confirmationCode)
+        .set({
+        facebookUserId,
+        status: "received",
+        requestedAt: firestore_1.FieldValue.serverTimestamp(),
+    });
+    try {
+        const userSnap = await db
+            .collection("users")
+            .where("facebookUserId", "==", facebookUserId)
+            .limit(1)
+            .get();
+        if (userSnap.empty) {
+            await db
+                .collection("_facebookDataDeletion")
+                .doc(confirmationCode)
+                .set({
+                status: "pending_manual",
+                completedAt: firestore_1.FieldValue.serverTimestamp(),
+            }, { merge: true });
+            res.json({ url: statusUrl, confirmation_code: confirmationCode });
+            return;
+        }
+        const uid = userSnap.docs[0].id;
+        await deleteUserDataByUid(uid);
+        await db
+            .collection("_facebookDataDeletion")
+            .doc(confirmationCode)
+            .set({
+            status: "complete",
+            uid,
+            completedAt: firestore_1.FieldValue.serverTimestamp(),
+        }, { merge: true });
+    }
+    catch (e) {
+        logger.error("Facebook data deletion failed", e);
+        await db
+            .collection("_facebookDataDeletion")
+            .doc(confirmationCode)
+            .set({
+            status: "error",
+            error: String(e),
+            completedAt: firestore_1.FieldValue.serverTimestamp(),
+        }, { merge: true });
+    }
+    res.json({ url: statusUrl, confirmation_code: confirmationCode });
+});
+exports.facebookDataDeletionStatus = (0, https_1.onRequest)({
+    region: "us-east1",
+}, async (req, res) => {
+    var _a;
+    const code = (_a = req.query.code) === null || _a === void 0 ? void 0 : _a.trim();
+    if (!code) {
+        res.status(400).json({ error: "missing_code" });
+        return;
+    }
+    const snap = await db.collection("_facebookDataDeletion").doc(code).get();
+    if (!snap.exists) {
+        res.status(404).json({ error: "not_found" });
+        return;
+    }
+    res.json(Object.assign({ confirmation_code: code }, snap.data()));
 });
 //# sourceMappingURL=index.js.map

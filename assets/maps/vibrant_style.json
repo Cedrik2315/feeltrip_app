@@ -1,0 +1,6 @@
+[
+  { "featureType": "landscape", "stylers": [ { "color": "#fff9c4" } ] },
+  { "featureType": "poi", "stylers": [ { "color": "#ffcc80" } ] },
+  { "featureType": "road", "stylers": [ { "color": "#ff5252" } ] },
+  { "featureType": "water", "stylers": [ { "color": "#40c4ff" } ] }
+]

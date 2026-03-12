@@ -41,11 +41,17 @@ android {
             storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
             storePassword = keystoreProperties["storePassword"] as String?
         }
+        getByName("debug") {                                          // ← aquí dentro
+            storeFile = file("D:/AndroidConfig/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
 
     defaultConfig {
         applicationId = "com.example.feeltrip_app"
-        minSdk = flutter.minSdkVersion  // Establecido explícitamente para compatibilidad con Firebase y Google Maps
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -56,14 +62,15 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            
             isMinifyEnabled = true
             isShrinkResources = true
-            
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
@@ -74,4 +81,4 @@ flutter {
 
 dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
-  }
+}

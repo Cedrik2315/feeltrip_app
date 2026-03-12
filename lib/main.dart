@@ -1,6 +1,5 @@
-﻿// main.dart
+// main.dart
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -18,6 +17,8 @@ import 'controllers/experience_controller.dart';
 import 'controllers/home_controller.dart';
 import 'repositories/trip_repository.dart';
 import 'screens/diario_screen.dart';
+import 'screens/preview_entry_screen.dart';
+import 'screens/smart_camera_screen.dart';
 import 'screens/experience_impact_dashboard_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
@@ -26,11 +27,15 @@ import 'screens/quiz_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/stories_screen.dart';
+import 'screens/auth_gate.dart';
 import 'screens/splash_screen.dart';
 import 'screens/trip_detail_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/bookings_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/terms_and_conditions_screen.dart';
+import 'screens/privacy_policy_screen.dart';
+import 'screens/premium_subscription_screen.dart';
 import 'services/api_service.dart';
 import 'services/admob_service.dart';
 import 'services/achievements_service.dart';
@@ -43,6 +48,12 @@ import 'services/location_service.dart';
 import 'services/storage_service.dart';
 import 'services/story_service.dart';
 import 'services/travel_service.dart';
+import 'services/cart_service.dart';
+import 'services/mercado_pago_service.dart';
+import 'services/purchase_service.dart';
+import 'services/deep_link_service.dart';
+import 'controllers/cart_controller.dart';
+import 'controllers/premium_controller.dart';
 import 'services/observability_service.dart';
 
 void main() async {
@@ -114,6 +125,16 @@ void main() async {
     );
   }
 
+  // Inicializar DeepLinkService
+  try {
+    debugPrint('Inicializando DeepLinkService...');
+    await DeepLinkService().initialize();
+    debugPrint('DeepLinkService inicializado');
+  } catch (e, st) {
+    debugPrint('ERROR en DeepLinkService: $e');
+    debugPrint('Stack trace: $st');
+  }
+
   debugPrint('Ejecutando runApp...');
 
   runApp(
@@ -130,6 +151,11 @@ void main() async {
         Provider<DiaryService>(create: (_) => DiaryService()),
         Provider<LocationService>(create: (_) => LocationService()),
         Provider<StorageService>(create: (_) => StorageService()),
+        Provider<CartService>(create: (_) => CartService()),
+        Provider<PurchaseService>(
+          create: (_) => PurchaseService(),
+          dispose: (_, service) => service.dispose(),
+        ),
         Provider<TravelService>(create: (_) => TravelService()),
         Provider<DiaryAchievementsService>(
             create: (_) => DiaryAchievementsService()),
@@ -163,6 +189,61 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
+  void initState() {
+    super.initState();
+    // Set up deep link callback for navigation
+    _setupDeepLinkHandler();
+  }
+
+  void _setupDeepLinkHandler() {
+    DeepLinkService().onDeepLinkReceived = (Uri uri) {
+      // Parse the deep link and navigate
+      final navData = DeepLinkService().parseDeepLink(uri);
+      if (navData != null) {
+        final path = navData['path'] as String;
+        final args = navData['arguments'] as Map<String, dynamic>?;
+
+        debugPrint('DeepLink: Navigating to $path with args: $args');
+
+        // Use GetX to navigate
+        if (Get.key.currentState != null) {
+          switch (path) {
+            case '/story':
+              if (args != null && args['storyId'] != null) {
+                // Navigate to stories screen with story ID
+                Get.toNamed('/stories', arguments: args);
+              }
+              break;
+            case '/agency':
+              if (args != null && args['agencyId'] != null) {
+                Get.toNamed('/home', arguments: args);
+              }
+              break;
+            case '/trip':
+              if (args != null && args['tripId'] != null) {
+                Get.toNamed('/trip-details', arguments: args['tripId']);
+              }
+              break;
+            case '/join':
+              if (args != null && args['referralCode'] != null) {
+                // Handle referral - navigate to home with referral code
+                Get.toNamed('/home', arguments: args);
+              }
+              break;
+            case '/experience':
+              if (args != null && args['experienceId'] != null) {
+                Get.toNamed('/impact-dashboard', arguments: args);
+              }
+              break;
+            default:
+              Get.toNamed('/home');
+          }
+        }
+      }
+    };
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Inyectar ExperienceController con GetX
@@ -174,6 +255,12 @@ class _MyAppState extends State<MyApp> {
           diaryService: context.read<DiaryService>(),
           storageService: context.read<StorageService>(),
         ));
+    Get.lazyPut(() => CartController(
+          context.read<AuthService>(),
+          context.read<CartService>(),
+          MercadoPagoService(), // Assuming it's stateless
+        ));
+    Get.lazyPut(() => PremiumController(context.read<PurchaseService>()));
   }
 
   @override
@@ -203,8 +290,10 @@ class _MyAppState extends State<MyApp> {
         Locale('es'), // Español
         Locale('en'), // Inglés (futuro)
       ],
-      navigatorObservers: [ObservabilityService.analyticsObserver],
-      home: const FeelTripSplashScreen(),
+      navigatorObservers: [
+        ObservabilityService.analyticsObserver
+      ], // Asegúrate de que esta línea esté correcta
+      home: const SplashScreen(),
       routes: {
         '/auth_gate': (_) => const AuthGate(),
         '/onboarding': (_) => const OnboardingScreen(),
@@ -216,160 +305,19 @@ class _MyAppState extends State<MyApp> {
         '/bookings': (_) => const BookingsScreen(),
         '/profile': (_) => const ProfileScreen(),
         '/diary': (_) => const DiarioScreen(),
+        '/smart-camera': (_) => const SmartCameraScreen(),
+        '/preview-entry': (_) => const PreviewEntryScreen(),
         '/quiz': (_) => const QuizScreen(),
         '/stories': (_) => const StoriesScreen(),
         '/impact-dashboard': (_) => const ExperienceImpactDashboardScreen(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/trip-details') {
-          String? tripId;
-          String? initialPurpose;
-          List<String>? initialItinerary;
-
-          final args = settings.arguments;
-          if (args is String) {
-            tripId = args;
-          } else if (args is Map) {
-            final dynamic rawTripId = args['tripId'];
-            if (rawTripId != null) {
-              tripId = rawTripId.toString();
-            }
-            final dynamic rawPurpose = args['initialPurpose'];
-            if (rawPurpose != null) {
-              initialPurpose = rawPurpose.toString();
-            }
-            final dynamic rawItinerary = args['initialItinerary'];
-            if (rawItinerary is List) {
-              initialItinerary = rawItinerary.map((e) => e.toString()).toList();
-            }
-          }
-
-          if (tripId != null && tripId.isNotEmpty) {
-            return MaterialPageRoute(
-              builder: (_) => TripDetailScreen(
-                tripId: tripId!,
-                initialPurpose: initialPurpose,
-                initialItinerary: initialItinerary,
-              ),
-            );
-          }
-        }
-        return null;
-      },
-    );
-  }
-}
-
-class AuthGate extends StatefulWidget {
-  const AuthGate({super.key});
-
-  @override
-  State<AuthGate> createState() => _AuthGateState();
-}
-
-class _AuthGateState extends State<AuthGate> {
-  bool _timeoutReached = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Timeout de 10 segundos para evitar pantalla negra infinita
-    Future.delayed(const Duration(seconds: 10), () {
-      if (mounted) {
-        setState(() {
-          _timeoutReached = true;
-        });
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: context.read<AuthService>().user,
-      builder: (context, snapshot) {
-        final uid = snapshot.data?.uid;
-        if (uid != null && uid.isNotEmpty) {
-          ObservabilityService.setUserId(uid);
-        }
-
-        debugPrint(
-            'AuthGate - connectionState: ${snapshot.connectionState}, hasError: ${snapshot.hasError}, error: ${snapshot.error}');
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          if (_timeoutReached) {
-            ObservabilityService.logAuthGateState('timeout_waiting_auth');
-            // Si pasó el timeout, mostrar opción de continuar sin autenticación
-            return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 16),
-                    const Text('Tiempo de espera de autenticación excedido'),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                              builder: (_) => const LoginScreen()),
-                        );
-                      },
-                      child: const Text('Continuar a Login'),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-          return const Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Cargando...'),
-                ],
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.hasError) {
-          ObservabilityService.logAuthGateState('error_auth_stream');
-          debugPrint('AuthGate error: ${snapshot.error}');
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text('Error: ${snapshot.error}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      );
-                    },
-                    child: const Text('Continuar a Login'),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.data != null) {
-          ObservabilityService.logAuthGateState('authenticated');
-          return const HomeScreen();
-        }
-
-        ObservabilityService.logAuthGateState('anonymous');
-        return const OnboardingScreen();
+        '/premium': (_) => const PremiumSubscriptionScreen(),
+        '/terms': (_) => const TermsAndConditionsScreen(),
+        '/privacy': (_) => const PrivacyPolicyScreen(),
+        '/trip-details': (context) {
+          // Extrae el ID del viaje de los argumentos de la ruta
+          final tripId = ModalRoute.of(context)!.settings.arguments as String;
+          return TripDetailScreen(tripId: tripId);
+        },
       },
     );
   }

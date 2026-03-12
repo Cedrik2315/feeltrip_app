@@ -1,51 +1,76 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:feeltrip_app/models/experience_model.dart';
 import 'package:feeltrip_app/services/database_service.dart';
 
 class MockDiaryService extends Mock implements DatabaseService {}
 
 void main() {
-  // Inicializar el binding de Flutter para tests
+  // Initialize Flutter binding for tests
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('DiarySaveStrategy enum has correct values', () {
-    expect(DiarySaveStrategy.values.length, 3);
-    expect(DiarySaveStrategy.cloudOnly, isNotNull);
-    expect(DiarySaveStrategy.localOnly, isNotNull);
-    expect(DiarySaveStrategy.cloudWithLocalFallback, isNotNull);
-  });
-
-  test('DiarioRegistro can be created from JSON', () {
+  test('DiaryEntry can be created from JSON', () {
     final json = {
       'id': 'test-id',
-      'texto': 'Test entry',
-      'emociones': ['Joy', 'Excitement'],
-      'fecha': '2024-01-01T00:00:00.000',
-      'destino': 'Paris',
+      'userId': 'user-123',
+      'title': 'Test entry',
+      'content': 'Test content',
+      'emotions': ['Joy', 'Excitement'],
+      'reflectionDepth': 3,
+      'createdAt': '2024-01-01T00:00:00.000',
     };
 
-    final registro = DiarioRegistro.fromJson(json);
+    final entry = DiaryEntry.fromJson(json);
 
-    expect(registro.id, 'test-id');
-    expect(registro.texto, 'Test entry');
-    expect(registro.emociones, ['Joy', 'Excitement']);
-    expect(registro.destino, 'Paris');
+    expect(entry.id, 'test-id');
+    expect(entry.userId, 'user-123');
+    expect(entry.title, 'Test entry');
+    expect(entry.content, 'Test content');
+    expect(entry.emotions, ['Joy', 'Excitement']);
+    expect(entry.reflectionDepth, 3);
   });
 
-  test('DiarioRegistro can convert to JSON', () {
-    final registro = DiarioRegistro(
+  test('DiaryEntry can convert to JSON', () {
+    final entry = DiaryEntry(
       id: 'test-id',
-      texto: 'Test entry',
-      emociones: ['Joy'],
-      fecha: DateTime(2024, 1, 1),
-      destino: 'Bali',
+      userId: 'user-123',
+      imageUrl: '',
+      title: 'Test entry',
+      content: 'Test content',
+      emotions: const ['Joy'],
+      reflectionDepth: 3,
+      createdAt: DateTime(2024, 1, 1),
     );
 
-    final json = registro.toJson();
+    final json = entry.toJson();
 
     expect(json['id'], 'test-id');
-    expect(json['texto'], 'Test entry');
-    expect(json['emociones'], ['Joy']);
-    expect(json['destino'], 'Bali');
+    expect(json['userId'], 'user-123');
+    expect(json['title'], 'Test entry');
+    expect(json['content'], 'Test content');
+    expect(json['emotions'], ['Joy']);
+    expect(json['reflectionDepth'], 3);
+  });
+
+  test('DiaryEntry can convert to Firestore map', () {
+    final entry = DiaryEntry(
+      id: 'test-id',
+      userId: 'user-123',
+      imageUrl: 'https://example.com/image.jpg',
+      title: 'Test entry',
+      content: 'Test content',
+      emotions: const ['Joy'],
+      reflectionDepth: 4,
+      createdAt: DateTime(2024, 1, 1),
+    );
+
+    final map = entry.toMap();
+
+    expect(map['userId'], 'user-123');
+    expect(map['imageUrl'], 'https://example.com/image.jpg');
+    expect(map['title'], 'Test entry');
+    expect(map['content'], 'Test content');
+    expect(map['emotions'], ['Joy']);
+    expect(map['reflectionDepth'], 4);
   });
 }

@@ -1,65 +1,72 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isSignedIn() {
+
+    // --- 1. FUNCIONES DE AYUDA (COMBINADAS) ---
+    function isAuthenticated() {
       return request.auth != null;
     }
-
     function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isResourceOwner() {
+      return isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    function isAssigningSelf() {
+      return isAuthenticated() && request.resource.data.userId == request.auth.uid;
     }
 
-    function isStoryOwner() {
-      return isSignedIn() && resource.data.userId == request.auth.uid;
+    // --- 2. VALIDACIONES DE DATOS ---
+    function isValidString(text, min, max) {
+      return text is string && text.size() >= min && text.size() <= max;
+    }
+    function isValidRating(rating) {
+      return (rating is number || rating is int) && rating >= 0 && rating <= 5;
     }
 
+    // --- 3. LÓGICA DE INTERACCIÓN ---
     function onlyStoryLikeMutation() {
       return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes']) &&
         request.resource.data.userId == resource.data.userId;
     }
-
     function onlyCommentReactionMutation() {
       return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes', 'reactions']) &&
         request.resource.data.userId == resource.data.userId;
     }
 
+    // --- REGLAS DE COLECCIONES ---
+
+    // 1. USUARIOS (Perfil, Diario, Carrito)
     match /users/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
-
-      match /diaryEntries/{entryId} {
-        allow read, create, update, delete: if isOwner(userId);
-      }
-
-      match /stories/{storyId} {
-        allow read, create, update, delete: if isOwner(userId);
-      }
-
-      match /private/{docId} {
-        allow read, create, update, delete: if isOwner(userId);
-      }
-
-      match /cartItems/{itemId} {
-        allow read, create, update, delete: if isOwner(userId);
-      }
+      allow read, write: if isOwner(userId);
+      match /diaryEntries/{entryId} { allow read, write: if isOwner(userId); }
+      match /cartItems/{itemId} { allow read, write: if isOwner(userId); }
+      match /private/{docId} { allow read, write: if isOwner(userId); }
     }
 
+    // 2. HISTORIAS (Stories)
     match /stories/{storyId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isStoryOwner() || onlyStoryLikeMutation();
-      allow delete: if isStoryOwner();
+      allow create: if isAssigningSelf()
+                    && isValidString(request.resource.data.title, 3, 100)
+                    && isValidString(request.resource.data.story, 10, 5000)
+                    && isValidRating(request.resource.data.rating);
+      allow update: if (isResourceOwner()
+                        && isValidString(request.resource.data.title, 3, 100)
+                        && isValidString(request.resource.data.story, 10, 5000))
+                    || (isAuthenticated() && onlyStoryLikeMutation());
+      allow delete: if isResourceOwner();
 
+      // 2.1 Comentarios
       match /comments/{commentId} {
         allow read: if true;
-        allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-        allow update: if (isSignedIn() && resource.data.userId == request.auth.uid) || onlyCommentReactionMutation();
-        allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow create: if isAssigningSelf() && isValidString(request.resource.data.content, 1, 1000);
+        allow update: if isResourceOwner() || (isAuthenticated() && onlyCommentReactionMutation());
+        allow delete: if isResourceOwner();
       }
     }
 
+    // 3. AGENCIAS Y EXPERIENCIAS (Lectura pública, escritura protegida)
     match /agencies/{agencyId} {
       allow read: if true;
       allow create, update, delete: if false;

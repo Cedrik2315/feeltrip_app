@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -99,14 +100,28 @@ class _ReelsScreenState extends State<ReelsScreen> {
     return transitions.sublist(0, 3);
   }
 
-  void shareReel() {
-    if (generatedVideoPath != null) {
-      // En implementacion real usarias:
-      // - Share plugin para compartir el archivo
-      // - Social media APIs para publicar
-      
+  Future<void> shareReel() async {
+    final path = generatedVideoPath;
+    if (path == null) return;
+
+    try {
+      final file = File(path);
+      if (!await file.exists()) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se encontró el archivo del reel.')),
+        );
+        return;
+      }
+
+      await Share.shareXFiles(
+        [XFile(path)],
+        text: 'Mi reel de viaje en FeelTrip',
+      );
+    } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reel compartido exitosamente 🎉')),
+        SnackBar(content: Text('Error al compartir: $e')),
       );
     }
   }

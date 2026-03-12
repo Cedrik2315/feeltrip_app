@@ -67,7 +67,8 @@ class _ExperienceImpactDashboardScreenState
     if (controller.diaryEntries.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Escribe en tu diario para obtener sugerencias con IA.'),
+          content:
+              Text('Escribe en tu diario para obtener sugerencias con IA.'),
         ),
       );
       return;
@@ -79,7 +80,7 @@ class _ExperienceImpactDashboardScreenState
       final avgDepth = controller.getAverageDepth().toStringAsFixed(1);
       final recentNotes = controller.diaryEntries
           .take(3)
-          .map((e) => '${e.location}: ${e.content}')
+          .map((e) => '${e.title}: ${e.content}')
           .join('\n');
 
       final prompt = '''
@@ -95,7 +96,8 @@ $recentNotes
 
       if (result == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No pude generar sugerencia por ahora.')),
+          const SnackBar(
+              content: Text('No pude generar sugerencia por ahora.')),
         );
       } else {
         setState(() {
@@ -186,12 +188,14 @@ $recentNotes
                             child: ElevatedButton.icon(
                               onPressed: _isGeneratingSuggestion
                                   ? null
-                                  : () => _generateTransformativeSuggestion(controller),
+                                  : () => _generateTransformativeSuggestion(
+                                      controller),
                               icon: _isGeneratingSuggestion
                                   ? const SizedBox(
                                       width: 16,
                                       height: 16,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
                                     )
                                   : const Icon(Icons.auto_awesome),
                               label: Text(
@@ -248,11 +252,13 @@ $recentNotes
                             Row(
                               children: [
                                 TextButton(
-                                  onPressed: () => Navigator.pushNamed(context, '/search'),
+                                  onPressed: () =>
+                                      Navigator.pushNamed(context, '/search'),
                                   child: const Text('Ver viajes'),
                                 ),
                                 TextButton(
-                                  onPressed: () => Navigator.pushNamed(context, '/stories'),
+                                  onPressed: () =>
+                                      Navigator.pushNamed(context, '/stories'),
                                   child: const Text('Ir a comunidad'),
                                 ),
                               ],
@@ -274,7 +280,8 @@ $recentNotes
                         children: [
                           const Text(
                             'Comunidad de Viajeros',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           const Text(
@@ -284,7 +291,8 @@ $recentNotes
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton.icon(
-                              onPressed: () => Navigator.pushNamed(context, '/stories'),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/stories'),
                               icon: const Icon(Icons.groups),
                               label: const Text('Ir a Comunidad'),
                             ),

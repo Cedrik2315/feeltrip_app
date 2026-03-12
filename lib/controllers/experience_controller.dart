@@ -95,6 +95,7 @@ class ExperienceController extends BaseController {
 
       final newStory = TravelerStory(
         id: const Uuid().v4(),
+        userId: userId!,
         author: author,
         title: title,
         story: story,
@@ -179,13 +180,15 @@ class ExperienceController extends BaseController {
   }
 
   Future<void> createDiaryEntry({
-    required String location,
+    required String title,
     required String content,
-    required List<String> emotions,
-    required int reflectionDepth,
+    required String emotion,
+    required File imageFile,
   }) async {
-    if (content.trim().length < 10) {
-      setError('El contenido es muy breve. Expresate mas!');
+    if (title.trim().isEmpty ||
+        content.trim().isEmpty ||
+        emotion.trim().isEmpty) {
+      setError('Por favor, completa el título, contenido y emoción.');
       return;
     }
 
@@ -195,12 +198,15 @@ class ExperienceController extends BaseController {
     }
 
     await runBusyFuture(() async {
+      final imageUrl =
+          await _storageService.uploadStoryImage(imageFile, userId!);
       final entry = DiaryEntry(
         id: const Uuid().v4(),
-        location: location,
+        userId: userId!,
+        imageUrl: imageUrl,
+        title: title,
         content: content,
-        emotions: emotions,
-        reflectionDepth: reflectionDepth,
+        emotions: [emotion], // Convert single emotion to list
         createdAt: DateTime.now(),
       );
 
@@ -215,32 +221,32 @@ class ExperienceController extends BaseController {
 
   Future<void> updateDiaryEntry(
     String entryId, {
-    required String location,
+    required String title,
     required String content,
-    required List<String> emotions,
-    required int reflectionDepth,
+    required String emotion,
   }) async {
     if (userId == null) return;
 
     await runBusyFuture(() async {
       final updates = {
-        'location': location,
+        'title': title,
         'content': content,
-        'emotions': emotions,
-        'reflectionDepth': reflectionDepth,
+        'emotions': [emotion], // Convert single emotion to list
       };
 
       await _diaryService.updateDiaryEntry(userId!, entryId, updates);
 
       final index = diaryEntries.indexWhere((e) => e.id == entryId);
       if (index != -1) {
+        final oldEntry = diaryEntries[index];
         diaryEntries[index] = DiaryEntry(
           id: entryId,
-          location: location,
+          userId: oldEntry.userId,
+          imageUrl: oldEntry.imageUrl,
+          title: title,
           content: content,
-          emotions: emotions,
-          reflectionDepth: reflectionDepth,
-          createdAt: diaryEntries[index].createdAt,
+          emotions: [emotion],
+          createdAt: oldEntry.createdAt,
         );
       }
 

@@ -1,107 +1,155 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../models/comment_model.dart';
-import '../services/story_service.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:feeltrip_app/services/comment_service.dart';
+import 'package:feeltrip_app/models/comment_model.dart';
 
 class CommentsScreen extends StatefulWidget {
   final String storyId;
 
-  const CommentsScreen({super.key, required this.storyId});
+  const CommentsScreen({Key? key, required this.storyId}) : super(key: key);
 
   @override
-  State<CommentsScreen> createState() => _CommentsScreenState();
+  _CommentsScreenState createState() => _CommentsScreenState();
 }
 
 class _CommentsScreenState extends State<CommentsScreen> {
-  final _commentController = TextEditingController();
-  late Future<List<Comment>> _commentsFuture;
-  bool _isPosting = false;
+  final CommentService _commentService = CommentService();
+  final TextEditingController _commentController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    _fetchComments();
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 
-  void _fetchComments() {
-    // Usamos un setState para que el FutureBuilder se reconstruya con el nuevo future.
-    setState(() {
-      _commentsFuture =
-          context.read<StoryService>().getCommentsForStory(widget.storyId);
-    });
-  }
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
 
-  Future<void> _postComment() async {
-    if (_commentController.text.trim().isEmpty || _isPosting) return;
-
-    setState(() => _isPosting = true);
-
-    try {
-      await context.read<StoryService>().addComment(
-            storyId: widget.storyId,
-            content: _commentController.text.trim(),
-          );
-
-      // --- INICIO DE LA CORRECCIÓN ---
-      // El error 'use_build_context_synchronously' ocurre si se usa 'context'
-      // después de un 'await' sin verificar si el widget sigue "montado".
-      if (!mounted) return;
-      // --- FIN DE LA CORRECCIÓN ---
-
-      _commentController.clear();
-      // Refrescar comentarios
-      _fetchComments();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al publicar el comentario: $e')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isPosting = false);
-      }
+    if (difference.inDays > 0) {
+      return 'hace \${difference.inDays} días';
+    } else if (difference.inHours > 0) {
+      return 'hace \${difference.inHours} horas';
+    } else if (difference.inMinutes > 0) {
+      return 'hace \${difference.inMinutes} minutos';
+    } else {
+      return 'hace unos segundos';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Comentarios')),
+      appBar: AppBar(
+        title: Text('Comentarios'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<List<Comment>>(
-              future: _commentsFuture,
+            child: StreamBuilder<List<Comment>>(
+              stream: _commentService.getComments(widget.storyId),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return Center(child: Text('Error al cargar comentarios'));
                 }
-                final comments = snapshot.data ?? [];
-                if (comments.isEmpty) {
-                  return const Center(
-                      child: Text('Sé el primero en comentar.'));
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
                 }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No hay comentarios aún'));
+                }
+
                 return ListView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: comments.length,
+                  itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    final comment = comments[index];
+                    final comment = snapshot.data![index];
                     return Card(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 4, horizontal: 8),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                            child: Text(comment.userName.isNotEmpty
-                                ? comment.userName.substring(0, 1).toUpperCase()
-                                : "?")),
-                        title: Text(comment.userName,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(comment.content),
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: comment.userAvatar.isNotEmpty
+                                      ? NetworkImage(comment.userAvatar)
+                                      : null,
+                                  child: comment.userAvatar.isEmpty
+                                      ? Text(comment.userName[0])
+                                      : null,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  comment.userName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  _formatDate(comment.createdAt),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Text(comment.content),
+                            SizedBox(height: 8),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.favorite),
+                                  onPressed: () => _commentService
+                                      .likeComment(widget.storyId, comment.id)
+                                      .catchError((e) => Get.snackbar(
+                                            'Error',
+                                            e.toString(),
+                                          )),
+                                ),
+                                Text(comment.likes.toString()),
+                                SizedBox(width: 8),
+                                IconButton(
+                                  icon: Icon(Icons.mood),
+                                  onPressed: () => _commentService
+                                      .addReaction(
+                                          widget.storyId, comment.id, '👍')
+                                      .catchError((e) => Get.snackbar(
+                                            'Error',
+                                            e.toString(),
+                                          )),
+                                ),
+                                if (comment.reactions.isNotEmpty)
+                                  Text(comment.reactions.join(' ')),
+                                Spacer(),
+                                if (FirebaseAuth.instance.currentUser?.uid ==
+                                    comment.userId)
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () => _commentService
+                                        .deleteComment(
+                                            widget.storyId, comment.id)
+                                        .catchError((e) => Get.snackbar(
+                                              'Error',
+                                              e.toString(),
+                                            )),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -109,37 +157,38 @@ class _CommentsScreenState extends State<CommentsScreen> {
               },
             ),
           ),
-          _buildCommentInput(),
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _commentController,
+                    decoration: InputDecoration(
+                      hintText: 'Escribe un comentario...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    if (_commentController.text.isNotEmpty) {
+                      _commentService
+                          .addComment(widget.storyId, _commentController.text)
+                          .then((_) => _commentController.clear())
+                          .catchError((e) => Get.snackbar(
+                                'Error',
+                                e.toString(),
+                              ));
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCommentInput() {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _commentController,
-                decoration:
-                    const InputDecoration(hintText: 'Añade un comentario...'),
-                onSubmitted: _isPosting ? null : (_) => _postComment(),
-              ),
-            ),
-            IconButton(
-              icon: _isPosting
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Icon(Icons.send),
-              onPressed: _isPosting ? null : _postComment,
-            ),
-          ],
-        ),
       ),
     );
   }

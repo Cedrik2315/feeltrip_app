@@ -1,12 +1,11 @@
 ﻿// historial_screen.dart
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/strings.dart';
+import '../models/experience_model.dart';
 import '../services/database_service.dart';
-import '../services/travel_service.dart';
 
 class HistorialScreen extends StatelessWidget {
   const HistorialScreen({super.key});
@@ -14,7 +13,6 @@ class HistorialScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final db = context.read<DatabaseService>();
-    final travelService = TravelService();
 
     return Scaffold(
       appBar: AppBar(
@@ -23,7 +21,7 @@ class HistorialScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
       ),
-      body: StreamBuilder<List<DiarioRegistro>>(
+      body: StreamBuilder<List<DiaryEntry>>(
         stream: db.obtenerEntradas(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -34,7 +32,7 @@ class HistorialScreen extends StatelessWidget {
             return const Center(child: Text(AppStrings.historyLoadError));
           }
 
-          final registros = snapshot.data ?? <DiarioRegistro>[];
+          final registros = snapshot.data ?? <DiaryEntry>[];
           if (registros.isEmpty) {
             return Center(
               child: Column(
@@ -57,10 +55,9 @@ class HistorialScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = registros[index];
               final fechaFormateada =
-                  DateFormat('dd MMMM yyyy - HH:mm').format(item.fecha);
+                  DateFormat('dd MMMM yyyy - HH:mm').format(item.createdAt);
 
               // Mostrar siempre la tarjeta simple (con texto y emociones)
-              // Y si tiene destino, mostrar también la versión pequeña
               return Card(
                 elevation: 3,
                 margin: const EdgeInsets.only(bottom: 16),
@@ -88,7 +85,7 @@ class HistorialScreen extends StatelessWidget {
                       ),
                       const Divider(height: 24),
                       Text(
-                        item.texto,
+                        item.content,
                         style: const TextStyle(
                           fontSize: 16,
                           height: 1.4,
@@ -99,7 +96,7 @@ class HistorialScreen extends StatelessWidget {
                       Wrap(
                         spacing: 8,
                         runSpacing: 4,
-                        children: item.emociones
+                        children: item.emotions
                             .map(
                               (e) => Chip(
                                 label: Text(
@@ -117,55 +114,6 @@ class HistorialScreen extends StatelessWidget {
                             )
                             .toList(),
                       ),
-                      // Si tiene destino, mostrar versión pequeña
-                      if (item.destino != null && item.destino!.isNotEmpty) ...[
-                        const Divider(height: 24),
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on,
-                                size: 16, color: Colors.deepPurple),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                "Destino sugerido: ${item.destino}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 15),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.open_in_new,
-                                  color: Colors.deepPurple),
-                              tooltip: 'Buscar en Airbnb',
-                              onPressed: () =>
-                                  travelService.buscarEnAirbnb(item.destino!),
-                            )
-                          ],
-                        ),
-                        if (item.lat != null && item.lng != null)
-                          Container(
-                            height: 120,
-                            width: double.infinity,
-                            margin: const EdgeInsets.only(top: 12),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: GoogleMap(
-                                initialCameraPosition: CameraPosition(
-                                  target: LatLng(item.lat!, item.lng!),
-                                  zoom: 11,
-                                ),
-                                liteModeEnabled: true,
-                                zoomControlsEnabled: false,
-                                mapToolbarEnabled: false,
-                                markers: {
-                                  Marker(
-                                    markerId: MarkerId(item.id),
-                                    position: LatLng(item.lat!, item.lng!),
-                                  ),
-                                },
-                              ),
-                            ),
-                          ),
-                      ],
                     ],
                   ),
                 ),
