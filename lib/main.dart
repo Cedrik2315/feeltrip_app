@@ -55,6 +55,8 @@ import 'services/deep_link_service.dart';
 import 'controllers/cart_controller.dart';
 import 'controllers/premium_controller.dart';
 import 'services/observability_service.dart';
+import 'screens/agency_profile_screen.dart';
+import 'screens/comments_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -216,7 +218,7 @@ class _MyAppState extends State<MyApp> {
               break;
             case '/agency':
               if (args != null && args['agencyId'] != null) {
-                Get.toNamed('/home', arguments: args);
+                Get.toNamed('/agency-profile', arguments: args);
               }
               break;
             case '/trip':
@@ -317,6 +319,16 @@ class _MyAppState extends State<MyApp> {
           // Extrae el ID del viaje de los argumentos de la ruta
           final tripId = ModalRoute.of(context)!.settings.arguments as String;
           return TripDetailScreen(tripId: tripId);
+        },
+        '/agency-profile': (context) {
+          final agencyId = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return AgencyProfileScreen(
+            agencyId: agencyId['agencyId'] as String,
+          );
+        },
+        '/comments': (context) {
+          final storyId = ModalRoute.of(context)!.settings.arguments as String;
+          return CommentsScreen(storyId: storyId);
         },
       },
     );
