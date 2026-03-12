@@ -167,14 +167,19 @@ class _ReelsScreenState extends State<ReelsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Mi Reel de Viaje'),
-        backgroundColor: Colors.teal[800],
+        backgroundColor: Colors.black,
+        elevation: 0,
+        title: const Text(
+          'Mi Reel de Viaje',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
             tooltip: 'Actualizar',
             onPressed: _isLoading ? null : _loadEntries,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.white),
           ),
         ],
       ),
@@ -183,7 +188,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.teal[800]!, Colors.teal[200]!],
+            colors: [Colors.black, Colors.black],
           ),
         ),
         child: Padding(
@@ -252,7 +257,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            foregroundColor: Colors.teal[800],
+                            foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
@@ -295,20 +300,84 @@ class _ReelsScreenState extends State<ReelsScreen> {
                                 itemCount: _entriesWithImages.length,
                                 itemBuilder: (context, index) {
                                   final entry = _entriesWithImages[index];
-                                  return CachedNetworkImage(
-                                    imageUrl: entry.imageUrl,
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, _) =>
-                                        const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                    errorWidget: (context, _, __) =>
-                                        const Center(
-                                      child: Icon(
-                                        Icons.image_not_supported_outlined,
-                                        color: Colors.white70,
+                                  return Stack(
+                                    children: [
+                                      CachedNetworkImage(
+                                        imageUrl: entry.imageUrl,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        placeholder: (context, _) =>
+                                            const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                        errorWidget: (context, _, __) =>
+                                            const Center(
+                                          child: Icon(
+                                            Icons.image_not_supported_outlined,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      Positioned(
+                                        top: 12,
+                                        left: 12,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            DateFormat('dd MMM yyyy', 'es')
+                                                .format(entry.createdAt),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 12,
+                                        right: 12,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.purple[300],
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            entry.emotions.isNotEmpty
+                                                ? entry.emotions.first
+                                                : 'Sin emoción',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: Container(
+                                          height: 80,
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                Colors.black.withValues(alpha: 0),
+                                                Colors.black,
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   );
                                 },
                               ),
@@ -323,10 +392,8 @@ class _ReelsScreenState extends State<ReelsScreen> {
                                     effect: WormEffect(
                                       dotHeight: 8,
                                       dotWidth: 8,
-                                      activeDotColor:
-                                          Colors.white.withValues(alpha: 0.92),
-                                      dotColor:
-                                          Colors.white.withValues(alpha: 0.35),
+                                      activeDotColor: Colors.white,
+                                      dotColor: Colors.white.withValues(alpha: 0.35),
                                     ),
                                   ),
                                 ),
@@ -399,6 +466,57 @@ class _ReelsScreenState extends State<ReelsScreen> {
           ),
         ),
       ),
+      floatingActionButton: _isSlideshowReady
+          ? Container(
+              height: 56,
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.amber,
+                            Colors.orange,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(30),
+                        onTap: () {
+                          setState(() {
+                            _isPlaying = !_isPlaying;
+                            if (_isPlaying) {
+                              _startAutoPlay();
+                            } else {
+                              _timer?.cancel();
+                            }
+                          });
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Icon(
+                            _isPlaying ? Icons.pause : Icons.play_arrow,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -408,7 +526,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Flexible(
           child: Text(
@@ -461,7 +579,7 @@ class _SlideOverlay extends StatelessWidget {
                     emotion,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -489,7 +607,7 @@ class _SlideOverlay extends StatelessWidget {
               ),
               IconButton(
                 tooltip: 'Compartir',
-                icon: const Icon(Icons.share, color: Colors.white),
+                icon: Icon(Icons.share, color: Colors.white),
                 onPressed: onShare,
               ),
             ],
