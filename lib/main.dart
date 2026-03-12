@@ -27,6 +27,7 @@ import 'screens/quiz_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/stories_screen.dart';
+import 'screens/reels_screen.dart';
 import 'screens/auth_gate.dart';
 import 'screens/splash_screen.dart';
 import 'screens/trip_detail_screen.dart';
@@ -311,6 +312,7 @@ class _MyAppState extends State<MyApp> {
         '/preview-entry': (_) => const PreviewEntryScreen(),
         '/quiz': (_) => const QuizScreen(),
         '/stories': (_) => const StoriesScreen(),
+        '/reels': (_) => const ReelsScreen(),
         '/impact-dashboard': (_) => const ExperienceImpactDashboardScreen(),
         '/premium': (_) => const PremiumSubscriptionScreen(),
         '/terms': (_) => const TermsAndConditionsScreen(),
