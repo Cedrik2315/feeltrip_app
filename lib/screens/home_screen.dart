@@ -884,11 +884,12 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (story.imageUrl.trim().isNotEmpty) ...[
+            if (story.imageUrl != null &&
+                story.imageUrl!.trim().isNotEmpty) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: CachedNetworkImage(
-                  imageUrl: story.imageUrl,
+                  imageUrl: story.imageUrl!,
                   height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,

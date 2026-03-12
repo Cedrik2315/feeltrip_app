@@ -235,7 +235,7 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
 
   Widget _buildHeader(TravelAgency agency) {
     final ImageProvider headerImage = agency.logo.isNotEmpty
-        ? NetworkImage(agency.logo)
+        ? NetworkImage(agency.logo) as ImageProvider<Object>
         : const AssetImage('assets/images/tromso_aurora.png');
 
     return SizedBox(
@@ -279,8 +279,9 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
                         ),
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage:
-                              agency.logo.isNotEmpty ? NetworkImage(agency.logo) : null,
+                          backgroundImage: agency.logo.isNotEmpty
+                              ? NetworkImage(agency.logo)
+                              : null,
                           backgroundColor: Colors.white,
                           child: agency.logo.isEmpty
                               ? const Icon(Icons.business,
@@ -364,7 +365,8 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
           backgroundColor: Colors.green,
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 50),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
       );
     }
@@ -519,11 +521,9 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
                           icon: Icons.email,
                           label: 'Email',
                           color: Colors.blue,
-                          onPressed: () =>
-                              _launchUrl('mailto:${agency.email}'),
+                          onPressed: () => _launchUrl('mailto:${agency.email}'),
                         ),
-                      if (agency.email.isNotEmpty)
-                        const SizedBox(height: 10),
+                      if (agency.email.isNotEmpty) const SizedBox(height: 10),
                       if (agency.website.isNotEmpty)
                         _contactButton(
                           icon: Icons.language,
