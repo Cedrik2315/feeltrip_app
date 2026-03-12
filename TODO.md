@@ -1,15 +1,24 @@
-# Premium Subscription Screen Visual Improvement
-- [x] 1. Plan created and approved
-✅ 2. Convert to StatefulWidget, add AnimationControllers for particles/crown/glow/borders
+# Smart Camera Screen Visual Improvements - TODO
+Status: In Progress
 
-✅ 3. Implement black gradient background + Stack with 25 subtle amber particle animations
-✅ 1-12. All visual improvements complete: particles, header, benefits, cards selection, CTA gradient button, withValues used, no logic changed.
+✅ 1. Create TODO.md with plan breakdown
+✅ 2. Confirm plan with user (approved)
 
-- [ ] 5. Replace benefits with gold checkmark list (✨ Sin anuncios | 🗺️ Mapas exclusivos, 🤖 IA ilimitada | 📊 Analytics avanzados)
-- [ ] 6. Enhance package cards: GestureDetector selection, annual "Más popular 🔥" badge, borders (gold for annual/lifetime, animated amber on select)
-- [ ] 7. Add gradient amber-orange CTA button "Prueba 7 días gratis" with gold shadow (fallback to main package buy)
-✅ 8. Update AppBar to black/gold theme
-- [ ] 9. Replace any withOpacity → withValues(alpha:) (none found)
-- [ ] 10. Edit file with all changes
-- [ ] 11. Test visuals/logic intact (flutter run, navigate, select/buy)
-- [ ] 12. Update TODO.md complete, attempt_completion
+✅ 3. Implement UI changes via edit_file:
+   - Add state variables (flash, aiMode, animations)
+   - Top semi-transparent gradient overlay with controls (close, flash toggle, flip)
+   - IA badge amber
+   - Bottom gradient overlay with gallery, capture (animated), IA button
+   - Flash capture overlay animation
+   - Use withValues(alpha:) for opacities
+
+✅ 4. Test changes: flutter analyze, hot reload
+
+✅ 5. Update TODO.md with completion
+
+✅ 6. Smart camera screen visual improvements completed
+
+⏳ 5. Update TODO.md with completion
+
+⏳ 6. attempt_completion with demo command
+

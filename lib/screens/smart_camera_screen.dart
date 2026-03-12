@@ -12,7 +12,11 @@ class SmartCameraScreen extends StatefulWidget {
 class _SmartCameraScreenState extends State<SmartCameraScreen> {
   CameraController? _controller;
   List<CameraDescription>? cameras;
-  final int _cameraIndex = 0;
+  int _cameraIndex = 0;
+  bool _flashOn = false;
+  bool _aiMode = true;
+  bool _isCapturing = false;
+  bool _showFlash = false;
 
   @override
   void initState() {
@@ -26,12 +30,30 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
       Get.snackbar('Error', 'No se encontraron cámaras disponibles.');
       return;
     }
-    _controller =
-        CameraController(cameras![_cameraIndex], ResolutionPreset.high);
+    _controller = CameraController(cameras![_cameraIndex], ResolutionPreset.high);
     await _controller!.initialize();
     if (mounted) {
       setState(() {});
     }
+  }
+
+  Future<void> _toggleFlash() async {
+    if (_controller == null) return;
+    setState(() => _flashOn = !_flashOn);
+    await _controller!.setFlashMode(_flashOn ? FlashMode.torch : FlashMode.off);
+  }
+
+  Future<void> _toggleCamera() async {
+    if (cameras == null || cameras!.length < 2) return;
+    await _controller?.dispose();
+    setState(() => _cameraIndex = _cameraIndex == 0 ? 1 : 0);
+    _controller = CameraController(cameras![_cameraIndex], ResolutionPreset.high);
+    await _controller!.initialize();
+    setState(() {});
+  }
+
+  void _toggleAIMode() {
+    setState(() => _aiMode = !_aiMode);
   }
 
   @override
@@ -49,55 +71,187 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          // 1. VISTA PREVIA DE CÁMARA (Pantalla Completa)
-          Center(
+          // 1. Preview cámara pantalla completa
+          AspectRatio(
+            aspectRatio: _controller!.value.aspectRatio,
             child: CameraPreview(_controller!),
           ),
-
-          // 2. INTERFAZ "FEELTRIP" SOBREPUESTA
-          Positioned(
-            bottom: 40,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.flash_off,
-                      color: Colors.white, size: 30),
-                  onPressed: () {},
-                ),
-                // BOTÓN DE DISPARO
-                GestureDetector(
-                  onTap: () async {
-                    final image = await _controller!.takePicture();
-                    Get.toNamed('/preview-entry', arguments: image.path);
-                  },
-                  child: Container(
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.flip_camera_android,
-                      color: Colors.white, size: 30),
-                  onPressed: () {},
-                ),
-              ],
+          // Flash overlay
+          AnimatedOpacity(
+            opacity: _showFlash ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 200),
+            child: Container(
+              color: Colors.white,
             ),
           ),
-          // BOTÓN CERRAR
+          // Top overlay degradado
           Positioned(
-            top: 50,
-            left: 20,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white, size: 30),
-              onPressed: () => Get.back(),
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 120,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xCC000000),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                      onPressed: () => Get.back(),
+                    ),
+                    const SizedBox(width: 20),
+                    GestureDetector(
+                      onTap: _toggleFlash,
+                      child: Icon(
+                        _flashOn ? Icons.flash_on : Icons.flash_off,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    IconButton(
+                      icon: const Icon(Icons.flip_camera_ios, color: Colors.white, size: 30),
+                      onPressed: _toggleCamera,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // IA Badge
+          if (_aiMode)
+            Positioned(
+              top: 60,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  '✨ IA Activo',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          // Bottom overlay degradado
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 200,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Color(0xCC000000),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Gallery
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.photo_library, color: Colors.black),
+                        onPressed: () {}, // Implementar navegación galería
+                      ),
+                    ),
+                    // Capture central
+                    GestureDetector(
+                      onTapDown: (_) => setState(() => _isCapturing = true),
+                      onTapUp: (_) => setState(() => _isCapturing = false),
+                      onTapCancel: () => setState(() => _isCapturing = false),
+                      onTap: () async {
+                        setState(() => _isCapturing = true);
+                        final image = await _controller!.takePicture();
+                        setState(() {
+                          _showFlash = true;
+                          _isCapturing = false;
+                        });
+                        Get.toNamed('/preview-entry', arguments: image.path);
+                        await Future.delayed(const Duration(milliseconds: 200));
+                        if (mounted) {
+                          setState(() => _showFlash = false);
+                        }
+                      },
+                      child: Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          border: Border.all(color: Colors.white, width: 4),
+                        ),
+                        child: AnimatedScale(
+                          scale: _isCapturing ? 0.95 : 1.0,
+                          duration: const Duration(milliseconds: 150),
+                          child: Container(
+                            width: 70,
+                            height: 70,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // IA Mode button
+                    GestureDetector(
+                      onTap: _toggleAIMode,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: _aiMode ? Colors.amber : Colors.white.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '✨ IA',
+                              style: TextStyle(
+                                color: _aiMode ? Colors.black : Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
