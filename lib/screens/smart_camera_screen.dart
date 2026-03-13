@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SmartCameraScreen extends StatefulWidget {
   const SmartCameraScreen({super.key});
@@ -21,7 +22,50 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
   @override
   void initState() {
     super.initState();
-    _setupCamera();
+    _checkAndRequestCameraPermission();
+  }
+
+  Future<void> _checkAndRequestCameraPermission() async {
+    final status = await Permission.camera.request();
+
+    if (status.isGranted) {
+      await _setupCamera();
+    } else if (status.isDenied) {
+      Get.dialog(
+        AlertDialog(
+          title: const Text('Permiso requerido'),
+          content: const Text(
+              'La cámara es necesaria para capturar momentos especiales de tu viaje.'),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Get.back();
+                _checkAndRequestCameraPermission();
+              },
+              child: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      );
+    } else if (status.isPermanentlyDenied) {
+      Get.dialog(
+        AlertDialog(
+          title: const Text('Permiso denegado'),
+          content:
+              const Text('Por favor habilita el permiso de cámara en Ajustes.'),
+          actions: [
+            TextButton(
+              onPressed: () => openAppSettings(),
+              child: const Text('Abrir Ajustes'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Future<void> _setupCamera() async {
@@ -30,7 +74,8 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
       Get.snackbar('Error', 'No se encontraron cámaras disponibles.');
       return;
     }
-    _controller = CameraController(cameras![_cameraIndex], ResolutionPreset.high);
+    _controller =
+        CameraController(cameras![_cameraIndex], ResolutionPreset.high);
     await _controller!.initialize();
     if (mounted) {
       setState(() {});
@@ -47,7 +92,8 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
     if (cameras == null || cameras!.length < 2) return;
     await _controller?.dispose();
     setState(() => _cameraIndex = _cameraIndex == 0 ? 1 : 0);
-    _controller = CameraController(cameras![_cameraIndex], ResolutionPreset.high);
+    _controller =
+        CameraController(cameras![_cameraIndex], ResolutionPreset.high);
     await _controller!.initialize();
     setState(() {});
   }
@@ -107,7 +153,8 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                      icon: const Icon(Icons.close,
+                          color: Colors.white, size: 30),
                       onPressed: () => Get.back(),
                     ),
                     const SizedBox(width: 20),
@@ -115,13 +162,14 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
                       onTap: _toggleFlash,
                       child: Icon(
                         _flashOn ? Icons.flash_on : Icons.flash_off,
-                        color: Colors.white,
+                        color: _flashOn ? Colors.amber : Colors.white,
                         size: 30,
                       ),
                     ),
                     const SizedBox(width: 20),
                     IconButton(
-                      icon: const Icon(Icons.flip_camera_ios, color: Colors.white, size: 30),
+                      icon: const Icon(Icons.flip_camera_ios,
+                          color: Colors.white, size: 30),
                       onPressed: _toggleCamera,
                     ),
                   ],
@@ -135,7 +183,8 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
               top: 60,
               right: 20,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.amber.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(20),
@@ -181,7 +230,8 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.photo_library, color: Colors.black),
+                        icon: const Icon(Icons.photo_library,
+                            color: Colors.black),
                         onPressed: () {}, // Implementar navegación galería
                       ),
                     ),
@@ -229,9 +279,12 @@ class _SmartCameraScreenState extends State<SmartCameraScreen> {
                     GestureDetector(
                       onTap: _toggleAIMode,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: _aiMode ? Colors.amber : Colors.white.withValues(alpha: 0.3),
+                          color: _aiMode
+                              ? Colors.amber
+                              : Colors.white.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
