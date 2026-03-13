@@ -71,8 +71,57 @@ class DestinationService {
     return '${body.substring(0, maxChars)}...';
   }
 
+  static Future<Map<String, double>?> getCoordinates(String destination) async {
+    try {
+      final query = destination.trim();
+      if (query.isEmpty) return null;
+
+      final uri = Uri.parse('https://nominatim.openstreetmap.org/search')
+          .replace(queryParameters: {
+        'q': query,
+        'format': 'json',
+        'limit': '1',
+      });
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'User-Agent': 'FeelTrip/1.0',
+        },
+      ).timeout(_timeout);
+
+      if (response.statusCode != 200) {
+        AppLogger.error(
+            'Nominatim error ${response.statusCode}: ${_safeBodySnippet(response.body)}');
+        return null;
+      }
+
+      final list = jsonDecode(response.body) as List<dynamic>;
+      if (list.isEmpty) return null;
+
+      final first = list.first as Map<String, dynamic>?;
+      final latStr = first?['lat'] as String?;
+      final lngStr = first?['lon'] as String?;
+
+      if (latStr == null || lngStr == null) return null;
+
+      final lat = double.tryParse(latStr);
+      final lng = double.tryParse(lngStr);
+
+      if (lat == null || lng == null) return null;
+
+      return {
+        'lat': lat,
+        'lng': lng,
+      };
+    } catch (e, st) {
+      AppLogger.error('Error en getCoordinates($destination)',
+          error: e, stackTrace: st);
+      return null;
+    }
+  }
+
   /// OpenWeatherMap
-  /// GET https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric&lang=es
   static Future<WeatherInfo?> getWeather(String city) async {
     try {
       final apiKey = _getKey('OPENWEATHER_API_KEY');
@@ -84,8 +133,8 @@ class DestinationService {
       final normalizedCity = city.trim();
       if (normalizedCity.isEmpty) return null;
 
-      final uri = Uri.parse('https://api.openweathermap.org/data/2.5/weather')
-          .replace(
+      final uri =
+          Uri.parse('https://api.openweathermap.org/data/2.5/weather').replace(
         queryParameters: {
           'q': normalizedCity,
           'appid': apiKey,
@@ -123,16 +172,15 @@ class DestinationService {
     }
   }
 
-  /// RestCountries (sin key)
-  /// GET https://restcountries.com/v3.1/name/{countryName}
+  /// RestCountries
   static Future<CountryInfo?> getCountryInfo(String countryName) async {
     try {
       final name = countryName.trim();
       if (name.isEmpty) return null;
 
-      final uri =
-          Uri.parse('https://restcountries.com/v3.1/name/${Uri.encodeComponent(name)}')
-              .replace(queryParameters: {
+      final uri = Uri.parse(
+              'https://restcountries.com/v3.1/name/${Uri.encodeComponent(name)}')
+          .replace(queryParameters: {
         'fields': 'languages,currencies,capital,flag,region',
       });
 
@@ -195,7 +243,6 @@ class DestinationService {
   }
 
   /// Exchange Rates
-  /// GET https://v6.exchangerate-api.com/v6/{EXCHANGE_RATE_API_KEY}/pair/{from}/{to}/{amount}
   static Future<CurrencyConversion?> convertCurrency(
     String from,
     String to,
@@ -241,8 +288,6 @@ class DestinationService {
   }
 
   /// Unsplash
-  /// GET https://api.unsplash.com/search/photos?query={destination}&per_page={count}
-  /// Headers: Authorization: Client-ID {UNSPLASH_ACCESS_KEY}
   static Future<List<String>> getDestinationPhotos(
     String destination, {
     int count = 5,
@@ -306,8 +351,6 @@ class DestinationService {
   }
 
   /// Foursquare (restaurantes)
-  /// GET https://api.foursquare.com/v3/places/search?ll={lat},{lng}&categories=13065&limit=10
-  /// Headers: Authorization: {FOURSQUARE_API_KEY}
   static Future<List<NearbyRestaurant>> getNearbyRestaurants(
     double lat,
     double lng, {
@@ -361,13 +404,16 @@ class DestinationService {
               location['locality'],
               location['region'],
               location['country'],
-            ].whereType<String>().map((e) => e.trim()).where((e) => e.isNotEmpty).join(', ');
+            ]
+                .whereType<String>()
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .join(', ');
 
         final categories = (map['categories'] as List?) ?? const [];
         final firstCategory =
             categories.isNotEmpty ? (categories.first as Map?) : null;
-        final categoryName =
-            (firstCategory?['name'] as String?)?.trim() ?? '';
+        final categoryName = (firstCategory?['name'] as String?)?.trim() ?? '';
 
         final rating = (map['rating'] as num?)?.toDouble();
 
@@ -393,4 +439,3 @@ class DestinationService {
     }
   }
 }
-
