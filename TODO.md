@@ -1,18 +1,32 @@
-# Unsplash Integration TODO
+# Emotional Preferences Quiz Screen - AI Destinations Feature
 
-✅ [Completed] Created TODO.md with steps
+**Status:** Plan approved ✓ Ready to implement
 
-✅ [Completed] 1. Add import and _unsplashImages field to trip_detail_screen.dart
+## Step-by-step Implementation Plan
 
-✅ [Completed] 2. Add initState logic to load Unsplash images
+**1. [DONE]** Created this TODO.md file
 
-✅ [Completed] 3. Update CarouselSlider with fallback logic and grey container with Icon
+**2. Update imports** ✓
+- Remove unused: dart:math, dart:convert, http
+- Re-add dart:convert, http for AI method
 
-✅ [Completed] 4. Add Positioned Unsplash credit
+**3. Add static fallbacks map** ✓
 
-✅ [Pending] 5. Replace withAlpha with withValues(alpha:)
+**4. Add _getAIDestinations method** ✓
 
-✅ [Completed] 6. Run flutter analyze
+**5. Add state variables: String? _archetype; Future<List<String>>? _destinationsFuture;** ✓
 
-⏳ [Pending] 7. Mark complete and attempt_completion
+**6. Replace all withOpacity(0.X) -> withValues(alpha: 0.X)** ✓
+
+**7. Update _showResults(): set _archetype and _destinationsFuture, then show dialog** ✓
+
+**8. Modify results dialog: add "Destinos para ti" section with FutureBuilder**
+
+**9. Run `flutter analyze`**
+
+**10. Test and update progress**
+
+**11. [FUTURE] attempt_completion**
+
+**Next step:** Update imports and state vars
 
