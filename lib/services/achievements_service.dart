@@ -159,12 +159,40 @@ class AchievementService {
 
   String? get _userId => _auth.currentUser?.uid;
 
+  Stream<List<Map<String, dynamic>>> getUserAchievements(String userId) {
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('achievements')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => {
+                  'id': doc.id,
+                  'title': doc['title'] ?? 'Logro',
+                  'emoji': _getEmojiForId(doc.id),
+                  'unlocked': true, // Si existe en Firestore está desbloqueado
+                  ...doc.data(),
+                })
+            .toList());
+  }
+
+  String _getEmojiForId(String id) {
+    final emojis = {
+      'primer_paso': '🌍',
+      'cazador_luces': '📸',
+      'alquimista_emocional': '✨',
+      // Agregar más según sea necesario
+    };
+    return emojis[id] ?? '🏆';
+  }
+
   Future<void> verificarYOtorgarLogros() async {
     final userId = _userId;
     if (userId == null || userId.isEmpty) return;
 
     // 1) "Primer Paso": primer registro (trips o diaryEntries)
-    final trips = await _db.collection('users').doc(userId).collection('trips').get();
+    final trips =
+        await _db.collection('users').doc(userId).collection('trips').get();
     final diaryEntries = await _db
         .collection('users')
         .doc(userId)
@@ -217,7 +245,8 @@ class AchievementService {
     String title,
     String desc,
   ) async {
-    final docRef = _db.collection('users').doc(userId).collection('achievements').doc(id);
+    final docRef =
+        _db.collection('users').doc(userId).collection('achievements').doc(id);
     final doc = await docRef.get();
     if (doc.exists) return;
 

@@ -6,9 +6,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import '../controllers/auth_controller.dart';
+import '../services/achievements_service.dart';
 import '../widgets/social_share_sheet.dart';
 import 'auth_gate.dart';
-
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -20,14 +20,29 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _screenshotController = ScreenshotController();
 
-  List<Map<String, dynamic>> get badges => [
-        {'emoji': '🌍', 'name': 'Primer viaje', 'unlocked': true},
-        {'emoji': '✈️', 'name': 'Nómada', 'unlocked': true},
-        {'emoji': '📖', 'name': 'Diario activo', 'unlocked': false},
-        {'emoji': '⭐', 'name': '5 estrellas', 'unlocked': true},
-        {'emoji': '🏆', 'name': 'Experto XP', 'unlocked': false},
-        {'emoji': '💎', 'name': 'Premium', 'unlocked': false},
-      ];
+  List<Map<String, dynamic>> _badges = [];
+  bool _loadingBadges = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final authController = Get.find<AuthController>();
+    final uid = authController.user?.uid;
+    if (uid != null) {
+      Get.find<AchievementService>().getUserAchievements(uid).listen((badges) {
+        if (mounted) {
+          setState(() {
+            _badges = badges;
+            _loadingBadges = false;
+          });
+        }
+      });
+    } else {
+      setState(() => _loadingBadges = false);
+    }
+  }
+
+  List<Map<String, dynamic>> get badges => _badges;
 
   Widget _buildStatCard(String label, String value) {
     return Container(
@@ -214,71 +229,129 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  height: 110,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: badges.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 16),
-                    itemBuilder: (context, index) {
-                      final badge = badges[index];
-                      final isUnlocked = badge['unlocked'] as bool;
-                      return Container(
-                        width: 85,
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: isUnlocked
-                                    ? Colors.amber[200]
-                                    : Colors.grey[300],
-                                shape: BoxShape.circle,
-                                border: Border.all(
+                if (_loadingBadges)
+                  SizedBox(
+                    height: 110,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 6,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 16),
+                      itemBuilder: (context, index) {
+                        return Container(
+                          width: 85,
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const CircularProgressIndicator(
+                                    strokeWidth: 3),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                height: 24,
+                                width: 70,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                else if (_badges.isEmpty)
+                  Container(
+                    height: 110,
+                    padding: const EdgeInsets.all(20),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.emoji_events_outlined,
+                            size: 48, color: Colors.grey),
+                        SizedBox(height: 8),
+                        Text('Aún no tienes logros 🏆',
+                            style: TextStyle(color: Colors.grey, fontSize: 16)),
+                      ],
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 110,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _badges.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 16),
+                      itemBuilder: (context, index) {
+                        final badge = _badges[index];
+                        final isUnlocked = badge['unlocked'] as bool;
+                        return Container(
+                          width: 85,
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
                                   color: isUnlocked
-                                      ? Colors.amber[700]!
-                                      : Colors.grey[500]!,
-                                  width: 3,
+                                      ? Colors.amber[200]
+                                      : Colors.grey[300],
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isUnlocked
+                                        ? Colors.amber[700]!
+                                        : Colors.grey[500]!,
+                                    width: 3,
+                                  ),
+                                ),
+                                child: Text(
+                                  badge['emoji'] ?? '🏆',
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              child: Text(
-                                badge['emoji'],
-                                style: const TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
+                              const SizedBox(height: 8),
+                              Expanded(
+                                child: Text(
+                                  badge['title'] ?? badge['name'] ?? 'Logro',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: isUnlocked
+                                        ? Colors.black87
+                                        : Colors.grey[600],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Expanded(
-                              child: Text(
-                                badge['name'],
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: isUnlocked
-                                      ? Colors.black87
-                                      : Colors.grey[600],
-                                ),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          _buildImprovedListTile(Icons.currency_exchange, 'Convertidor de Monedas', () => Get.toNamed('/currency-converter')),
+          _buildImprovedListTile(
+              Icons.currency_exchange,
+              'Convertidor de Monedas',
+              () => Get.toNamed('/currency-converter')),
           _buildImprovedListTile(Icons.bar_chart_outlined, 'Mis Estadísticas',
               () => Navigator.pushNamed(context, '/stats')),
           _buildImprovedListTile(Icons.share_outlined, 'Compartir Perfil',
