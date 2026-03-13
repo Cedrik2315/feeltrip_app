@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/affiliate_service.dart';
+import '../services/analytics_service.dart';
 
 class AffiliateWidget extends StatelessWidget {
   final String destination;
@@ -28,7 +29,11 @@ class AffiliateWidget extends StatelessWidget {
               children: options.map((option) {
                 return Expanded(
                   child: GestureDetector(
-                    onTap: () => AffiliateService.openAffiliateLink(option.url),
+                    onTap: () {
+                      AnalyticsService.logAffiliateClick(
+                          option.name, destination);
+                      AffiliateService.openAffiliateLink(option.url);
+                    },
                     child: Container(
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(

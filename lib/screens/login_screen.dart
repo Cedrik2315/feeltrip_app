@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/auth_controller.dart';
+import '../services/analytics_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -70,7 +71,8 @@ class _LoginScreenState extends State<LoginScreen>
       final message = e.toString().replaceFirst('Exception: ', '');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message.isEmpty ? 'No se pudo iniciar sesión' : message),
+          content:
+              Text(message.isEmpty ? 'No se pudo iniciar sesión' : message),
         ),
       );
     } finally {
@@ -250,15 +252,17 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                   const SizedBox(height: 16),
                   _gradientPrimaryButton(
-                    label: _isSigningIn ? 'Iniciando sesión...' : 'Iniciar sesión',
+                    label:
+                        _isSigningIn ? 'Iniciando sesión...' : 'Iniciar sesión',
                     onPressed: _isSigningIn
                         ? null
-                        : () => _runSignIn(
-                              () => _authController.login(
+                        : () => _runSignIn(() async {
+                              await _authController.login(
                                 email: _emailController.text.trim(),
                                 password: _passwordController.text,
-                              ),
-                            ),
+                              );
+                              AnalyticsService.logLogin('email');
+                            }),
                   ),
                   const SizedBox(height: 10),
                   TextButton(
@@ -306,7 +310,10 @@ class _LoginScreenState extends State<LoginScreen>
                   _socialButton(
                     onPressed: _isSigningIn
                         ? null
-                        : () => _runSignIn(_authController.loginWithGoogle),
+                        : () => _runSignIn(() async {
+                              await _authController.loginWithGoogle();
+                              AnalyticsService.logLogin('google');
+                            }),
                     leading: Container(
                       width: 26,
                       height: 26,

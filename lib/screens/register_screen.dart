@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/auth_controller.dart';
+import '../services/analytics_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -53,6 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      AnalyticsService.logSignUp('email');
       // AuthGate will handle navigation to HomeScreen after successful registration
     } catch (e) {
       Get.snackbar(
@@ -254,8 +256,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         label: 'Nombre',
                         icon: Icons.person_outline,
                       ),
-                      validator: (value) =>
-                          value!.isEmpty ? 'Por favor, ingresa tu nombre' : null,
+                      validator: (value) => value!.isEmpty
+                          ? 'Por favor, ingresa tu nombre'
+                          : null,
                     ),
                     const SizedBox(height: 14),
                     TextFormField(
@@ -346,13 +349,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       decoration: TextDecoration.underline,
                                     ),
                                     recognizer: TapGestureRecognizer()
-                                      ..onTap = () =>
-                                          Navigator.pushNamed(context, '/terms'),
+                                      ..onTap = () => Navigator.pushNamed(
+                                          context, '/terms'),
                                   ),
                                   TextSpan(
                                     text: ' y la ',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.9),
                                     ),
                                   ),
                                   TextSpan(
@@ -364,14 +368,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () => Navigator.pushNamed(
-                                        context,
-                                        '/privacy',
-                                      ),
+                                            context,
+                                            '/privacy',
+                                          ),
                                   ),
                                   TextSpan(
                                     text: '.',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.9),
                                     ),
                                   ),
                                 ],

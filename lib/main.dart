@@ -53,6 +53,7 @@ import 'services/cart_service.dart';
 import 'services/mercado_pago_service.dart';
 import 'services/purchase_service.dart';
 import 'services/deep_link_service.dart';
+import 'services/analytics_service.dart';
 import 'controllers/cart_controller.dart';
 import 'controllers/premium_controller.dart';
 import 'services/observability_service.dart';
@@ -290,13 +291,8 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('es'), // Español
-        Locale('en'), // Inglés (futuro)
-      ],
-      navigatorObservers: [
-        ObservabilityService.analyticsObserver
-      ], // Asegúrate de que esta línea esté correcta
+      supportedLocales: const [Locale('es'), Locale('en')],
+      navigatorObservers: [AnalyticsService.observer],
       home: const SplashScreen(),
       routes: {
         '/auth_gate': (_) => const AuthGate(),

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
+import '../services/analytics_service.dart';
 
 // 8 Archetypes exactly as specified
 const List<Map<String, dynamic>> archetypes = [
@@ -369,9 +370,10 @@ class _EmotionalPreferencesQuizScreenState
       ..sort((a, b) => b.value.compareTo(a.value));
     final primary = topArchetypes[0].key;
     _archetype = primary;
-_destinationsFuture = _getAIDestinations(primary);
+    _destinationsFuture = _getAIDestinations(primary);
+    AnalyticsService.logQuizCompleted(primary);
     setState(() {});
-    
+
     // Save archetype to Firestore
     final authController = Get.find<AuthController>();
     if (authController.user != null) {
@@ -382,7 +384,7 @@ _destinationsFuture = _getAIDestinations(primary);
         'archetypeEmoji': archetypeData['emoji'],
       }, SetOptions(merge: true));
     }
-    
+
     _confettiController.play();
 
     showDialog(
@@ -454,7 +456,7 @@ _destinationsFuture = _getAIDestinations(primary);
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           children: [
-                           const Text ('✨ Consultando IA...',
+                            const Text('✨ Consultando IA...',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 18)),
                             const SizedBox(height: 16),
@@ -509,7 +511,8 @@ _destinationsFuture = _getAIDestinations(primary);
                                   color: Colors.white.withValues(alpha: 0.3),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.3)),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.3)),
                                 ),
                                 child: Text(dest,
                                     style: const TextStyle(

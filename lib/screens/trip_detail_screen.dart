@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+﻿﻿import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../services/destination_service.dart';
 import '../models/trip_model.dart';
+import '../services/analytics_service.dart';
 import '../constants/strings.dart';
 import '../controllers/cart_controller.dart';
 import '../widgets/affiliate_widget.dart';
@@ -64,13 +65,16 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     super.initState();
     _tripFuture = _fetchTripDetails();
     _tripFuture.then((trip) async {
-      if (trip != null && mounted && trip.images.isEmpty) {
-        final imgs =
-            await DestinationService.getDestinationPhotos(trip.destination);
-        if (mounted) {
-          setState(() {
-            _unsplashImages = imgs;
-          });
+      if (trip != null && mounted) {
+        AnalyticsService.logViewTrip(trip.id, trip.destination);
+        if (trip.images.isEmpty) {
+          final imgs =
+              await DestinationService.getDestinationPhotos(trip.destination);
+          if (mounted) {
+            setState(() {
+              _unsplashImages = imgs;
+            });
+          }
         }
       }
     });
@@ -603,7 +607,10 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: ElevatedButton.icon(
-                  onPressed: () => _cartController.addToCart(trip),
+                  onPressed: () {
+                    AnalyticsService.logAddToCart(trip.id, trip.price);
+                    _cartController.addToCart(trip);
+                  },
                   icon: const Icon(Icons.shopping_cart_outlined,
                       color: Colors.white),
                   label: Text('Añadir por \$${trip.price.toStringAsFixed(2)}',
