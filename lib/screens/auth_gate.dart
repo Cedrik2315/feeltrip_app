@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 import '../services/auth_service.dart';
 import '../services/observability_service.dart';
-import 'home_screen.dart';
+
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
 
@@ -136,7 +137,8 @@ class _AuthGateState extends State<AuthGate> {
 
         if (snapshot.data != null) {
           ObservabilityService.logAuthGateState('authenticated');
-          return const HomeScreen();
+          Get.offAllNamed('/quiz');
+          return const SizedBox.shrink(); // Placeholder while Get navigates
         }
 
         ObservabilityService.logAuthGateState('anonymous');

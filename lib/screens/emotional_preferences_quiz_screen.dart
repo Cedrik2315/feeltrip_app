@@ -4,6 +4,9 @@ import 'package:confetti/confetti.dart';
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import '../controllers/auth_controller.dart';
 
 // 8 Archetypes exactly as specified
 const List<Map<String, dynamic>> archetypes = [
@@ -366,8 +369,20 @@ class _EmotionalPreferencesQuizScreenState
       ..sort((a, b) => b.value.compareTo(a.value));
     final primary = topArchetypes[0].key;
     _archetype = primary;
-    _destinationsFuture = _getAIDestinations(primary);
+_destinationsFuture = _getAIDestinations(primary);
     setState(() {});
+    
+    // Save archetype to Firestore
+    final authController = Get.find<AuthController>();
+    if (authController.user != null) {
+      final uid = authController.user!.uid;
+      final archetypeData = archetypes.firstWhere((a) => a['name'] == primary);
+      FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'archetype': primary,
+        'archetypeEmoji': archetypeData['emoji'],
+      }, SetOptions(merge: true));
+    }
+    
     _confettiController.play();
 
     showDialog(
@@ -421,11 +436,10 @@ class _EmotionalPreferencesQuizScreenState
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.of(ctx).pop();
-                  Navigator.of(context)
-                      .pop(primary); // Return primary archetype
+                  Get.offAllNamed('/home');
                 },
-                icon: const Icon(Icons.map),
-                label: const Text('Ver mi mapa'),
+                icon: const Icon(Icons.explore),
+                label: const Text('Explorar viajes para mí'),
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.deepPurple),

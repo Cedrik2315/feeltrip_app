@@ -10,6 +10,9 @@ import '../screens/edit_profile_screen.dart';
 import '../services/achievements_service.dart';
 import '../widgets/social_share_sheet.dart';
 import 'auth_gate.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -349,10 +352,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          _buildImprovedListTile(
+_buildImprovedListTile(
               Icons.currency_exchange,
               'Convertidor de Monedas',
               () => Get.toNamed('/currency-converter')),
+ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: const Text('🧭', style: TextStyle(fontSize: 20)),
+              ),
+              title: const Text('Mi arquetipo'),
+              subtitle: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                future: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(Get.find<AuthController>().user!.uid)
+                    .get(),
+                builder: (ctx, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Text('Cargando...');
+                  }
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return const Text('Descubre tu perfil de viajero');
+                  }
+                  final data = snapshot.data!.data();
+                  final archetype = data?['archetype'] as String?;
+                  final emoji = data?['archetypeEmoji'] as String?;
+                  if (archetype != null && emoji != null) {
+                    return Text('$emoji $archetype');
+                  }
+                  return const Text('Descubre tu perfil de viajero');
+                },
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Get.toNamed('/quiz'),
+            ),
           _buildImprovedListTile(Icons.bar_chart_outlined, 'Mis Estadísticas',
               () => Navigator.pushNamed(context, '/stats')),
           _buildImprovedListTile(Icons.share_outlined, 'Compartir Perfil',
