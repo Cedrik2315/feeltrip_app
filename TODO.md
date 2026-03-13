@@ -1,12 +1,1 @@
-# Fix Critical Errors - Affiliate Widget & RevenueCat
-
-Status: In progress
-
-## Steps:
-1. [x] Create this TODO.md
-2. [x] Update imports in lib/widgets/affiliate_widget.dart 
-3. [x] Add purchases_flutter to pubspec.yaml
-4. [] Run `flutter pub get`
-5. [] Run `flutter analyze` - confirm 0 errors
-6. [] Update TODO.md - mark complete
-7. [] Task complete
+# Premium Controller & Analytics Fixes\n\n- [ ] 1. Update lib/controllers/premium_controller.dart with missing getters/fields/methods\n- [ ] 2. Add logPremiumAttempt method to lib/services/analytics_service.dart\n- [ ] 3. Run `flutter analyze 2>&1 | Select-String -Pattern "error -"`\n- [ ] 4. Verify no errors and complete task
