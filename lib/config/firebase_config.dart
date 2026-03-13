@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'dart:async';
 
 class FirebaseConfig {
   static Future<void> initialize() async {
@@ -13,7 +14,7 @@ class FirebaseConfig {
         const Duration(seconds: 5),
         onTimeout: () {
           print('⚠️ Firebase timeout - usando MOCK data');
-          return;
+          throw TimeoutException('Firebase timeout', const Duration(seconds: 5));
         },
       );
       

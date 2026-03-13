@@ -209,6 +209,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.11"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -265,6 +273,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+5"
+  firebase_analytics:
+    dependency: "direct main"
+    description:
+      name: firebase_analytics
+      sha256: dbf1e7ab22cfb1f4a4adb103b46a26276b4edc593d4a78ef6fb942bafc92e035
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.10.7"
+  firebase_analytics_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_analytics_platform_interface
+      sha256: "3729b74f8cf1d974a27ba70332ecb55ff5ff560edc8164a6469f4a055b429c37"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.10.8"
+  firebase_analytics_web:
+    dependency: transitive
+    description:
+      name: firebase_analytics_web
+      sha256: "019cd7eee74254d33fbd2e29229367ce33063516bf6b3258a341d89e3b0f1655"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.7+7"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -704,6 +736,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  purchases_flutter:
+    dependency: "direct main"
+    description:
+      name: purchases_flutter
+      sha256: "88bd00ac44273d4782abc09453dffd8314be39764bc8f67f68a26325ea68b91f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.14.0"
   rxdart:
     dependency: transitive
     description:
