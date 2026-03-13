@@ -1,1 +1,9 @@
-# Premium Controller & Analytics Fixes\n\n- [ ] 1. Update lib/controllers/premium_controller.dart with missing getters/fields/methods\n- [ ] 2. Add logPremiumAttempt method to lib/services/analytics_service.dart\n- [ ] 3. Run `flutter analyze 2>&1 | Select-String -Pattern "error -"`\n- [ ] 4. Verify no errors and complete task
+# Fix Failing Tests Plan ✓
+
+## Steps:
+1. [x] Edit test/services/affiliate_service_test.dart
+2. [x] Edit test/services/auth_service_test.dart
+3. [x] Run flutter test --reporter=compact
+4. [x] Verify and complete
+
+**Status:** Both tests fixed successfully. `flutter test --reporter=compact` completed with all 6 tests passing (00:24 +6: All tests passed!).
