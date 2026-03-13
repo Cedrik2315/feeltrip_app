@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 
+import '../services/destination_service.dart';
 import '../models/trip_model.dart';
 import '../constants/strings.dart';
 import '../controllers/cart_controller.dart';
@@ -19,10 +20,11 @@ class TripDetailScreen extends StatefulWidget {
 
 class _TripDetailScreenState extends State<TripDetailScreen> {
   late Future<Trip?> _tripFuture;
+  List<String> _unsplashImages = [];
   final CartController _cartController = Get.find();
   bool _isDescriptionExpanded = false;
 
-  // Mock data para el itinerario, ya que no está en el modelo.
+  // Mock data para el itinerario
   final List<Map<String, String>> _mockItinerary = [
     {
       'day': '1',
@@ -60,11 +62,21 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
   void initState() {
     super.initState();
     _tripFuture = _fetchTripDetails();
+    _tripFuture.then((trip) async {
+      if (trip != null && mounted && trip.images.isEmpty) {
+        final imgs =
+            await DestinationService.getDestinationPhotos(trip.destination);
+        if (mounted) {
+          setState(() {
+            _unsplashImages = imgs;
+          });
+        }
+      }
+    });
   }
 
   Future<Trip?> _fetchTripDetails() async {
     try {
-      // Asumimos que los viajes están en una colección 'trips'
       final docSnapshot = await FirebaseFirestore.instance
           .collection('trips')
           .doc(widget.tripId)
@@ -72,7 +84,6 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
 
       if (docSnapshot.exists) {
         final data = docSnapshot.data()!;
-        // Aseguramos que el ID esté en el mapa para el modelo
         data['id'] = docSnapshot.id;
         return Trip.fromJson(data);
       }
@@ -84,7 +95,6 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
   }
 
   Widget _buildStatsRow(Trip trip, BuildContext context) {
-    // Datos de ejemplo para la demo visual
     const duration = 5;
     const groupSize = "4-10";
     const rating = 4.8;
@@ -92,7 +102,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     Widget buildStatCard(IconData icon, String label, String value) {
       return Card(
         elevation: 2,
-        shadowColor: Colors.black.withAlpha(50),
+        shadowColor: Colors.black.withValues(alpha: 50 / 255),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
@@ -145,19 +155,14 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
           duration: const Duration(milliseconds: 300),
         ),
         InkWell(
-          onTap: () {
-            setState(() {
-              _isDescriptionExpanded = !_isDescriptionExpanded;
-            });
-          },
+          onTap: () =>
+              setState(() => _isDescriptionExpanded = !_isDescriptionExpanded),
           child: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
               _isDescriptionExpanded ? 'Ver menos' : 'Ver más',
               style: const TextStyle(
-                color: Colors.deepPurple,
-                fontWeight: FontWeight.bold,
-              ),
+                  color: Colors.deepPurple, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -181,10 +186,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _mockItinerary.length,
-          itemBuilder: (context, index) {
-            return _buildItineraryItem(context, _mockItinerary[index],
-                index == 0, index == _mockItinerary.length - 1);
-          },
+          itemBuilder: (context, index) => _buildItineraryItem(
+              context,
+              _mockItinerary[index],
+              index == 0,
+              index == _mockItinerary.length - 1),
         ),
       ],
     );
@@ -203,9 +209,8 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 if (!isFirst)
                   Expanded(
                       child: Container(
-                          width: 2, color: Colors.deepPurple.shade100))
-                else
-                  const Expanded(child: SizedBox()),
+                          width: 2, color: Colors.deepPurple.shade100)),
+                const SizedBox(height: 12),
                 CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.deepPurple,
@@ -216,9 +221,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 if (!isLast)
                   Expanded(
                       child: Container(
-                          width: 2, color: Colors.deepPurple.shade100))
-                else
-                  const Expanded(child: SizedBox()),
+                          width: 2, color: Colors.deepPurple.shade100)),
               ],
             ),
           ),
@@ -228,8 +231,8 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               padding: const EdgeInsets.only(bottom: 24.0),
               child: Card(
                 elevation: 2,
-                shadowColor: Colors.black.withAlpha(50),
-                margin: const EdgeInsets.all(0),
+                shadowColor: Colors.black.withValues(alpha: 50 / 255),
+                margin: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
                 child: Padding(
@@ -237,13 +240,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        dayInfo['title']!,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
+                      Text(dayInfo['title']!,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       Text(dayInfo['description']!,
                           style: Theme.of(context).textTheme.bodyMedium),
@@ -267,11 +268,9 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
           if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
             return const Center(
-              child: Text('No se pudo cargar el viaje. Inténtalo de nuevo.'),
-            );
+                child: Text('No se pudo cargar el viaje. Inténtalo de nuevo.'));
           }
 
           final trip = snapshot.data!;
@@ -286,7 +285,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 leading: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
-                    backgroundColor: Colors.black.withAlpha(100),
+                    backgroundColor: Colors.black.withValues(alpha: 100 / 255),
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () => Get.back(),
@@ -294,34 +293,64 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                   ),
                 ),
                 flexibleSpace: FlexibleSpaceBar(
-                  title: Text(trip.destination,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                                blurRadius: 10.0,
-                                color: Color(0x8A000000) /* Colors.black54 */)
-                          ])),
+                  title: Text(
+                    trip.destination,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(blurRadius: 10.0, color: Color(0x8A000000))
+                      ],
+                    ),
+                  ),
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      trip.images.isNotEmpty
-                          ? CarouselSlider(
-                              options: CarouselOptions(
-                                height: 350,
-                                viewportFraction: 1.0,
-                                autoPlay: true,
+                      Builder(
+                        builder: (context) {
+                          final images = trip.images.isNotEmpty
+                              ? trip.images
+                              : _unsplashImages;
+                          if (images.isEmpty) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.landscape,
+                                  color: Colors.grey, size: 100),
+                            );
+                          }
+                          return Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              CarouselSlider(
+                                options: CarouselOptions(
+                                  height: 350.0,
+                                  viewportFraction: 1.0,
+                                  autoPlay: true,
+                                ),
+                                items: images
+                                    .map((item) => CachedNetworkImage(
+                                          imageUrl: item,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                        ))
+                                    .toList(),
                               ),
-                              items: trip.images
-                                  .map((item) => CachedNetworkImage(
-                                        imageUrl: item,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                      ))
-                                  .toList(),
-                            )
-                          : Container(color: Colors.grey),
+                              if (_unsplashImages.isNotEmpty)
+                                const Positioned(
+                                  bottom: 8,
+                                  right: 8,
+                                  child: Text(
+                                    '📸 Unsplash',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Container(
@@ -332,7 +361,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                               end: Alignment.bottomCenter,
                               colors: [
                                 Colors.transparent,
-                                Colors.black.withAlpha(200)
+                                Colors.black.withValues(alpha: 200 / 255),
                               ],
                             ),
                           ),
@@ -349,9 +378,10 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                  color: Colors.black.withAlpha(80),
-                                  blurRadius: 8,
-                                  spreadRadius: 2)
+                                color: Colors.black.withValues(alpha: 80 / 255),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
                             ],
                           ),
                           child: Text(
@@ -419,7 +449,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               color: Theme.of(context).scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(30),
+                  color: Colors.black.withValues(alpha: 30 / 255),
                   blurRadius: 20,
                   offset: const Offset(0, -10),
                 ),
@@ -434,7 +464,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
-                  borderRadius: BorderRadius.circular(30.0),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 child: ElevatedButton.icon(
                   onPressed: () => _cartController.addToCart(trip),
@@ -449,7 +479,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                     foregroundColor: Colors.white,
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0)),
+                        borderRadius: BorderRadius.circular(30)),
                   ),
                 ),
               ),

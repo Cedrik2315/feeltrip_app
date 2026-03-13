@@ -1,6 +1,18 @@
-# Currency Converter Implementation
-- [ ] 1. Create lib/screens/currency_converter_screen.dart
-- [ ] 2. Update lib/main.dart (add route)
-- [ ] 3. Update lib/screens/profile_screen.dart (add navigation tile)
-- [ ] 4. Run flutter analyze
-- [ ] 5. Test navigation and conversion
+# Unsplash Integration TODO
+
+✅ [Completed] Created TODO.md with steps
+
+✅ [Completed] 1. Add import and _unsplashImages field to trip_detail_screen.dart
+
+✅ [Completed] 2. Add initState logic to load Unsplash images
+
+✅ [Completed] 3. Update CarouselSlider with fallback logic and grey container with Icon
+
+✅ [Completed] 4. Add Positioned Unsplash credit
+
+✅ [Pending] 5. Replace withAlpha with withValues(alpha:)
+
+✅ [Completed] 6. Run flutter analyze
+
+⏳ [Pending] 7. Mark complete and attempt_completion
+
