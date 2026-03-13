@@ -1,264 +1,148 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../config/firebase_config.dart';
+﻿// story_service.dart
 import '../models/experience_model.dart';
+import '../core/app_logger.dart';
+import '../models/comment_model.dart';
+import '../repositories/story_repository.dart';
 
 class StoryService {
   static final StoryService _instance = StoryService._internal();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final StoryRepository _repository;
 
   factory StoryService() {
     return _instance;
   }
 
-  StoryService._internal();
+  StoryService._internal({StoryRepository? repository})
+      : _repository = repository ?? StoryRepository();
 
-  // ============ CRUD OPERATIONS ============
-
-  /// Obtener todas las historias públicas (ordenadas por más recientes)
   Future<List<TravelerStory>> getPublicStories({int limit = 50}) async {
     try {
-      final snapshot = await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .orderBy(FirebaseConfig.createdAtField, descending: true)
-          .limit(limit)
-          .get();
-
-      return snapshot.docs
-          .map((doc) => TravelerStory.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      print('❌ Error fetching public stories: $e');
+      return await _repository.getPublicStories(limit: limit);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.getPublicStories',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  /// Obtener historias de un usuario específico
   Future<List<TravelerStory>> getUserStories(String userId) async {
     try {
-      final snapshot = await _firestore
-          .collection(FirebaseConfig.usersCollection)
-          .doc(userId)
-          .collection(FirebaseConfig.storiesSubcollection)
-          .orderBy(FirebaseConfig.createdAtField, descending: true)
-          .get();
-
-      return snapshot.docs
-          .map((doc) => TravelerStory.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      print('❌ Error fetching user stories: $e');
+      return await _repository.getUserStories(userId);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.getUserStories',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  /// Obtener una historia específica
   Future<TravelerStory?> getStory(String storyId) async {
     try {
-      final doc = await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .doc(storyId)
-          .get();
-
-      if (doc.exists) {
-        return TravelerStory.fromFirestore(doc);
-      }
-      return null;
-    } catch (e) {
-      print('❌ Error fetching story: $e');
+      return await _repository.getStory(storyId);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.getStory',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  /// Crear una nueva historia
   Future<String> createStory(String userId, TravelerStory story) async {
     try {
-      final now = DateTime.now();
-      final storyData = {
-        'id': story.id,
-        'userId': userId,
-        'author': story.author,
-        'title': story.title,
-        'story': story.story,
-        'emotionalHighlights': story.emotionalHighlights,
-        'likes': 0,
-        'rating': story.rating,
-        'createdAt': now,
-        'updatedAt': now,
-        'published': true,
-      };
-
-      // Guardar en colección privada del usuario
-      await _firestore
-          .collection(FirebaseConfig.usersCollection)
-          .doc(userId)
-          .collection(FirebaseConfig.storiesSubcollection)
-          .doc(story.id)
-          .set(storyData);
-
-      // Publicar en colección pública
-      await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .doc(story.id)
-          .set(storyData);
-
-      print('✅ Story created: ${story.id}');
-      return story.id;
-    } catch (e) {
-      print('❌ Error creating story: $e');
+      return await _repository.createStory(userId, story);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.createStory',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  /// Actualizar una historia
   Future<void> updateStory(
       String userId, String storyId, Map<String, dynamic> updates) async {
     try {
-      updates['updatedAt'] = DateTime.now();
-
-      await _firestore
-          .collection(FirebaseConfig.usersCollection)
-          .doc(userId)
-          .collection(FirebaseConfig.storiesSubcollection)
-          .doc(storyId)
-          .update(updates);
-
-      await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .doc(storyId)
-          .update(updates);
-
-      print('✅ Story updated: $storyId');
-    } catch (e) {
-      print('❌ Error updating story: $e');
+      await _repository.updateStory(userId, storyId, updates);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.updateStory',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  /// Agregar like a una historia
   Future<void> likeStory(String storyId) async {
     try {
-      await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .doc(storyId)
-          .update({'likes': FieldValue.increment(1)});
-
-      print('✅ Story liked: $storyId');
-    } catch (e) {
-      print('❌ Error liking story: $e');
+      await _repository.likeStory(storyId);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.likeStory',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  /// Quitar like de una historia
   Future<void> unlikeStory(String storyId) async {
     try {
-      await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .doc(storyId)
-          .update({'likes': FieldValue.increment(-1)});
-
-      print('✅ Story unliked: $storyId');
-    } catch (e) {
-      print('❌ Error unliking story: $e');
+      await _repository.unlikeStory(storyId);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.unlikeStory',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  /// Eliminar una historia
   Future<void> deleteStory(String userId, String storyId) async {
     try {
-      await _firestore
-          .collection(FirebaseConfig.usersCollection)
-          .doc(userId)
-          .collection(FirebaseConfig.storiesSubcollection)
-          .doc(storyId)
-          .delete();
-
-      await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .doc(storyId)
-          .delete();
-
-      print('✅ Story deleted: $storyId');
-    } catch (e) {
-      print('❌ Error deleting story: $e');
+      await _repository.deleteStory(userId, storyId);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.deleteStory',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  // ============ STREAM OPERATIONS ============
-
-  /// Stream de historias públicas en tiempo real
   Stream<List<TravelerStory>> getPublicStoriesStream({int limit = 50}) {
-    try {
-      return _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .orderBy(FirebaseConfig.createdAtField, descending: true)
-          .limit(limit)
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => TravelerStory.fromFirestore(doc))
-              .toList());
-    } catch (e) {
-      print('❌ Error setting up stories stream: $e');
-      rethrow;
-    }
+    return _repository.getPublicStoriesStream(limit: limit);
   }
 
-  /// Stream de historias de un usuario
   Stream<List<TravelerStory>> getUserStoriesStream(String userId) {
-    try {
-      return _firestore
-          .collection(FirebaseConfig.usersCollection)
-          .doc(userId)
-          .collection(FirebaseConfig.storiesSubcollection)
-          .orderBy(FirebaseConfig.createdAtField, descending: true)
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => TravelerStory.fromFirestore(doc))
-              .toList());
-    } catch (e) {
-      print('❌ Error setting up user stories stream: $e');
-      rethrow;
-    }
+    return _repository.getUserStoriesStream(userId);
   }
 
-  // ============ SEARCH ============
-
-  /// Buscar historias por título
   Future<List<TravelerStory>> searchStoriesByTitle(String query) async {
     try {
-      // Nota: Para búsqueda completa, usar Algolia o similar
-      // Esta es una búsqueda básica por prefijo
-      final snapshot = await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .where('title', isGreaterThanOrEqualTo: query)
-          .where('title', isLessThan: query + 'z')
-          .get();
-
-      return snapshot.docs
-          .map((doc) => TravelerStory.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      print('❌ Error searching stories: $e');
+      return await _repository.searchStoriesByTitle(query);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.searchStoriesByTitle',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }
 
-  /// Buscar historias por emoción
   Future<List<TravelerStory>> searchStoriesByEmotion(String emotion) async {
     try {
-      final snapshot = await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .where('emotionalHighlights', arrayContains: emotion)
-          .orderBy(FirebaseConfig.createdAtField, descending: true)
-          .get();
+      return await _repository.searchStoriesByEmotion(emotion);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.searchStoriesByEmotion',
+          error: e, stackTrace: st, name: 'StoryService');
+      rethrow;
+    }
+  }
 
-      return snapshot.docs
-          .map((doc) => TravelerStory.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      print('❌ Error searching by emotion: $e');
+  Future<List<Comment>> getCommentsForStory(String storyId) async {
+    try {
+      return await _repository.getCommentsForStory(storyId);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.getCommentsForStory',
+          error: e, stackTrace: st, name: 'StoryService');
+      rethrow;
+    }
+  }
+
+  Future<void> addComment({
+    required String storyId,
+    required String content,
+  }) async {
+    try {
+      await _repository.addComment(storyId: storyId, content: content);
+    } catch (e, st) {
+      AppLogger.error('Error en StoryService.addComment',
+          error: e, stackTrace: st, name: 'StoryService');
       rethrow;
     }
   }

@@ -1,41 +1,49 @@
+﻿import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
+
+import '../core/app_logger.dart';
 import 'firebase_options.dart';
 
 class FirebaseConfig {
   static Future<void> initialize() async {
     try {
-      // Si estamos usando MOCK data, saltamos Firebase
-      print('⏳ Inicializando Firebase...');
-      
+      AppLogger.debug('Inicializando Firebase...', name: 'FirebaseConfig');
+
       final initTask = Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       ).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          print('⚠️ Firebase timeout - usando MOCK data');
-          return;
+          AppLogger.info('Firebase timeout - usando MOCK data', name: 'FirebaseConfig');
+          throw TimeoutException('Firebase initialization timed out');
         },
       );
-      
+
       await initTask;
-      print('✅ Firebase inicializado exitosamente');
-    } catch (e) {
-      // Si Firebase ya está inicializado, esto es esperado
-      if (e.toString().contains('duplicate-app') || 
+      AppLogger.info('Firebase inicializado exitosamente', name: 'FirebaseConfig');
+    } catch (e, st) {
+      if (e.toString().contains('duplicate-app') ||
           e.toString().contains('already exists')) {
-        print('✅ Firebase ya estaba inicializado');
+        AppLogger.info('Firebase ya estaba inicializado', name: 'FirebaseConfig');
         return;
       }
       if (e.toString().contains('TimeoutException')) {
-        print('⚠️ Firebase timeout - usando MOCK data sin problemas');
+        AppLogger.info(
+          'Firebase timeout - usando MOCK data sin problemas',
+          name: 'FirebaseConfig',
+        );
         return;
       }
-      print('⚠️ Error inicializando Firebase (continuando con MOCK): $e');
-      // No rethrow - permitir que la app continúe con MOCK data
+      AppLogger.error(
+        'Error inicializando Firebase (continuando con MOCK)',
+        error: e,
+        stackTrace: st,
+        name: 'FirebaseConfig',
+      );
     }
   }
 
-  // Estructura de Firestore
   static const String usersCollection = 'users';
   static const String storiesCollection = 'stories';
   static const String storiesSubcollection = 'stories';
@@ -43,12 +51,11 @@ class FirebaseConfig {
   static const String impactMetricsSubcollection = 'impactMetrics';
   static const String quizResultsSubcollection = 'quizResults';
 
-  // Documentos y campos
   static const String userProfileDoc = 'profile';
   static const String userDiaryStatsDoc = 'stats';
-  
-  // Campos comunes
+
   static const String createdAtField = 'createdAt';
   static const String updatedAtField = 'updatedAt';
   static const String userIdField = 'userId';
 }
+

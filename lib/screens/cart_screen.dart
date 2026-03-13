@@ -1,338 +1,290 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../controllers/cart_controller.dart';
+import '../models/cart_item_model.dart';
 
-class CartScreen extends StatefulWidget {
-  @override
-  State<CartScreen> createState() => _CartScreenState();
-}
-
-class _CartScreenState extends State<CartScreen> {
-  List<Map<String, dynamic>> cartItems = [
-    {
-      'title': 'Tromsø Aurora Borealis',
-      'destination': 'Noruega',
-      'price': 1290,
-      'quantity': 1,
-      'image': '🌌',
-    },
-    {
-      'title': 'Cocina Toscana',
-      'destination': 'Italia',
-      'price': 980,
-      'quantity': 1,
-      'image': '🍝',
-    },
-  ];
-
-  double get _subtotal => cartItems.fold(
-        0,
-        (sum, item) => sum + (item['price'] as num) * (item['quantity'] as num),
-      );
-
-  double get _tax => _subtotal * 0.1;
-  double get _total => _subtotal + _tax;
+class CartScreen extends StatelessWidget {
+  const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final CartController controller = Get.find<CartController>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Carrito de Compras'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: cartItems.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.shopping_cart_outlined,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Tu carrito está vacío',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                    ),
-                    child: Text('Continuar Comprando'),
-                  ),
-                ],
-              ),
-            )
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Items del carrito
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: cartItems.length,
-                    itemBuilder: (context, index) {
-                      final item = cartItems[index];
-                      return Dismissible(
-                        key: Key(item['title']),
-                        onDismissed: (_) {
-                          setState(() {
-                            cartItems.removeAt(index);
-                          });
-                        },
-                        background: Container(
-                          color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          padding: EdgeInsets.only(right: 16),
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                        ),
-                        child: Card(
-                          margin: EdgeInsets.all(12),
-                          child: Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 80,
-                                  height: 80,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: Colors.purple[100],
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      item['image'],
-                                      style: TextStyle(fontSize: 32),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item['title'],
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        item['destination'],
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        '\$${item['price']}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.deepPurple,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Column(
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.add),
-                                      onPressed: () {
-                                        setState(() {
-                                          item['quantity']++;
-                                        });
-                                      },
-                                      iconSize: 18,
-                                    ),
-                                    Text('${item['quantity']}'),
-                                    IconButton(
-                                      icon: Icon(Icons.remove),
-                                      onPressed: item['quantity'] > 1
-                                          ? () {
-                                              setState(() {
-                                                item['quantity']--;
-                                              });
-                                            }
-                                          : null,
-                                      iconSize: 18,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-
-                  SizedBox(height: 12),
-
-                  // Resumen de pago
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                    ),
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Resumen de Pago',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Subtotal:'),
-                            Text('\$${_subtotal.toStringAsFixed(2)}'),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Impuestos (10%):'),
-                            Text('\$${_tax.toStringAsFixed(2)}'),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Divider(),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              '\$${_total.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              _showCheckoutDialog();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: Text(
-                              'Proceder al Pago',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.deepPurple),
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: Text(
-                              'Continuar Comprando',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+        title: const Text('Mi Carrito'),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.purple[700]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+          ),
+        ),
+      ),
+      body: Obx(() {
+        if (controller.cartItems.isEmpty) {
+          return _buildEmptyState(context);
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.only(top: 8, bottom: 16),
+          itemCount: controller.cartItems.length,
+          itemBuilder: (context, index) {
+            final item = controller.cartItems[index];
+            return _buildCartItemCard(context, item, controller);
+          },
+        );
+      }),
+      bottomNavigationBar: Obx(
+        () => controller.cartItems.isNotEmpty
+            ? _buildBottomBar(context, controller)
+            : const SizedBox.shrink(),
+      ),
     );
   }
 
-  void _showCheckoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirmar Compra'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${cartItems.length} viajes en tu carrito'),
-            SizedBox(height: 12),
-            Text(
-              'Total: \$${_total.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.deepPurple,
+  Widget _buildCartItemCard(
+      BuildContext context, CartItem item, CartController controller) {
+    return Dismissible(
+      key: Key(item.id),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        controller.removeFromCart(item.id);
+        Get.snackbar(
+          'Eliminado',
+          '${item.tripTitle} fue eliminado de tu carrito.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.black87,
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(12),
+          borderRadius: 8,
+        );
+      },
+      background: Container(
+        decoration: BoxDecoration(
+          color: Colors.red.shade400,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20.0),
+        child: const Icon(Icons.delete_sweep_outlined,
+            color: Colors.white, size: 30),
+      ),
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        elevation: 3,
+        shadowColor: Colors.black.withAlpha(30),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CachedNetworkImage(
+                  imageUrl: item.image,
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => Container(
+                    width: 80,
+                    height: 80,
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.image_not_supported,
+                        color: Colors.grey),
+                  ),
+                ),
               ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.tripTitle,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '\$${item.price.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.deepPurple.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
+                onPressed: () => controller.removeFromCart(item.id),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomBar(BuildContext context, CartController controller) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withAlpha(40),
+              spreadRadius: 0,
+              blurRadius: 20),
+        ],
+      ),
+      child: Obx(
+        () {
+          final subtotal = controller.totalPrice;
+          final taxes = subtotal * 0.10; // 10% de impuestos
+          final total = subtotal + taxes;
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Subtotal:',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+                  Text('\$${subtotal.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 16)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Impuestos (10%):',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+                  Text('\$${taxes.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 16)),
+                ],
+              ),
+              const Divider(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total:',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('\$${total.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple)),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.deepPurple, Colors.purple.shade700],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: controller.checkout,
+                  icon: const Icon(Icons.lock_outline, color: Colors.white),
+                  label: const Text('Pagar de forma segura',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0)),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.shopping_cart_outlined,
+                size: 100, color: Colors.grey[300]),
+            const SizedBox(height: 24),
+            const Text(
+              'Tu carrito está vacío',
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87),
             ),
-            SizedBox(height: 12),
-            Text('Se enviarán detalles a tu email'),
+            const SizedBox(height: 8),
+            Text(
+              'Parece que aún no has añadido ningún viaje. ¡Explora nuestros destinos!',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            ),
+            const SizedBox(height: 32),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.deepPurple, Colors.purple.shade700],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(30.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.deepPurple.withAlpha(80),
+                    blurRadius: 12,
+                    offset: const Offset(0, 5),
+                  )
+                ],
+              ),
+              child: ElevatedButton.icon(
+                onPressed: () => Get.offNamed('/home'),
+                icon: const Icon(Icons.explore_outlined),
+                label: const Text('Explorar Viajes'),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
+                ),
+              ),
+            )
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('¡Compra realizada con éxito!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              setState(() {
-                cartItems.clear();
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-            ),
-            child: Text('Confirmar Pago'),
-          ),
-        ],
       ),
     );
   }

@@ -104,42 +104,89 @@ Agrega estos documentos:
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Todos pueden leer historias
+
+    // --- 1. FUNCIONES DE AYUDA (COMBINADAS) ---
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isResourceOwner() {
+      return isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    function isAssigningSelf() {
+      return isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // --- 2. VALIDACIONES DE DATOS ---
+    function isValidString(text, min, max) {
+      return text is string && text.size() >= min && text.size() <= max;
+    }
+    function isValidRating(rating) {
+      return (rating is number || rating is int) && rating >= 0 && rating <= 5;
+    }
+
+    // --- 3. LÓGICA DE INTERACCIÓN ---
+    function onlyStoryLikeMutation() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes']) &&
+        request.resource.data.userId == resource.data.userId;
+    }
+    function onlyCommentReactionMutation() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes', 'reactions']) &&
+        request.resource.data.userId == resource.data.userId;
+    }
+
+    // --- REGLAS DE COLECCIONES ---
+
+    // 1. USUARIOS (Perfil, Diario, Carrito)
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      match /diaryEntries/{entryId} { allow read, write: if isOwner(userId); }
+      match /cartItems/{itemId} { allow read, write: if isOwner(userId); }
+      match /private/{docId} { allow read, write: if isOwner(userId); }
+    }
+
+    // 2. HISTORIAS (Stories)
     match /stories/{storyId} {
       allow read: if true;
-      allow write: if request.auth != null;
-      
-      // Comentarios en historias
+      allow create: if isAssigningSelf()
+                    && isValidString(request.resource.data.title, 3, 100)
+                    && isValidString(request.resource.data.story, 10, 5000)
+                    && isValidRating(request.resource.data.rating);
+      allow update: if (isResourceOwner()
+                        && isValidString(request.resource.data.title, 3, 100)
+                        && isValidString(request.resource.data.story, 10, 5000))
+                    || (isAuthenticated() && onlyStoryLikeMutation());
+      allow delete: if isResourceOwner();
+
+      // 2.1 Comentarios
       match /comments/{commentId} {
         allow read: if true;
-        allow create: if request.auth != null;
-        allow update, delete: if request.auth.uid == resource.data.userId;
+        allow create: if isAssigningSelf() && isValidString(request.resource.data.content, 1, 1000);
+        allow update: if isResourceOwner() || (isAuthenticated() && onlyCommentReactionMutation());
+        allow delete: if isResourceOwner();
       }
     }
 
-    // Todos pueden leer agencias
-    match /agencies/{agencyId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
+    // 3. AGENCIAS Y EXPERIENCIAS (Lectura pública, escritura protegida)
+    match /agencies/{agencyId} { allow read: if true; allow write: if false; }
+    match /experiences/{experienceId} { allow read: if true; allow write: if false; }
 
-    // Otros
-    match /experiences/{docId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-    
-    match /diary_entries/{docId} {
-      allow read, write: if request.auth.uid == resource.data.userId;
-    }
-
-    // Default: deny
-    match /{document=**} {
-      allow read, write: if false;
-    }
+    // Bloquear todo lo demás
+    match /{document=**} { allow read, write: if false; }
   }
 }
 ```
+
+Estas reglas **fusionadas** ahora validan:
+- Que el título de la historia tenga entre 3 y 100 caracteres.
+- Que la historia tenga entre 10 y 5000 caracteres.
+- Que los comentarios no excedan los 1000 caracteres.
+- Que el usuario solo pueda editar/borrar sus propios datos.
+- Que el diario sea accesible **solo** por su dueño (ruta `/users/{userId}/diaryEntries`).
+- Que el **carrito de compras** sea privado para cada usuario.
+- Que **otros usuarios** puedan dar "like" a historias y reaccionar a comentarios sin poder editar el resto del contenido.
 
 3. Haz click: **PUBLISH**
 4. Espera 1-2 minutos para que se propaguen los cambios

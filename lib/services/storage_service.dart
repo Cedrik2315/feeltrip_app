@@ -1,84 +1,84 @@
+﻿// storage_service.dart
+import 'dart:io';
+import 'dart:developer' as developer;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import '../models/user_model.dart';
-import '../models/cart_item_model.dart';
 
 class StorageService {
-  static final StorageService _instance = StorageService._internal();
-  static late SharedPreferences _prefs;
-
-  factory StorageService() {
-    return _instance;
-  }
-
-  StorageService._internal();
+  static SharedPreferences? _prefs;
 
   static Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
+    _prefs ??= await SharedPreferences.getInstance();
   }
 
-  // User
-  Future<void> saveUser(User user) async {
-    final userJson = json.encode(user.toJson());
-    await _prefs.setString('user', userJson);
+  static int? getInt(String key) {
+    return _prefs?.getInt(key);
   }
 
-  User? getUser() {
-    final userJson = _prefs.getString('user');
-    if (userJson == null) return null;
-    return User.fromJson(json.decode(userJson));
+  static Future<bool> setInt(String key, int value) async {
+    await init();
+    return _prefs!.setInt(key, value);
   }
 
-  Future<void> clearUser() async {
-    await _prefs.remove('user');
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<String?> subirFotoParada(File imageFile, String nombreParada) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return null;
+
+      // Creamos una ruta única: users/ID_USUARIO/diarios/TIMESTAMP_NOMBRE.jpg
+      // Limpiamos el nombre de la parada para evitar caracteres raros en la URL
+      final nombreLimpio =
+          nombreParada.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
+      final fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_$nombreLimpio.jpg';
+      final ref = _storage.ref().child('users/${user.uid}/diarios/$fileName');
+
+      // Subimos el archivo
+      final uploadTask = ref.putFile(imageFile);
+      final snapshot = await uploadTask;
+
+      // Retornamos la URL pública
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      developer.log("Error subiendo a Storage: $e", name: 'StorageService');
+      return null;
+    }
   }
 
-  // Token
-  Future<void> saveToken(String token) async {
-    await _prefs.setString('auth_token', token);
+  /// Sube una imagen de historia al storage y devuelve la URL
+  Future<String> uploadStoryImage(File image, String userId) async {
+    try {
+      final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      // Organiza las imágenes en una carpeta 'stories' por usuario
+      final Reference ref = _storage.ref().child('stories/$userId/$fileName');
+
+      final UploadTask uploadTask = ref.putFile(image);
+      final TaskSnapshot snapshot = await uploadTask;
+
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      throw Exception('Error al subir imagen de historia: $e');
+    }
   }
 
-  String? getToken() {
-    return _prefs.getString('auth_token');
-  }
+  /// Sube un avatar de usuario al storage y devuelve la URL.
+  /// Sobrescribe el avatar anterior si existe.
+  Future<String> uploadUserAvatar(File image, String userId) async {
+    try {
+      // Usamos un nombre de archivo constante para que el avatar siempre se sobrescriba.
+      const String fileName = 'avatar.jpg';
+      final Reference ref = _storage.ref().child('users/$userId/$fileName');
 
-  Future<void> clearToken() async {
-    await _prefs.remove('auth_token');
-  }
+      final UploadTask uploadTask = ref.putFile(image);
+      final TaskSnapshot snapshot = await uploadTask;
 
-  // Cart
-  Future<void> saveCart(List<CartItem> items) async {
-    final cartJson = json.encode(
-      items.map((item) => item.toJson()).toList(),
-    );
-    await _prefs.setString('cart', cartJson);
-  }
-
-  List<CartItem> getCart() {
-    final cartJson = _prefs.getString('cart');
-    if (cartJson == null) return [];
-    final List<dynamic> decoded = json.decode(cartJson);
-    return decoded.map((item) => CartItem.fromJson(item)).toList();
-  }
-
-  Future<void> clearCart() async {
-    await _prefs.remove('cart');
-  }
-
-  // Preferences
-  Future<void> setThemeMode(String mode) async {
-    await _prefs.setString('theme_mode', mode);
-  }
-
-  String getThemeMode() {
-    return _prefs.getString('theme_mode') ?? 'light';
-  }
-
-  Future<void> setLanguage(String language) async {
-    await _prefs.setString('language', language);
-  }
-
-  String getLanguage() {
-    return _prefs.getString('language') ?? 'es';
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      throw Exception('Error al subir el avatar del usuario: $e');
+    }
   }
 }

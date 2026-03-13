@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+ 
 
 class Comment {
   final String id;
@@ -7,9 +8,9 @@ class Comment {
   final String userName;
   final String userAvatar;
   final String content;
-  final List<String> reactions; // ['❤️', '😂', '🔥', etc]
-  final DateTime createdAt;
+  final List<String> reactions;
   final int likes;
+  final DateTime createdAt;
 
   Comment({
     required this.id,
@@ -19,66 +20,62 @@ class Comment {
     required this.userAvatar,
     required this.content,
     required this.reactions,
-    required this.createdAt,
     required this.likes,
+    required this.createdAt,
   });
-
-  factory Comment.fromJson(Map<String, dynamic> json) {
-    return Comment(
-      id: json['id'] ?? '',
-      storyId: json['storyId'] ?? '',
-      userId: json['userId'] ?? '',
-      userName: json['userName'] ?? 'Usuario',
-      userAvatar: json['userAvatar'] ?? '',
-      content: json['content'] ?? '',
-      reactions: List<String>.from(json['reactions'] ?? []),
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
-      likes: json['likes'] ?? 0,
-    );
-  }
 
   factory Comment.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Comment(
-      id: data['id'] ?? doc.id,
+      id: doc.id,
       storyId: data['storyId'] ?? '',
       userId: data['userId'] ?? '',
-      userName: data['userName'] ?? 'Usuario',
+      userName: data['userName'] ?? '',
       userAvatar: data['userAvatar'] ?? '',
       content: data['content'] ?? '',
       reactions: List<String>.from(data['reactions'] ?? []),
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       likes: data['likes'] ?? 0,
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'storyId': storyId,
       'userId': userId,
       'userName': userName,
       'userAvatar': userAvatar,
       'content': content,
       'reactions': reactions,
-      'createdAt': createdAt.toIso8601String(),
       'likes': likes,
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'id': id,
-      'storyId': storyId,
-      'userId': userId,
-      'userName': userName,
-      'userAvatar': userAvatar,
-      'content': content,
-      'reactions': reactions,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'likes': likes,
-    };
+  Comment copyWith({
+    String? id,
+    String? storyId,
+    String? userId,
+    String? userName,
+    String? userAvatar,
+    String? content,
+    List<String>? reactions,
+    int? likes,
+    DateTime? createdAt,
+  }) {
+    return Comment(
+      id: id ?? this.id,
+      storyId: storyId ?? this.storyId,
+      userId: userId ?? this.userId,
+      userName: userName ?? this.userName,
+      userAvatar: userAvatar ?? this.userAvatar,
+      content: content ?? this.content,
+      reactions: reactions ?? this.reactions,
+      likes: likes ?? this.likes,
+      createdAt: createdAt ?? this.createdAt,
+    );
   }
+
+  @override
+  String toString() => 'Comment(\$id, \$content) by \$userName';
 }

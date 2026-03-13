@@ -1,130 +1,90 @@
-// Firestore Security Rules con soporte para Comentarios y Agencias
-// Copiar a Firebase Console: Firestore Database > Rules
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Función para verificar autenticación
-    function isSignedIn() {
+
+    // --- 1. FUNCIONES DE AYUDA (COMBINADAS) ---
+    function isAuthenticated() {
       return request.auth != null;
     }
-
-    // Función para verificar owner
-    function isOwner(uid) {
-      return request.auth.uid == uid;
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isResourceOwner() {
+      return isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    function isAssigningSelf() {
+      return isAuthenticated() && request.resource.data.userId == request.auth.uid;
     }
 
-    // ===== USERS =====
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+
+    // --- 2. VALIDACIONES DE DATOS ---
+    function isValidString(text, min, max) {
+      return text is string && text.size() >= min && text.size() <= max;
+    }
+    function isValidRating(rating) {
+      return (rating is number || rating is int) && rating >= 0 && rating <= 5;
+    }
+
+    // --- 3. LÓGICA DE INTERACCIÓN ---
+    function onlyStoryLikeMutation() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes']) &&
+        request.resource.data.userId == resource.data.userId;
+    }
+    function onlyCommentReactionMutation() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes', 'reactions']) &&
+        request.resource.data.userId == resource.data.userId;
+    }
+
+    // --- REGLAS DE COLECCIONES ---
+
+    // 1. USUARIOS (Perfil, Diario, Carrito)
     match /users/{userId} {
-      allow read: if isSignedIn();
-      allow create: if isOwner(userId);
-      allow update, delete: if isOwner(userId);
+      allow read, write: if isOwner(userId);
+      match /diaryEntries/{entryId} { allow read, write: if isOwner(userId); }
+      match /cartItems/{itemId} { allow read, write: if isOwner(userId); }
+      match /private/{docId} { allow read, write: if isOwner(userId); }
     }
 
-    // ===== STORIES (Historias de Viaje) =====
+    // 2. HISTORIAS (Stories)
     match /stories/{storyId} {
-      // Todos pueden leer historias
       allow read: if true;
-      
-      // Solo autenticados pueden crear
-      allow create: if isSignedIn();
-      
-      // Solo el dueño puede actualizar/eliminar
-      allow update, delete: if isOwner(resource.data.userId);
+      allow create: if isAssigningSelf()
+                    && isValidString(request.resource.data.title, 3, 100)
+                    && isValidString(request.resource.data.story, 10, 5000)
+                    && isValidRating(request.resource.data.rating);
+      allow update: if (isResourceOwner()
+                        && isValidString(request.resource.data.title, 3, 100)
+                        && isValidString(request.resource.data.story, 10, 5000))
+                    || (isAuthenticated() && onlyStoryLikeMutation());
+      allow delete: if isResourceOwner();
 
-      // ===== COMMENTS (Comentarios de Historias) =====
+      // 2.1 Comentarios
       match /comments/{commentId} {
-        // Todos pueden leer comentarios
         allow read: if true;
-        
-        // Autenticados pueden crear comentarios
-        allow create: if isSignedIn() && 
-          request.resource.data.userId == request.auth.uid;
-        
-        // Solo el dueño del comentario puede actualizar/eliminar
-        allow update, delete: if isOwner(resource.data.userId);
+        allow create: if isAssigningSelf() && isValidString(request.resource.data.content, 1, 1000);
+        allow update: if isResourceOwner() || (isAuthenticated() && onlyCommentReactionMutation());
+        allow delete: if isResourceOwner();
       }
     }
 
-    // ===== AGENCIES (Perfiles de Agencias) =====
+    // 3. AGENCIAS Y EXPERIENCIAS (Lectura pública, escritura protegida)
     match /agencies/{agencyId} {
-      // Todos pueden leer agencias
       allow read: if true;
-      
-      // Solo admins o la agencia propietaria pueden crear
-      allow create: if isSignedIn();
-      
-      // Solo el propietario puede actualizar
-      allow update: if isOwner(resource.data.ownerId) || 
-        request.auth.token.admin == true;
-      
-      // Solo admins pueden eliminar
-      allow delete: if request.auth.token.admin == true;
-
-      // ===== AGENCY REVIEWS =====
-      match /reviews/{reviewId} {
-        allow read: if true;
-        
-        allow create: if isSignedIn();
-        
-        allow update, delete: if isOwner(resource.data.userId) || 
-          request.auth.token.admin == true;
-      }
+      allow create: if isAuthenticated() && isAssigningSelf();
+      allow update: if isResourceOwner();
+      allow delete: if isAdmin();
     }
 
-    // ===== EXPERIENCES (Experiencias) =====
     match /experiences/{experienceId} {
-      // Todos pueden leer
       allow read: if true;
-      
-      // Autenticados pueden crear
-      allow create: if isSignedIn();
-      
-      // Solo propietario puede actualizar
-      allow update, delete: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isAssigningSelf();
+      allow update: if isResourceOwner();
+      allow delete: if isResourceOwner();
     }
 
-    // ===== DIARY ENTRIES (Entradas de Diario) =====
-    match /diary_entries/{entryId} {
-      // Solo el propietario puede leer
-      allow read: if isOwner(resource.data.userId);
-      
-      // Autenticados pueden crear
-      allow create: if isSignedIn() && 
-        request.resource.data.userId == request.auth.uid;
-      
-      // Solo el propietario puede actualizar/eliminar
-      allow update, delete: if isOwner(resource.data.userId);
-    }
-
-    // ===== FOLLOWERS (Sistema de Seguidores) =====
-    match /followers/{followId} {
-      // Todos pueden leer (public followers)
-      allow read: if true;
-      
-      // Autenticados pueden crear
-      allow create: if isSignedIn() && 
-        request.resource.data.followerId == request.auth.uid;
-      
-      // Solo el seguidor puede eliminar su seguimiento
-      allow delete: if isOwner(resource.data.followerId);
-    }
-
-    // ===== USER PREFERENCES =====
-    match /user_preferences/{userId} {
-      allow read: if isOwner(userId);
-      allow create, update: if isOwner(userId);
-      allow delete: if isOwner(userId);
-    }
-
-    // ===== NOTIFICATIONS =====
-    match /notifications/{notificationId} {
-      allow read: if isOwner(resource.data.userId);
-      allow create: if request.auth.uid != null;
-      allow update, delete: if isOwner(resource.data.userId);
-    }
-
-    // ===== DEFAULT DENY ALL =====
     match /{document=**} {
       allow read, write: if false;
     }

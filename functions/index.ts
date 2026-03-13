@@ -1,0 +1,116 @@
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import Stripe from "stripe";
+import { onCall, onRequest } from "firebase-functions/v2/https";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import * as logger from "firebase-functions/logger";
+
+// 1. Inicialización de Firebase Admin
+try {
+  admin.initializeApp();
+} catch (e) {
+  logger.info("Admin App ya inicializada.");
+}
+
+const db = admin.firestore();
+
+// 2. Inicialización de Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", { 
+  apiVersion: "2023-10-16" as any 
+});
+
+/**
+ * TRIGGER: onNewComment (v2)
+ * RUTA DEFINITIVA: users/{userId}/comments/{commentId}
+ * RUTA CORREGIDA: stories/{storyId}/comments/{commentId}
+ * Este trigger forzará la creación de la subcolección 'notifications'
+ */
+export const onNewComment = onDocumentCreated("stories/{storyId}/comments/{commentId}", async (event) => {
+    logger.info("🎯 PASO 1: EVENTO DETECTADO");
+
+    if (!event.data) {
+        logger.error("❌ ERROR: No hay datos en el evento.");
+        return;
+    }
+
+    const { storyId, commentId } = event.params;
+    const commentData = event.data.data();
+    logger.info(`🔍 PASO 2: Procesando comentario ${commentId} en la historia ${storyId}`);
+
+    try {
+        // Obtener el autor de la historia para notificarle
+        const storyDoc = await db.collection("stories").doc(storyId).get();
+        if (!storyDoc.exists) {
+            logger.error(`❌ ERROR: La historia ${storyId} no existe.`);
+            return;
+        }
+        const storyAuthorId = storyDoc.data()?.userId;
+        if (!storyAuthorId) {
+            logger.error(`❌ ERROR: La historia ${storyId} no tiene un autor (userId).`);
+            return;
+        }
+
+        // Referencia directa para asegurar la creación de la subcolección
+        const notificationRef = db.collection("users").doc(storyAuthorId).collection("notifications").doc();
+        
+        const nuevaNotificacion = {
+            title: `Nuevo comentario de ${commentData.userName || "Alguien"}`,
+            body: commentData.content || "Sin contenido",
+            type: "new_comment",
+            isRead: false,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            commentReference: commentId,
+            referenceId: storyId, // ID de la historia para navegar a ella
+        };
+
+        logger.info("✍️ PASO 3: Intentando escribir en Firestore...");
+        
+        await notificationRef.set(nuevaNotificacion);
+        
+        logger.info("✅ PASO 4: ¡ESCRITURA EXITOSA! Revisa Firestore ahora.");
+
+    } catch (error) {
+        logger.error("❌ ERROR CRÍTICO AL ESCRIBIR:", error);
+    }
+});
+
+/**
+ * CALLABLE: analyzeDiaryEntry (Gemini AI)
+ */
+export const analyzeDiaryEntry = onCall(async (request) => {
+    if (!request.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "Debes iniciar sesión.");
+    }
+    const { text, apiKey } = request.data;
+    try {
+        const genAI = new GoogleGenerativeAI(apiKey || process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const result = await model.generateContent(`Analiza este texto y extrae 3 emociones: ${text}`);
+        return { suggestions: result.response.text() };
+    } catch (error) {
+        throw new functions.https.HttpsError("internal", "Error con Gemini.");
+    }
+});
+
+/**
+ * HTTP: createPaymentIntent (Stripe)
+ */
+export const createPaymentIntent = onRequest(async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    if (req.method === 'OPTIONS') {
+        res.status(204).send('');
+        return;
+    }
+    try {
+        const { amount } = req.body;
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: parseInt(amount),
+            currency: "usd",
+            payment_method_types: ['card'],
+        });
+        res.status(200).json({ clientSecret: paymentIntent.client_secret });
+    } catch (error) {
+        res.status(500).send("Error en Stripe.");
+    }
+});

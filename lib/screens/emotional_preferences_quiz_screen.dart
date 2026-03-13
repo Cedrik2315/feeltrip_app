@@ -1,506 +1,708 @@
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import 'package:confetti/confetti.dart';
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import '../controllers/auth_controller.dart';
+import '../services/analytics_service.dart';
+
+// 8 Archetypes exactly as specified
+const List<Map<String, dynamic>> archetypes = [
+  {
+    'emoji': '🌊',
+    'name': 'Aventurero',
+    'description': 'busca adrenalina y deportes extremos',
+    'mapStyle': 'retro_style.json'
+  },
+  {
+    'emoji': '🧘',
+    'name': 'Contemplativo',
+    'description': 'busca paz, meditación y naturaleza',
+    'mapStyle': 'zen_style.json'
+  },
+  {
+    'emoji': '🎨',
+    'name': 'Creativo',
+    'description': 'busca arte, cultura y experiencias únicas',
+    'mapStyle': 'vibrant_style.json'
+  },
+  {
+    'emoji': '🤝',
+    'name': 'Conector',
+    'description': 'busca comunidad, voluntariado y personas',
+    'mapStyle': 'cyberpunk_style.json'
+  },
+  {
+    'emoji': '🦁',
+    'name': 'Explorador',
+    'description': 'busca lugares remotos y off-the-beaten-path',
+    'mapStyle': 'mystery_style.json'
+  },
+  {
+    'emoji': '🌱',
+    'name': 'Eco-consciente',
+    'description': 'busca turismo sostenible y naturaleza',
+    'mapStyle': 'zen_style.json'
+  },
+  {
+    'emoji': '💆',
+    'name': 'Sanador',
+    'description': 'busca retiros, bienestar y transformación',
+    'mapStyle': 'retro_style.json'
+  },
+  {
+    'emoji': '🎉',
+    'name': 'Festivo',
+    'description': 'busca gastronomía, fiestas y vida nocturna',
+    'mapStyle': 'vibrant_style.json'
+  },
+];
+
+/// Fallback destinations por arquetipo para cuando falle la API
+const Map<String, List<String>> _staticDestinations = {
+  'Aventurero': [
+    '🪂 Queenstown: Bungee jumping mundial',
+    '🏔️ Patagonia: Trekking glaciar',
+    '🌋 Islandia: Volcanes activos',
+    '🏜️ Namibia: Dunas 4x4',
+    '🦈 Sudáfrica: Tiburones jaula',
+  ],
+  'Contemplativo': [
+    '🧘 Bali Ubud: Templos meditación',
+    '🏔️ Himalaya: Retiros silencio',
+    '🌅 Santorini: Atardeceres paz',
+    '🏞️ Lake District: Caminatas reflexivas',
+    '🌊 Tulum: Cenotes sagrados',
+  ],
+  'Creativo': [
+    '🎨 París: Museos arte',
+    '📸 Marruecos: Fotografía color',
+    '🎪 Lisboa: Street art',
+    '🕌 Estambul: Mezquitas historia',
+    '🎭 Edimburgo: Festivales arte',
+  ],
+  'Conector': [
+    '🤝 Bali Canggu: Comunidades nómadas',
+    '🌍 Volunteer Africa: Proyectos impacto',
+    '🏘️ Porto: Vecinos hospitalarios',
+    '🎪 Burning Man: Conexiones profundas',
+    '🏝️ Koh Phangan: Retiros grupo',
+  ],
+  'Explorador': [
+    '🏔️ Mongolia: Nómadas estepas',
+    '🏜️ Antártida: Última frontera',
+    '🌋 Kamchatka: Volcanes salvaje',
+    '🗺️ Papua Guinea: Tribus remotas',
+    '🏝️ Islas Solomon: Playas vírgenes',
+  ],
+  'Eco-consciente': [
+    '🌿 Costa Rica: Biodiversidad pura',
+    '🐼 Borneo: Orangutanes sostenibles',
+    '🌊 Galápagos: Conservación marina',
+    '🏞️ Nueva Zelanda: Eco-turismo',
+    '🌱 Perú Amazonía: Comunidades indígenas',
+  ],
+  'Sanador': [
+    '💆 Glastonbury: Sanación espiritual',
+    '🧘 Rishikesh: Yoga Ganges',
+    '🌸 Jeju Corea: Baños volcánicos',
+    '🏔️ Perú Valle Sagrado: Chamanismo',
+    '🌊 Sedona: Vortex energía',
+  ],
+  'Festivo': [
+    '🍷 Río Janeiro: Carnaval samba',
+    '🍻 Múnich Oktoberfest: Cerveza fiesta',
+    '🎉 Ibiza: Clubbing legendario',
+    '🌃 Bangkok: Street food nightlife',
+    '🍝 Italia Toscana: Vinos gastronomía',
+  ],
+};
+
+// 10 Questions with 4 options, each option points to 2-3 archetypes (indices)
+const List<Map<String, dynamic>> questions = [
+  {
+    'text': '¿Qué te motiva a viajar?',
+    'options': [
+      {
+        'text': 'Transformación personal',
+        'points': [6, 1]
+      }, // Sanador, Contemplativo
+      {
+        'text': 'Diversión y placer',
+        'points': [7, 0]
+      }, // Festivo, Aventurero
+      {
+        'text': 'Conexión con otros',
+        'points': [3, 2]
+      }, // Conector, Creativo
+      {
+        'text': 'Aventura extrema',
+        'points': [0, 4]
+      }, // Aventurero, Explorador
+    ],
+    'bgColor': Colors.deepPurple,
+  },
+  {
+    'text': '¿Cómo prefieres moverte?',
+    'options': [
+      {
+        'text': 'Solo/a explorando',
+        'points': [4, 1]
+      }, // Explorador, Contemplativo
+      {
+        'text': 'Con mi pareja',
+        'points': [6, 3]
+      }, // Sanador, Conector
+      {
+        'text': 'Grupo pequeño de amigos',
+        'points': [3, 7]
+      }, // Conector, Festivo
+      {
+        'text': 'Grupo grande organizado',
+        'points': [2, 5]
+      }, // Creativo, Eco
+    ],
+    'bgColor': Colors.teal,
+  },
+  // ... (full 10)
+  {
+    'text': '¿Qué tipo de alojamiento prefieres?',
+    'options': [
+      {
+        'text': 'Tienda de campaña',
+        'points': [0, 4, 5]
+      }, // Aventurero, Explorador, Eco
+      {
+        'text': 'Hostel social',
+        'points': [3, 7]
+      }, // Conector, Festivo
+      'Hotel boutique', [2, 6], // Creativo, Sanador
+      'Villa de lujo', [1, 7], // Contemplativo, Festivo
+    ],
+    'bgColor': Colors.orange,
+  },
+  {
+    'text': '¿Qué actividad te emociona más?',
+    'options': [
+      {
+        'text': 'Senderismo extremo',
+        'points': [0, 4]
+      },
+      'Meditación guiada',
+      [1, 6],
+      'Visitar museos',
+      [2],
+      'Ir de fiestas',
+      [7, 3],
+    ],
+    'bgColor': Colors.green,
+  },
+  {
+    'text': '¿Cómo planificas tu viaje?',
+    'options': [
+      {
+        'text': 'Totalmente improvisado',
+        'points': [4, 0]
+      },
+      'Poco planificado',
+      [1, 6],
+      'Moderadamente organizado',
+      [2, 5],
+      'Todo planificado',
+      [3, 7],
+    ],
+    'bgColor': Colors.indigo,
+  },
+  {
+    'text': '¿Qué paisaje te llama más?',
+    'options': [
+      {
+        'text': 'Montañas desafiantes',
+        'points': [0, 4]
+      },
+      'Mar tranquilo',
+      [1, 6],
+      'Ciudades vibrantes',
+      [2, 7],
+      'Selva misteriosa',
+      [5],
+    ],
+    'bgColor': Colors.blue,
+  },
+  {
+    'text': '¿Qué defines como éxito en un viaje?',
+    'options': [
+      {
+        'text': 'Fotos increíbles',
+        'points': [2, 0]
+      },
+      'Nuevos amigos',
+      [3],
+      'Paz interior',
+      [1, 6],
+      'Aprendizaje profundo',
+      [5, 4],
+    ],
+    'bgColor': Colors.amber,
+  },
+  {
+    'text': '¿Cuánto tiempo libre necesitas?',
+    'options': [
+      {
+        'text': 'Nada, acción total',
+        'points': [0, 7]
+      },
+      'Poco, equilibrio',
+      [3, 2],
+      'Bastante, contemplación',
+      [1, 6],
+      'Todo el tiempo libre',
+      [4, 5],
+    ],
+    'bgColor': Colors.pink,
+  },
+  {
+    'text': '¿Qué comes en tus viajes?',
+    'options': [
+      {
+        'text': 'Comida local auténtica',
+        'points': [4, 2]
+      },
+      'Opciones veganas sostenibles',
+      [5, 1],
+      'Internacional gourmet',
+      [7],
+      'Lo que sea disponible',
+      [0, 3],
+    ],
+    'bgColor': Colors.brown,
+  },
+  {
+    'text': '¿Cómo terminas un viaje?',
+    'options': [
+      {
+        'text': 'Agotado pero feliz',
+        'points': [0, 7]
+      },
+      'Renovado espiritualmente',
+      [6, 1],
+      'Inspirado creativamente',
+      [2],
+      'Con nuevos amigos',
+      [3, 4],
+    ],
+    'bgColor': Colors.red,
+  },
+];
 
 class EmotionalPreferencesQuizScreen extends StatefulWidget {
+  const EmotionalPreferencesQuizScreen({super.key});
+
   @override
   State<EmotionalPreferencesQuizScreen> createState() =>
       _EmotionalPreferencesQuizScreenState();
 }
 
 class _EmotionalPreferencesQuizScreenState
-    extends State<EmotionalPreferencesQuizScreen> {
-  final PageController _pageController = PageController();
-  int _currentQuestion = 0;
-  Map<String, int> _scores = {
-    'conexion': 0,
-    'transformacion': 0,
-    'aventura': 0,
-    'reflexion': 0,
-    'aprendizaje': 0,
+    extends State<EmotionalPreferencesQuizScreen>
+    with TickerProviderStateMixin {
+  late PageController _pageController;
+  late AnimationController _animController;
+  late ConfettiController _confettiController;
+  int currentIndex = 0;
+  List<int> selectedOptions = List.filled(questions.length, -1);
+  Map<String, int> points = {
+    for (int i = 0; i < archetypes.length; i++) archetypes[i]['name']: 0
   };
-
-  final List<QuizQuestion> questions = [
-    QuizQuestion(
-      question: '¿Qué buscas cuando viajas?',
-      answers: [
-        QuizAnswer('Conectar con nuevas personas y culturas', 'conexion'),
-        QuizAnswer('Transformar mi perspectiva de la vida', 'transformacion'),
-        QuizAnswer('Vivir aventuras y emociones fuertes', 'aventura'),
-        QuizAnswer(
-            'Reflexionar y encontrar paz interior', 'reflexion'),
-      ],
-    ),
-    QuizQuestion(
-      question: '¿Qué tipo de experiencia te impacta más?',
-      answers: [
-        QuizAnswer('Momentos auténticos con gente local', 'conexion'),
-        QuizAnswer('Epifanías que cambian mi forma de pensar', 'transformacion'),
-        QuizAnswer('Hazañas que me sacan de mi zona de confort', 'aventura'),
-        QuizAnswer('Silencio y contemplación de la belleza', 'reflexion'),
-      ],
-    ),
-    QuizQuestion(
-      question: '¿Cuándo sabes que un viaje fue exitoso?',
-      answers: [
-        QuizAnswer(
-            'Cuando he hecho amigos que durarán para siempre',
-            'conexion'),
-        QuizAnswer('Cuando regreso siendo una persona diferente',
-            'transformacion'),
-        QuizAnswer('Cuando he hecho cosas que no pensé posibles',
-            'aventura'),
-        QuizAnswer(
-            'Cuando tengo claridad sobre quién soy realmente',
-            'reflexion'),
-      ],
-    ),
-    QuizQuestion(
-      question: '¿Qué emociones buscas sentir?',
-      answers: [
-        QuizAnswer('Pertenencia y comunidad', 'conexion'),
-        QuizAnswer('Renovación y esperanza', 'transformacion'),
-        QuizAnswer('Adrenalina y emoción', 'aventura'),
-        QuizAnswer('Asombro y gratitud', 'reflexion'),
-      ],
-    ),
-    QuizQuestion(
-      question: '¿Cuál es tu mayor miedo en un viaje?',
-      answers: [
-        QuizAnswer(
-            'Sentirme solo y desconectado', 'conexion'),
-        QuizAnswer('Que nada cambie en mí', 'transformacion'),
-        QuizAnswer('Que sea aburrido o sin desafíos', 'aventura'),
-        QuizAnswer('No tener tiempo para reflexionar', 'reflexion'),
-      ],
-    ),
-    QuizQuestion(
-      question: '¿Qué rol juegas en un grupo de viaje?',
-      answers: [
-        QuizAnswer('El que conecta y hace amigos', 'conexion'),
-        QuizAnswer('El que cuestiona y busca significado', 'transformacion'),
-        QuizAnswer('El que propone actividades audaces', 'aventura'),
-        QuizAnswer('El que observa y reflexiona en silencio', 'reflexion'),
-      ],
-    ),
-    QuizQuestion(
-      question: '¿Cuál es tu ideal de un recuerdo de viaje?',
-      answers: [
-        QuizAnswer(
-            'Una foto con amigos que hice en el camino',
-            'conexion'),
-        QuizAnswer(
-            'Un diario lleno de reflexiones personales',
-            'transformacion'),
-        QuizAnswer('Un video de una hazaña increíble', 'aventura'),
-        QuizAnswer('Una sensación indescriptible en el pecho',
-            'reflexion'),
-      ],
-    ),
-    QuizQuestion(
-      question: '¿Cómo prefieres aprender del viaje?',
-      answers: [
-        QuizAnswer(
-            'Conversando profundamente con locales',
-            'conexion'),
-        QuizAnswer(
-            'Enfrentando mis miedos y limitaciones',
-            'transformacion'),
-        QuizAnswer('Probando actividades nuevas y extremas',
-            'aventura'),
-        QuizAnswer('Observando la naturaleza y la cultura',
-            'reflexion'),
-      ],
-    ),
-  ];
+  String? _archetype;
+  Future<List<String>>? _destinationsFuture;
+  Color? _bgColor = questions[0]['bgColor'];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Descubre Tu Viajero Interior'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Column(
-        children: [
-          // Progress indicator
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Pregunta ${_currentQuestion + 1} de ${questions.length}',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                    Text(
-                      '${((_currentQuestion + 1) / questions.length * 100).toStringAsFixed(0)}%',
-                      style: TextStyle(
-                        color: Colors.deepPurple,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: (_currentQuestion + 1) / questions.length,
-                    minHeight: 6,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.deepPurple,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 12),
-                SmoothPageIndicator(
-                  controller: _pageController,
-                  count: questions.length,
-                  effect: ExpandingDotsEffect(
-                    dotHeight: 6,
-                    dotWidth: 6,
-                    activeDotColor: Colors.deepPurple,
-                    dotColor: Colors.grey[300]!,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Questions
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentQuestion = index;
-                });
-              },
-              itemCount: questions.length,
-              itemBuilder: (context, index) {
-                return _buildQuestion(questions[index]);
-              },
-            ),
-          ),
-
-          // Navigation
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Row(
-              children: [
-                if (_currentQuestion > 0)
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        _pageController.previousPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Text('Atrás'),
-                    ),
-                  ),
-                if (_currentQuestion > 0) SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _currentQuestion < questions.length - 1
-                        ? () {
-                            _pageController.nextPage(
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        : () {
-                            _showResults();
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Text(
-                      _currentQuestion < questions.length - 1
-                          ? 'Siguiente'
-                          : 'Ver Resultados',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _animController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 3));
+    _bgColor = questions[0]['bgColor'] as Color?;
   }
 
-  Widget _buildQuestion(QuizQuestion question) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 16),
-            Text(
-              question.question,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                height: 1.4,
-              ),
-            ),
-            SizedBox(height: 32),
-            Column(
-              children: question.answers
-                  .map((answer) => _buildAnswerButton(answer))
-                  .toList(),
-            ),
-          ],
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _animController.dispose();
+    _confettiController.dispose();
+    super.dispose();
   }
 
-  Widget _buildAnswerButton(QuizAnswer answer) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12),
-      child: ElevatedButton(
-        onPressed: () {
-          setState(() {
-            _scores[answer.category] =
-                (_scores[answer.category] ?? 0) + 1;
-          });
-          if (_currentQuestion < questions.length - 1) {
-            _pageController.nextPage(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          } else {
-            _showResults();
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepPurple,
-          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-          alignment: Alignment.centerLeft,
-        ),
-        child: Text(
-          answer.text,
-          textAlign: TextAlign.left,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.white,
-            height: 1.4,
-          ),
-        ),
-      ),
-    );
+  void selectOption(int questionIndex, int optionIndex) {
+    setState(() {
+      selectedOptions[questionIndex] = optionIndex;
+    });
+
+    // Add points
+    final optPoints =
+        ((questions[questionIndex]['options'] as List)[optionIndex]['points'] ??
+            []) as List<int>;
+    for (int idx in optPoints) {
+      final name = archetypes[idx]['name'] as String;
+      points[name] = (points[name] ?? 0) + 1;
+    }
+
+    if (currentIndex < questions.length - 1) {
+      final nextColor = questions[currentIndex + 1]['bgColor'] as Color;
+      _bgColor = nextColor;
+      _pageController.nextPage(
+          duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+    } else {
+      _showResults();
+    }
   }
 
   void _showResults() {
-    // Encontrar la categoría con mayor puntuación
-    String topCategory = _scores.entries
-        .reduce((a, b) => a.value > b.value ? a : b)
-        .key;
+    // Compute top
+    final topArchetypes = points.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final primary = topArchetypes[0].key;
+    _archetype = primary;
+    _destinationsFuture = _getAIDestinations(primary);
+    AnalyticsService.logQuizCompleted(primary);
+    setState(() {});
 
-    Map<String, Map<String, dynamic>> results = {
-      'conexion': {
-        'title': 'El Viajero Conector 💕',
-        'description':
-            'Buscas establecer conexiones auténticas con otras personas y culturas. Para ti, los viajes son sobre crear relaciones significativas y sentir que perteneces a comunidades alrededor del mundo.',
-        'recommendation':
-            'Te recomendamos experiencias de voluntariado, homestays, talleres con artesanos locales y actividades en grupo donde puedas conocer gente genuina.',
-        'color': Color(0xFFE91E63),
-      },
-      'transformacion': {
-        'title': 'El Viajero Transformado 🦋',
-        'description':
-            'Los viajes son tu herramienta de crecimiento personal. Buscas experiencias que desafíen tu perspectiva y te ayuden a convertirte en una versión mejorada de ti mismo.',
-        'recommendation':
-            'Considera retiros de reflexión, viajes de autoconocimiento, meditación, talleres de desarrollo personal y experiencias que toquen tu alma profundamente.',
-        'color': Color(0xFF9C27B0),
-      },
-      'aventura': {
-        'title': 'El Viajero Aventurero ⚡',
-        'description':
-            'Buscas adrenalina, desafíos y hazañas que prueben tus límites. Para ti, un viaje memorable es aquel donde experimentas lo extraordinario y lo imposible.',
-        'recommendation':
-            'Explora expediciones de trekking, deportes extremos, montañismo, safaris y actividades que te saquen de tu zona de confort.',
-        'color': Color(0xFFFF6F00),
-      },
-      'reflexion': {
-        'title': 'El Viajero Contemplativo 🌅',
-        'description':
-            'Viajas para encontrar paz, claridad y conexión con la belleza del mundo. Los momentos de silencio y contemplación son tan valiosos para ti como las actividades.',
-        'recommendation':
-            'Opta por retiros espirituales, viajes a la naturaleza, santuarios, viajes de fotografía artística y experiencias culturales sin prisa.',
-        'color': Color(0xFF00BCD4),
-      },
-      'aprendizaje': {
-        'title': 'El Viajero Aprendiz 📚',
-        'description':
-            'Tienes sed de conocimiento y quieres aprender profundamente sobre las culturas, historias y tradiciones del mundo. Para ti, viajar es una educación permanente.',
-        'recommendation':
-            'Explora viajes académicos, visitas a museos, talleres especializados, tours con historiadores y experiencias educativas profundas.',
-        'color': Color(0xFF4CAF50),
-      },
-    };
+    // Save archetype to Firestore
+    final authController = Get.find<AuthController>();
+    if (authController.user != null) {
+      final uid = authController.user!.uid;
+      final archetypeData = archetypes.firstWhere((a) => a['name'] == primary);
+      FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'archetype': primary,
+        'archetypeEmoji': archetypeData['emoji'],
+      }, SetOptions(merge: true));
+    }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => QuizResultsScreen(
-          category: topCategory,
-          resultData: results[topCategory]!,
+    _confettiController.play();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.transparent,
+        contentPadding: EdgeInsets.zero,
+        content: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+                colors: [Colors.purple, Colors.deepPurple]),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ConfettiWidget(confettiController: _confettiController),
+              Text('¡Tu perfil $_archetype!',
+                  style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white)),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...topArchetypes.take(2).map((e) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Column(
+                          children: [
+                            Text(
+                              archetypes.firstWhere(
+                                (a) => a['name'] == e.key,
+                                orElse: () => {'emoji': '🌍'},
+                              )['emoji'] as String,
+                              style: const TextStyle(fontSize: 40),
+                            ),
+                            Text(
+                              '${e.value} puntos',
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  Get.offAllNamed('/home');
+                },
+                icon: const Icon(Icons.explore),
+                label: const Text('Explorar viajes para mí'),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.deepPurple),
+              ),
+              const SizedBox(height: 8),
+              if (_destinationsFuture != null)
+                FutureBuilder<List<String>>(
+                  future: _destinationsFuture,
+                  builder: (ctx, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            const Text('✨ Consultando IA...',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18)),
+                            const SizedBox(height: 16),
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    if (snapshot.hasError || !snapshot.hasData) {
+                      return Column(
+                        children: [
+                          const Text('No se pudieron cargar destinos',
+                              style: TextStyle(color: Colors.white70)),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _destinationsFuture =
+                                    _getAIDestinations(_archetype!);
+                              });
+                            },
+                            child: const Text('Reintentar',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      );
+                    }
+                    final destinations = snapshot.data!;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Destinos para ti:',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 12),
+                        ...destinations.map((dest) => AnimatedOpacity(
+                              opacity: 1.0,
+                              duration: const Duration(milliseconds: 300),
+                              child: Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 8),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.3),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.3)),
+                                ),
+                                child: Text(dest,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 16)),
+                              ),
+                            )),
+                        const SizedBox(height: 16),
+                      ],
+                    );
+                  },
+                ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Refacer quiz',
+                    style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-class QuizQuestion {
-  final String question;
-  final List<QuizAnswer> answers;
+  Future<List<String>> _getAIDestinations(String archetype) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.anthropic.com/v1/messages'),
+        headers: {
+          'x-api-key': const String.fromEnvironment('ANTHROPIC_API_KEY'),
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'model': 'claude-haiku-4-5-20251001',
+          'max_tokens': 500,
+          'messages': [
+            {
+              'role': 'user',
+              'content':
+                  'Soy un viajero tipo $archetype. Recomiéndame exactamente 5 destinos con una línea cada uno. Formato: emoji Destino: descripción. Solo la lista.'
+            }
+          ],
+        }),
+      );
 
-  QuizQuestion({
-    required this.question,
-    required this.answers,
-  });
-}
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final content = data['content'][0]['text'] as String;
+        return content
+            .split('\n')
+            .where((line) => line.trim().isNotEmpty)
+            .take(5)
+            .toList();
+      }
+    } catch (e) {
+      debugPrint('AI destinations error: $e');
+    }
 
-class QuizAnswer {
-  final String text;
-  final String category;
-
-  QuizAnswer(this.text, this.category);
-}
-
-class QuizResultsScreen extends StatelessWidget {
-  final String category;
-  final Map<String, dynamic> resultData;
-
-  const QuizResultsScreen({
-    required this.category,
-    required this.resultData,
-  });
+    // Fallback
+    return _staticDestinations[archetype] ??
+        [
+          '🌍 Destino 1: Increíble experiencia',
+          '🏔️ Destino 2: Aventura única',
+          '🌅 Destino 3: Paz total',
+          '🎉 Destino 4: Fiesta inolvidable',
+          '🧘 Destino 5: Transformación personal',
+        ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Tu Perfil de Viajero'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Hero section
-            Container(
-              color: resultData['color'],
-              padding: EdgeInsets.all(32),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  Text(
-                    resultData['title'],
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              (_bgColor ?? Colors.deepPurple).withValues(alpha: 0.8),
+              (_bgColor ?? Colors.deepPurple).withValues(alpha: 0.3)
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    LinearProgressIndicator(
+                      value: (currentIndex + 1) / questions.length,
+                      backgroundColor: Colors.white24,
+                      valueColor:
+                          const AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 24),
-                  Icon(
-                    Icons.favorite,
-                    size: 64,
-                    color: Colors.white,
-                  ),
-                ],
+                    const SizedBox(height: 20),
+                    Text(
+                      '${currentIndex + 1}/${questions.length}',
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ],
+                ),
               ),
-            ),
-
-            SizedBox(height: 24),
-
-            // Descripción
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Quién eres como viajero',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    resultData['description'],
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 1.6,
-                      color: Colors.grey[800],
-                    ),
-                  ),
-
-                  SizedBox(height: 24),
-
-                  Text(
-                    'Viajes perfectos para ti',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    resultData['recommendation'],
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 1.6,
-                      color: Colors.grey[800],
-                    ),
-                  ),
-
-                  SizedBox(height: 32),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: EdgeInsets.symmetric(vertical: 16),
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (idx) {
+                    setState(() {
+                      currentIndex = idx;
+                    });
+                  },
+                  itemCount: questions.length,
+                  itemBuilder: (ctx, idx) {
+                    final q = questions[idx];
+                    final options = q['options'] as List;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            q['text'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 60),
+                          ...options.asMap().entries.map((entry) {
+                            final optIdx = entry.key;
+                            final opt = entry.value;
+                            final selected = selectedOptions[idx] == optIdx;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: GestureDetector(
+                                onTap: () => selectOption(idx, optIdx),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20, horizontal: 24),
+                                  decoration: BoxDecoration(
+                                    color: selected
+                                        ? Colors.white
+                                        : Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                        color: Colors.white.withValues(
+                                            alpha: selected ? 0.5 : 0.3)),
+                                    boxShadow: selected
+                                        ? [
+                                            BoxShadow(
+                                                color: Colors.white
+                                                    .withValues(alpha: 0.3),
+                                                blurRadius: 20,
+                                                spreadRadius: 0)
+                                          ]
+                                        : [],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Text(opt['text'],
+                                          style: TextStyle(
+                                              color: selected
+                                                  ? Colors.deepPurple
+                                                  : Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600)),
+                                      const Spacer(),
+                                      Icon(Icons.arrow_forward_ios,
+                                          color: selected
+                                              ? Colors.deepPurple
+                                              : Colors.white
+                                                  .withValues(alpha: 0.7)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       ),
-                      child: Text(
-                        'Ver Viajes Recomendados',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 32),
-                ],
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

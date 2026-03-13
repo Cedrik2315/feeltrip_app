@@ -1,13 +1,19 @@
-import 'package:share_plus/share_plus.dart';
+﻿import 'package:share_plus/share_plus.dart';
+
+import '../core/app_logger.dart';
+import 'deep_link_service.dart';
 
 class SharingService {
   /// Compartir historia a WhatsApp
   static Future<void> shareToWhatsApp({
     required String storyTitle,
     required String storyDescription,
-    required String deepLink,
+    required String storyId,
   }) async {
     try {
+      // Generate dynamic deep link with preview
+      final deepLink = await DeepLinkService().createStoryLink(storyId);
+
       final message =
           '📸 $storyTitle\n\n$storyDescription\n\n✨ Descubre más historias en FeelTrip:\n$deepLink';
 
@@ -16,9 +22,9 @@ class SharingService {
         subject: '¡Mira esta historia en FeelTrip!',
       );
 
-      print('✅ Compartido a WhatsApp exitosamente');
+      AppLogger.debug('Compartido a WhatsApp exitosamente: $deepLink');
     } catch (e) {
-      print('❌ Error compartiendo: $e');
+      AppLogger.debug('Error compartiendo: $e');
       rethrow;
     }
   }
@@ -27,9 +33,12 @@ class SharingService {
   static Future<void> shareToFacebook({
     required String storyTitle,
     required String storyDescription,
-    required String deepLink,
+    required String storyId,
   }) async {
     try {
+      // Generate dynamic deep link with preview
+      final deepLink = await DeepLinkService().createStoryLink(storyId);
+
       final message =
           '🌍 $storyTitle\n\n$storyDescription\n\n🎒 FeelTrip: Conecta con viajeros\n$deepLink';
 
@@ -38,9 +47,9 @@ class SharingService {
         subject: '¡Comparte esta aventura!',
       );
 
-      print('✅ Compartido a Facebook exitosamente');
+      AppLogger.debug('Compartido a Facebook exitosamente: $deepLink');
     } catch (e) {
-      print('❌ Error compartiendo: $e');
+      AppLogger.debug('Error compartiendo: $e');
       rethrow;
     }
   }
@@ -48,16 +57,19 @@ class SharingService {
   /// Compartir historia a TikTok (mediante link)
   static Future<void> shareToTikTok({
     required String storyTitle,
-    required String deepLink,
+    required String storyId,
   }) async {
     try {
+      // Generate dynamic deep link with preview
+      final deepLink = await DeepLinkService().createStoryLink(storyId);
+
       final message = '🎬 $storyTitle\n\nMira esto en FeelTrip:\n$deepLink';
 
       await Share.share(message, subject: '¡Mira en FeelTrip!');
 
-      print('✅ Compartido a TikTok exitosamente');
+      AppLogger.debug('Compartido a TikTok exitosamente: $deepLink');
     } catch (e) {
-      print('❌ Error compartiendo: $e');
+      AppLogger.debug('Error compartiendo: $e');
       rethrow;
     }
   }
@@ -76,20 +88,33 @@ class SharingService {
         subject: 'Comparte desde FeelTrip',
       );
 
-      print('✅ Compartido exitosamente');
+      AppLogger.debug('Compartido exitosamente');
     } catch (e) {
-      print('❌ Error compartiendo: $e');
+      AppLogger.debug('Error compartiendo: $e');
       rethrow;
     }
   }
 
+  static Future<void> shareDiaryEntry({
+    required String title,
+    required String content,
+  }) async {
+    final message = '📝 $title\n\n$content\n\nFeelTrip: https://feeltrip.app';
+    await Share.share(message, subject: 'Mi diario en FeelTrip');
+  }
+
   /// Generar deep link a una historia
-  static String generateStoryDeepLink(String storyId) {
-    return 'https://feeltrip.app/story/$storyId';
+  static Future<String> generateStoryDeepLink(String storyId) async {
+    return DeepLinkService().createStoryLink(storyId);
   }
 
   /// Generar deep link a un perfil de agencia
-  static String generateAgencyDeepLink(String agencyId) {
-    return 'https://feeltrip.app/agency/$agencyId';
+  static Future<String> generateAgencyDeepLink(String agencyId) async {
+    return DeepLinkService().createAgencyLink(agencyId);
+  }
+
+  /// Generar link de referido
+  static Future<String> generateReferralLink(String referralCode) async {
+    return DeepLinkService().createReferralLink(referralCode);
   }
 }

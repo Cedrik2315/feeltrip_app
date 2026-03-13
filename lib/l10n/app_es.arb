@@ -1,0 +1,15 @@
+{
+  "appTitle": "FeelTrip App",
+  "homeTitle": "FeelTrip - Viajes transformadores",
+  "loginTitle": "Iniciar sesión",
+  "emailLabel": "Email",
+  "passwordLabel": "Contraseña",
+  "loginButton": "Entrar",
+  "diaryTitle": "FeelTrip - Diario IA",
+  "diaryPrompt": "¿Qué descubriste hoy?",
+  "diaryHint": "Escribe tus pensamientos aquí...",
+  "diaryAnalyze": "Analizar y guardar en la nube",
+  "diarySaved": "Viaje guardado en tu historial privado",
+  "historyTitle": "Mis viajes emocionales",
+  "historyEmpty": "Aún no tienes registros de viaje."
+}

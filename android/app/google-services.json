@@ -12,7 +12,28 @@
           "package_name": "com.example.feeltrip_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "315728939057-20go5k517efskh6hoh2kbd3bigvgnfdt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.feeltrip_app",
+            "certificate_hash": "ede659402385f12bcc06fe51b1c31c7541f87c85"
+          }
+        },
+        {
+          "client_id": "315728939057-iabdkn9bt98lqsad9nsu7n3g8mq100np.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.feeltrip_app",
+            "certificate_hash": "efc62dcd6bd927a18db952ad6194b0f474b1324e"
+          }
+        },
+        {
+          "client_id": "315728939057-mq4eckidcmrtlnsb3d68dfi3qg2dcr88.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAfg-_6MyMO_CNZ9R2GUSMbaeudlXV96eY"
@@ -20,7 +41,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "315728939057-mq4eckidcmrtlnsb3d68dfi3qg2dcr88.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "315728939057-kiuca6mgaukqavpjvego4nntjntmo86g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.feeltripApp"
+              }
+            }
+          ]
         }
       }
     }

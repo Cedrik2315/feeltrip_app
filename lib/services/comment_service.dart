@@ -1,54 +1,28 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 import '../models/comment_model.dart';
-import '../mock_data.dart';
 
 class CommentService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static bool useMockData = true; // CAMBIAR A FALSE CUANDO FIRESTORE ESTÉ LISTO
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// Crear un nuevo comentario
-  Future<void> addComment({
-    required String storyId,
-    required String userId,
-    required String userName,
-    required String userAvatar,
-    required String content,
-  }) async {
+  Future<void> addComment(String storyId, String content) async {
     try {
-      if (useMockData) {
-        // MOCK: Simular guardar en mock_data
-        final commentId = const Uuid().v4();
-        final newComment = {
-          'id': commentId,
-          'storyId': storyId,
-          'userId': userId,
-          'userName': userName,
-          'userAvatar': userAvatar,
-          'content': content,
-          'reactions': [],
-          'createdAt': Timestamp.now(),
-          'likes': 0,
-        };
-        
-        MockData.mockComments.putIfAbsent(storyId, () => []);
-        MockData.mockComments[storyId]!.insert(0, newComment);
-        print('✅ [MOCK] Comentario agregado: $commentId');
-        return;
-      }
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not logged in');
 
-      // FIRESTORE REAL (cuando esté disponible)
       final commentId = const Uuid().v4();
       final comment = Comment(
         id: commentId,
         storyId: storyId,
-        userId: userId,
-        userName: userName,
-        userAvatar: userAvatar,
+        userId: user.uid,
+        userName: user.displayName ?? 'Anonymous',
+        userAvatar: user.photoURL ?? '',
         content: content,
         reactions: [],
-        createdAt: DateTime.now(),
         likes: 0,
+        createdAt: DateTime.now(),
       );
 
       await _firestore
@@ -56,39 +30,13 @@ class CommentService {
           .doc(storyId)
           .collection('comments')
           .doc(commentId)
-          .set(comment.toFirestore());
-
-      print('✅ Comentario agregado a Firestore: $commentId');
+          .set(comment.toMap());
     } catch (e) {
-      print('❌ Error agregando comentario: $e');
-      rethrow;
+      throw Exception('Failed to add comment: \$e');
     }
   }
 
-  /// Obtener comentarios de una historia
   Stream<List<Comment>> getComments(String storyId) {
-    if (useMockData) {
-      // MOCK: Retornar datos mock como stream
-      final mockCommentsList = MockData.mockComments[storyId] ?? [];
-      final comments = mockCommentsList.map((data) {
-        return Comment(
-          id: data['id'],
-          storyId: data['storyId'],
-          userId: data['userId'],
-          userName: data['userName'],
-          userAvatar: data['userAvatar'],
-          content: data['content'],
-          reactions: List<String>.from(data['reactions']),
-          createdAt: data['createdAt'].toDate(),
-          likes: data['likes'],
-        );
-      }).toList();
-      
-      // Retornar como Stream (simulando Firestore)
-      return Stream.value(comments);
-    }
-
-    // FIRESTORE REAL
     return _firestore
         .collection('stories')
         .doc(storyId)
@@ -100,49 +48,7 @@ class CommentService {
             .toList());
   }
 
-  /// Agregar reacción a un comentario
-  Future<void> addReaction({
-    required String storyId,
-    required String commentId,
-    required String reaction, // '❤️', '😂', '🔥', etc
-  }) async {
-    try {
-      if (useMockData) {
-        // MOCK: Agregar reacción al mock data
-        final comments = MockData.mockComments[storyId] ?? [];
-        final comment = comments.firstWhere((c) => c['id'] == commentId, orElse: () => {});
-        if (comment.isNotEmpty) {
-          final reactions = List<String>.from(comment['reactions']);
-          reactions.add(reaction);
-          comment['reactions'] = reactions;
-          print('✅ [MOCK] Reacción agregada: $reaction');
-        }
-        return;
-      }
-
-      // FIRESTORE REAL
-      final docRef = _firestore
-          .collection('stories')
-          .doc(storyId)
-          .collection('comments')
-          .doc(commentId);
-
-      await docRef.update({
-        'reactions': FieldValue.arrayUnion([reaction])
-      });
-
-      print('✅ Reacción agregada: $reaction');
-    } catch (e) {
-      print('❌ Error agregando reacción: $e');
-      rethrow;
-    }
-  }
-
-  /// Dar like a un comentario
-  Future<void> likeComment({
-    required String storyId,
-    required String commentId,
-  }) async {
+  Future<void> likeComment(String storyId, String commentId) async {
     try {
       await _firestore
           .collection('stories')
@@ -150,33 +56,48 @@ class CommentService {
           .collection('comments')
           .doc(commentId)
           .update({
-        'likes': FieldValue.increment(1)
-      });
-
-      print('✅ Like agregado al comentario');
+            'likes': FieldValue.increment(1),
+          });
     } catch (e) {
-      print('❌ Error dando like: $e');
-      rethrow;
+      throw Exception('Failed to like comment: \$e');
     }
   }
 
-  /// Eliminar comentario
-  Future<void> deleteComment({
-    required String storyId,
-    required String commentId,
-  }) async {
+  Future<void> addReaction(String storyId, String commentId, String emoji) async {
     try {
       await _firestore
           .collection('stories')
           .doc(storyId)
           .collection('comments')
           .doc(commentId)
-          .delete();
-
-      print('✅ Comentario eliminado');
+          .update({
+            'reactions': FieldValue.arrayUnion([emoji]),
+          });
     } catch (e) {
-      print('❌ Error eliminando comentario: $e');
-      rethrow;
+      throw Exception('Failed to add reaction: \$e');
+    }
+  }
+
+  Future<void> deleteComment(String storyId, String commentId) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not logged in');
+
+      final doc = await _firestore
+          .collection('stories')
+          .doc(storyId)
+          .collection('comments')
+          .doc(commentId)
+          .get();
+
+      final comment = Comment.fromFirestore(doc);
+      if (comment.userId != user.uid) {
+        throw Exception('You can only delete your own comments');
+      }
+
+      await doc.reference.delete();
+    } catch (e) {
+      throw Exception('Failed to delete comment: \$e');
     }
   }
 }

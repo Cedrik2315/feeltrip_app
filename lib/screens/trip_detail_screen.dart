@@ -1,479 +1,634 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:intl/intl.dart';
+﻿﻿import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:get/get.dart';
+
+import '../services/destination_service.dart';
 import '../models/trip_model.dart';
-import '../models/booking_model.dart';
-import '../services/api_service.dart';
+import '../services/analytics_service.dart';
+import '../constants/strings.dart';
+import '../controllers/cart_controller.dart';
+import '../widgets/affiliate_widget.dart';
 
 class TripDetailScreen extends StatefulWidget {
   final String tripId;
 
-  const TripDetailScreen({required this.tripId});
+  const TripDetailScreen({super.key, required this.tripId});
 
   @override
   State<TripDetailScreen> createState() => _TripDetailScreenState();
 }
 
 class _TripDetailScreenState extends State<TripDetailScreen> {
-  late Future<Trip> _trip;
-  final ApiService _apiService = ApiService();
-  int _selectedPeople = 1;
-  bool _isFavorite = false;
+  late Future<Trip?> _tripFuture;
+  List<String> _unsplashImages = [];
+  final CartController _cartController = Get.find();
+  bool _isDescriptionExpanded = false;
+
+  // Mock data para el itinerario
+  final List<Map<String, String>> _mockItinerary = [
+    {
+      'day': '1',
+      'title': 'Llegada y Bienvenida',
+      'description':
+          'Recepción en el aeropuerto y traslado al hotel. Cena de bienvenida para conocer al grupo.'
+    },
+    {
+      'day': '2',
+      'title': 'Exploración de la Ciudad',
+      'description':
+          'Tour guiado por los principales puntos históricos y culturales.'
+    },
+    {
+      'day': '3',
+      'title': 'Aventura en la Naturaleza',
+      'description':
+          'Excursión a la reserva natural, con senderismo y observación de fauna.'
+    },
+    {
+      'day': '4',
+      'title': 'Día de Reflexión',
+      'description':
+          'Talleres de mindfulness y yoga. Tarde libre para exploración personal.'
+    },
+    {
+      'day': '5',
+      'title': 'Cena de Despedida',
+      'description':
+          'Cena de despedida para compartir las experiencias del viaje.'
+    },
+  ];
 
   @override
   void initState() {
     super.initState();
-    _trip = _apiService.getTripDetails(widget.tripId);
+    _tripFuture = _fetchTripDetails();
+    _tripFuture.then((trip) async {
+      if (trip != null && mounted) {
+        AnalyticsService.logViewTrip(trip.id, trip.destination);
+        if (trip.images.isEmpty) {
+          final imgs =
+              await DestinationService.getDestinationPhotos(trip.destination);
+          if (mounted) {
+            setState(() {
+              _unsplashImages = imgs;
+            });
+          }
+        }
+      }
+    });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<Trip>(
-      future: _trip,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            appBar: AppBar(title: Text('Detalles del Viaje')),
-            body: Center(child: CircularProgressIndicator()),
-          );
-        } else if (snapshot.hasError) {
-          return Scaffold(
-            appBar: AppBar(title: Text('Error')),
-            body: Center(child: Text('Error: ${snapshot.error}')),
-          );
-        } else if (!snapshot.hasData) {
-          return Scaffold(
-            appBar: AppBar(title: Text('No encontrado')),
-            body: Center(child: Text('Viaje no encontrado')),
-          );
-        }
+  Future<Trip?> _fetchTripDetails() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('trips')
+          .doc(widget.tripId)
+          .get();
 
-        final trip = snapshot.data!;
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data()!;
+        data['id'] = docSnapshot.id;
+        return Trip.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Error fetching trip: $e");
+      return null;
+    }
+  }
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Detalles del Viaje'),
-            backgroundColor: Colors.deepPurple,
-            actions: [
-              IconButton(
-                icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
-                onPressed: () {
-                  setState(() {
-                    _isFavorite = !_isFavorite;
-                  });
-                },
-              ),
+  Widget _buildStatsRow(Trip trip, BuildContext context) {
+    const duration = 5;
+    const groupSize = "4-10";
+    const rating = 4.8;
+
+    Widget buildStatCard(IconData icon, String label, String value) {
+      return Card(
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 50 / 255),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+          child: Column(
+            children: [
+              Icon(icon, color: Colors.deepPurple, size: 24),
+              const SizedBox(height: 4),
+              Text(label, style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 2),
+              Text(value,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold)),
             ],
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Galería de imágenes
-                Container(
-                  height: 250,
-                  color: Colors.grey[300],
-                  child: trip.images.isNotEmpty
-                      ? PageView.builder(
-                          itemCount: trip.images.length,
-                          itemBuilder: (context, index) {
-                            return Image.network(
-                              trip.images[index],
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  Icon(Icons.image_not_supported),
-                            );
-                          },
-                        )
-                      : Icon(Icons.image_not_supported),
-                ),
+        ),
+      );
+    }
 
-                Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Título y precio
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  trip.title,
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on,
-                                        size: 18, color: Colors.grey),
-                                    SizedBox(width: 4),
-                                    Text(trip.destination),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'desde',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                '\$${trip.price.toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.deepPurple,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 16),
-
-                      // Información general
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildInfoCard(
-                            Icons.calendar_today,
-                            '${trip.duration} días',
-                            'Duración',
-                          ),
-                          _buildInfoCard(
-                            Icons.trending_up,
-                            trip.difficulty,
-                            'Dificultad',
-                          ),
-                          _buildInfoCard(
-                            Icons.people,
-                            '${trip.maxParticipants}',
-                            'Máximo',
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 20),
-
-                      // Rating
-                      Row(
-                        children: [
-                          RatingBar.builder(
-                            initialRating: trip.rating,
-                            minRating: 1,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 5,
-                            itemSize: 20,
-                            itemBuilder: (context, _) =>
-                                Icon(Icons.star, color: Colors.amber),
-                            onRatingUpdate: (_) {},
-                            ignoreGestures: true,
-                          ),
-                          SizedBox(width: 8),
-                          Text('${trip.reviews} reseñas'),
-                        ],
-                      ),
-
-                      SizedBox(height: 20),
-
-                      // Descripción
-                      Text(
-                        'Descripción',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(trip.description),
-
-                      SizedBox(height: 20),
-
-                      // Destino
-                      Text(
-                        'Destino',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(trip.country),
-
-                      SizedBox(height: 20),
-
-                      // Guía
-                      Text(
-                        'Guía',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(trip.guide),
-
-                      SizedBox(height: 20),
-
-                      // Destacados
-                      if (trip.highlights.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Destacados',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: trip.highlights
-                                  .map((highlight) => Padding(
-                                        padding: EdgeInsets.only(bottom: 8),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.check_circle,
-                                                color: Colors.green, size: 20),
-                                            SizedBox(width: 8),
-                                            Expanded(child: Text(highlight)),
-                                          ],
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
-                            SizedBox(height: 20),
-                          ],
-                        ),
-
-                      // Amenidades
-                      if (trip.amenities.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Incluye',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: trip.amenities
-                                  .map((amenity) => Chip(label: Text(amenity)))
-                                  .toList(),
-                            ),
-                            SizedBox(height: 20),
-                          ],
-                        ),
-
-                      // Fechas
-                      Text(
-                        'Fechas',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        '${DateFormat('dd/MM/yyyy').format(trip.startDate)} - ${DateFormat('dd/MM/yyyy').format(trip.endDate)}',
-                      ),
-
-                      SizedBox(height: 20),
-
-                      // Seleccionar cantidad de personas
-                      Text(
-                        'Cantidad de Viajeros',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.remove),
-                              onPressed: _selectedPeople > 1
-                                  ? () => setState(() => _selectedPeople--)
-                                  : null,
-                            ),
-                            Text(
-                              '$_selectedPeople',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.add),
-                              onPressed: _selectedPeople < trip.maxParticipants
-                                  ? () => setState(() => _selectedPeople++)
-                                  : null,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Botón de reservar
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _showBookingDialog(context, trip);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: Text(
-                            'Reservar Ahora',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 12),
-
-                      // Botón agregar al carrito
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Agregado al carrito',
-                                ),
-                              ),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.deepPurple),
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: Text(
-                            'Agregar al Carrito',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.deepPurple,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        buildStatCard(Icons.calendar_today, 'Duración', '$duration días'),
+        buildStatCard(Icons.group, 'Grupo', groupSize),
+        buildStatCard(Icons.star, 'Rating', '$rating'),
+        buildStatCard(Icons.public, 'Destino', trip.destination),
+      ],
     );
   }
 
-  Widget _buildInfoCard(IconData icon, String value, String label) {
+  Widget _buildExpandableDescription(Trip trip, BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: Colors.deepPurple, size: 28),
-        SizedBox(height: 8),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+        AnimatedCrossFade(
+          firstChild: Text(
+            trip.description,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
+          secondChild: Text(
+            trip.description,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          crossFadeState: _isDescriptionExpanded
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 300),
         ),
-        SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 12,
+        InkWell(
+          onTap: () =>
+              setState(() => _isDescriptionExpanded = !_isDescriptionExpanded),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              _isDescriptionExpanded ? 'Ver menos' : 'Ver más',
+              style: const TextStyle(
+                  color: Colors.deepPurple, fontWeight: FontWeight.bold),
+            ),
           ),
         ),
       ],
     );
   }
 
-  void _showBookingDialog(BuildContext context, Trip trip) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirmar Reserva'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Viaje: ${trip.title}'),
-            SizedBox(height: 8),
-            Text('Viajeros: $_selectedPeople'),
-            SizedBox(height: 8),
-            Text(
-              'Total: \$${(trip.price * _selectedPeople).toStringAsFixed(2)}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.deepPurple,
+  Widget _buildItinerary(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Itinerario del Viaje',
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _mockItinerary.length,
+          itemBuilder: (context, index) => _buildItineraryItem(
+              context,
+              _mockItinerary[index],
+              index == 0,
+              index == _mockItinerary.length - 1),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildItineraryItem(BuildContext context, Map<String, String> dayInfo,
+      bool isFirst, bool isLast) {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: 40,
+            child: Column(
+              children: [
+                if (!isFirst)
+                  Expanded(
+                      child: Container(
+                          width: 2, color: Colors.deepPurple.shade100)),
+                CircleAvatar(
+                  radius: 12,
+                  backgroundColor: Colors.deepPurple,
+                  child: Text(dayInfo['day']!,
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+                if (!isLast)
+                  Expanded(
+                      child: Container(
+                          width: 2, color: Colors.deepPurple.shade100)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Card(
+                elevation: 2,
+                shadowColor: Colors.black.withValues(alpha: 50 / 255),
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        dayInfo['title']!,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        dayInfo['description']!,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Reserva realizada con éxito'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-            ),
-            child: Text('Confirmar'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNearbyPlaces(String destination) {
+    const double lat = 40.4168;
+    const double lng = -3.7038;
+
+    return FutureBuilder<List<NearbyRestaurant>>(
+      future: DestinationService.getNearbyRestaurants(lat, lng),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Row(
+              children: List.generate(
+                3,
+                (index) => Container(
+                  width: 140,
+                  height: 120,
+                  margin: const EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final restaurants = snapshot.data!;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '🍽️ Lugares recomendados',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 160,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: restaurants.length,
+                  itemBuilder: (context, index) {
+                    final restaurant = restaurants[index];
+                    return Container(
+                      width: 140,
+                      margin: const EdgeInsets.only(right: 12),
+                      child: Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                restaurant.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Text('🍽️ ',
+                                      style: TextStyle(fontSize: 12)),
+                                  Expanded(
+                                    child: Text(
+                                      restaurant.category.isNotEmpty
+                                          ? restaurant.category
+                                          : 'Restaurante',
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.star,
+                                      color: Colors.amber, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    restaurant.rating != null
+                                        ? '$restaurant.rating!.toStringAsFixed(1)'
+                                        : 'N/D',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                '250 m',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder<Trip?>(
+        future: _tripFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+            return const Center(
+                child: Text('No se pudo cargar el viaje. Inténtalo de nuevo.'));
+          }
+
+          final trip = snapshot.data!;
+
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 300.0,
+                floating: false,
+                pinned: true,
+                backgroundColor: Colors.deepPurple,
+                leading: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.black.withValues(alpha: 100 / 255),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Get.back(),
+                    ),
+                  ),
+                ),
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(
+                    trip.destination,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(blurRadius: 10.0, color: Color(0x8A000000))
+                      ],
+                    ),
+                  ),
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Builder(
+                        builder: (context) {
+                          final images = trip.images.isNotEmpty
+                              ? trip.images
+                              : _unsplashImages;
+                          if (images.isEmpty) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.landscape,
+                                  color: Colors.grey, size: 100),
+                            );
+                          }
+                          return Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              CarouselSlider(
+                                options: CarouselOptions(
+                                  height: 350.0,
+                                  viewportFraction: 1.0,
+                                  autoPlay: true,
+                                ),
+                                items: images
+                                    .map((item) => CachedNetworkImage(
+                                          imageUrl: item,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                        ))
+                                    .toList(),
+                              ),
+                              if (_unsplashImages.isNotEmpty)
+                                const Positioned(
+                                  bottom: 8,
+                                  right: 8,
+                                  child: Text(
+                                    '📸 Unsplash',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          height: 150,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withValues(alpha: 200 / 255),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 60,
+                        right: 16,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.amber,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 80 / 255),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            '\$${trip.price.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          trip.title,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        if (trip.isTransformative)
+                          Chip(
+                            label: const Text(
+                                AppStrings.homeTransformativeExperience),
+                            backgroundColor: Colors.purple.shade50,
+                            labelStyle: TextStyle(
+                                color: Colors.purple.shade800,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        const SizedBox(height: 16),
+                        _buildStatsRow(trip, context),
+                        const SizedBox(height: 24),
+                        _buildExpandableDescription(trip, context),
+                        const Divider(height: 32),
+                        _buildItinerary(context),
+                        _buildNearbyPlaces(trip.destination),
+                        AffiliateWidget(destination: trip.destination),
+                      ],
+                    ),
+                  ),
+                ]),
+              ),
+            ],
+          );
+        },
+      ),
+      bottomNavigationBar: FutureBuilder<Trip?>(
+        future: _tripFuture,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const SizedBox.shrink();
+          }
+          final trip = snapshot.data!;
+          return Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 30 / 255),
+                  blurRadius: 20,
+                  offset: const Offset(0, -10),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.deepPurple, Colors.purple.shade700],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    AnalyticsService.logAddToCart(trip.id, trip.price);
+                    _cartController.addToCart(trip);
+                  },
+                  icon: const Icon(Icons.shopping_cart_outlined,
+                      color: Colors.white),
+                  label: Text('Añadir por \$${trip.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

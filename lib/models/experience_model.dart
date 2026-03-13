@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 enum ExperienceTypeEnum {
   adventure,
@@ -16,11 +17,11 @@ class ExperienceType {
   final List<String> keywords;
 
   ExperienceType({
-    required this.id,
-    required this.name,
-    required this.emoji,
-    required this.description,
-    required this.keywords,
+    this.id = '',
+    this.name = '',
+    this.emoji = '',
+    this.description = '',
+    this.keywords = const [],
   });
 }
 
@@ -35,15 +36,15 @@ class ExperienceImpact {
   final DateTime createdAt;
 
   ExperienceImpact({
-    required this.id,
-    required this.tripId,
-    required this.emotions,
-    required this.learnings,
-    required this.transformationStory,
-    required this.impactScore,
-    required this.connectedWith,
-    required this.createdAt,
-  });
+    this.id = '',
+    this.tripId = '',
+    this.emotions = const [],
+    this.learnings = const [],
+    this.transformationStory = '',
+    this.impactScore = 0,
+    this.connectedWith = const [],
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   factory ExperienceImpact.fromJson(Map<String, dynamic> json) {
     return ExperienceImpact(
@@ -101,39 +102,62 @@ class ExperienceImpact {
   }
 }
 
+class ParadaViaje {
+  String nombre;
+  LatLng posicion;
+  String? descripcion;
+  String? imagePath; // Ruta local de la foto tomada
+
+  ParadaViaje({
+    required this.nombre,
+    required this.posicion,
+    this.descripcion,
+    this.imagePath,
+  });
+}
+
 class TravelerStory {
   final String id;
+  final String userId;
   final String author;
   final String title;
   final String story;
+  final String? destination;
   final List<String> emotionalHighlights;
   final double rating;
   int likes;
   final DateTime createdAt;
+  final String? imageUrl;
 
   TravelerStory({
-    required this.id,
-    required this.author,
-    required this.title,
-    required this.story,
-    required this.emotionalHighlights,
-    required this.rating,
-    required this.likes,
-    required this.createdAt,
-  });
+    this.id = '',
+    this.userId = '',
+    this.author = '',
+    this.title = '',
+    this.story = '',
+    this.destination,
+    this.emotionalHighlights = const [],
+    this.rating = 0.0,
+    this.likes = 0,
+    DateTime? createdAt,
+    this.imageUrl,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   factory TravelerStory.fromJson(Map<String, dynamic> json) {
     return TravelerStory(
       id: json['id'] ?? '',
+      userId: json['userId'] ?? '',
       author: json['author'] ?? '',
       title: json['title'] ?? '',
       story: json['story'] ?? '',
+      destination: json['destination'] as String?,
       emotionalHighlights: List<String>.from(json['emotionalHighlights'] ?? []),
       rating: (json['rating'] ?? 0).toDouble(),
       likes: json['likes'] ?? 0,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
+      imageUrl: json['imageUrl'],
     );
   }
 
@@ -141,32 +165,39 @@ class TravelerStory {
     final data = doc.data() as Map<String, dynamic>;
     return TravelerStory(
       id: data['id'] ?? doc.id,
+      userId: data['userId'] ?? '',
       author: data['author'] ?? '',
       title: data['title'] ?? '',
       story: data['story'] ?? '',
+      destination: data['destination'] as String?,
       emotionalHighlights: List<String>.from(data['emotionalHighlights'] ?? []),
       rating: (data['rating'] ?? 0).toDouble(),
       likes: data['likes'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      imageUrl: data['imageUrl'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
       'author': author,
       'title': title,
       'story': story,
+      'destination': destination,
       'emotionalHighlights': emotionalHighlights,
       'rating': rating,
       'likes': likes,
       'createdAt': createdAt.toIso8601String(),
+      'imageUrl': imageUrl,
     };
   }
 
   Map<String, dynamic> toFirestore() {
-    return {
+    final map = {
       'id': id,
+      'userId': userId,
       'author': author,
       'title': title,
       'story': story,
@@ -174,34 +205,46 @@ class TravelerStory {
       'rating': rating,
       'likes': likes,
       'createdAt': createdAt,
+      'imageUrl': imageUrl,
     };
+    if (destination != null) {
+      map['destination'] = destination;
+    }
+    return map;
   }
 }
 
 class DiaryEntry {
   final String id;
-  final String location;
-  final String content;
-  final List<String> emotions;
-  final int reflectionDepth;
+  final String userId;
+  final String imageUrl;
+  final String title;
+  final String content; // Texto generado por IA o escrito
+  final List<String>
+      emotions; // Lista de emociones: Ej: ["Nostalgia", "Asombro"]
+  final int reflectionDepth; // Profundidad de reflexión (1-5)
   final DateTime createdAt;
 
   DiaryEntry({
-    required this.id,
-    required this.location,
+    this.id = '',
+    required this.userId,
+    required this.imageUrl,
+    required this.title,
     required this.content,
     required this.emotions,
-    required this.reflectionDepth,
+    this.reflectionDepth = 3,
     required this.createdAt,
   });
 
   factory DiaryEntry.fromJson(Map<String, dynamic> json) {
     return DiaryEntry(
       id: json['id'] ?? '',
-      location: json['location'] ?? '',
+      userId: json['userId'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      title: json['title'] ?? '',
       content: json['content'] ?? '',
       emotions: List<String>.from(json['emotions'] ?? []),
-      reflectionDepth: json['reflectionDepth'] ?? 1,
+      reflectionDepth: json['reflectionDepth'] ?? 3,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
@@ -212,18 +255,25 @@ class DiaryEntry {
     final data = doc.data() as Map<String, dynamic>;
     return DiaryEntry(
       id: data['id'] ?? doc.id,
-      location: data['location'] ?? '',
+      userId: data['userId'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
+      title: data['title'] ?? '',
       content: data['content'] ?? '',
       emotions: List<String>.from(data['emotions'] ?? []),
-      reflectionDepth: data['reflectionDepth'] ?? 1,
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      reflectionDepth: data['reflectionDepth'] ?? 3,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ??
+          (data['createdAt'] is String
+              ? DateTime.parse(data['createdAt'])
+              : DateTime.now()),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'location': location,
+      'userId': userId,
+      'imageUrl': imageUrl,
+      'title': title,
       'content': content,
       'emotions': emotions,
       'reflectionDepth': reflectionDepth,
@@ -231,10 +281,25 @@ class DiaryEntry {
     };
   }
 
+  // Convertir a Map para guardar en Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'userId': userId,
+      'imageUrl': imageUrl,
+      'title': title,
+      'content': content,
+      'emotions': emotions,
+      'reflectionDepth': reflectionDepth,
+      'createdAt': createdAt,
+    };
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
-      'location': location,
+      'userId': userId,
+      'imageUrl': imageUrl,
+      'title': title,
       'content': content,
       'emotions': emotions,
       'reflectionDepth': reflectionDepth,

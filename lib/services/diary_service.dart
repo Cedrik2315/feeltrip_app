@@ -1,5 +1,8 @@
+// diary_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../config/firebase_config.dart';
+import '../core/app_logger.dart';
 import '../models/experience_model.dart';
 
 class DiaryService {
@@ -26,11 +29,9 @@ class DiaryService {
           .limit(limit)
           .get();
 
-      return snapshot.docs
-          .map((doc) => DiaryEntry.fromFirestore(doc))
-          .toList();
+      return snapshot.docs.map((doc) => DiaryEntry.fromFirestore(doc)).toList();
     } catch (e) {
-      print('❌ Error fetching diary entries: $e');
+      AppLogger.debug('�O Error fetching diary entries: $e');
       rethrow;
     }
   }
@@ -50,7 +51,7 @@ class DiaryService {
       }
       return null;
     } catch (e) {
-      print('❌ Error fetching diary entry: $e');
+      AppLogger.debug('�O Error fetching diary entry: $e');
       rethrow;
     }
   }
@@ -61,7 +62,7 @@ class DiaryService {
       final now = DateTime.now();
       final entryData = {
         'id': entry.id,
-        'location': entry.location,
+        'imageUrl': entry.imageUrl,
         'content': entry.content,
         'emotions': entry.emotions,
         'reflectionDepth': entry.reflectionDepth,
@@ -79,10 +80,10 @@ class DiaryService {
       // Actualizar estadísticas del usuario
       await _updateUserDiaryStats(userId);
 
-      print('✅ Diary entry created: ${entry.id}');
+      AppLogger.debug('�o. Diary entry created: ${entry.id}');
       return entry.id;
     } catch (e) {
-      print('❌ Error creating diary entry: $e');
+      AppLogger.debug('�O Error creating diary entry: $e');
       rethrow;
     }
   }
@@ -103,9 +104,9 @@ class DiaryService {
       // Actualizar estadísticas
       await _updateUserDiaryStats(userId);
 
-      print('✅ Diary entry updated: $entryId');
+      AppLogger.debug('�o. Diary entry updated: $entryId');
     } catch (e) {
-      print('❌ Error updating diary entry: $e');
+      AppLogger.debug('�O Error updating diary entry: $e');
       rethrow;
     }
   }
@@ -123,9 +124,9 @@ class DiaryService {
       // Actualizar estadísticas
       await _updateUserDiaryStats(userId);
 
-      print('✅ Diary entry deleted: $entryId');
+      AppLogger.debug('�o. Diary entry deleted: $entryId');
     } catch (e) {
-      print('❌ Error deleting diary entry: $e');
+      AppLogger.debug('�O Error deleting diary entry: $e');
       rethrow;
     }
   }
@@ -145,7 +146,7 @@ class DiaryService {
               .map((doc) => DiaryEntry.fromFirestore(doc))
               .toList());
     } catch (e) {
-      print('❌ Error setting up diary stream: $e');
+      AppLogger.debug('�O Error setting up diary stream: $e');
       rethrow;
     }
   }
@@ -163,7 +164,7 @@ class DiaryService {
       final stats = doc.data()?['diaryStats'] ?? {};
       return stats;
     } catch (e) {
-      print('❌ Error fetching diary stats: $e');
+      AppLogger.debug('�O Error fetching diary stats: $e');
       return {};
     }
   }
@@ -213,15 +214,14 @@ class DiaryService {
           'avgReflectionDepth': double.parse(avgDepth.toStringAsFixed(2)),
           'uniqueEmotionCount': uniqueEmotions.length,
           'overallImpactScore': impactScore,
-          'lastEntryDate':
-              entries.isNotEmpty ? entries.first.createdAt : null,
+          'lastEntryDate': entries.isNotEmpty ? entries.first.createdAt : null,
           'lastUpdated': DateTime.now(),
         },
       }, SetOptions(merge: true));
 
-      print('✅ Diary stats updated for user: $userId');
+      AppLogger.debug('�o. Diary stats updated for user: $userId');
     } catch (e) {
-      print('❌ Error updating diary stats: $e');
+      AppLogger.debug('�O Error updating diary stats: $e');
     }
   }
 
@@ -236,7 +236,7 @@ class DiaryService {
           .where((entry) => entry.emotions.contains(emotion))
           .toList();
     } catch (e) {
-      print('❌ Error filtering by emotion: $e');
+      AppLogger.debug('�O Error filtering by emotion: $e');
       rethrow;
     }
   }
@@ -249,16 +249,15 @@ class DiaryService {
           .collection(FirebaseConfig.usersCollection)
           .doc(userId)
           .collection(FirebaseConfig.diaryEntriesSubcollection)
-          .where(FirebaseConfig.createdAtField, isGreaterThanOrEqualTo: startDate)
+          .where(FirebaseConfig.createdAtField,
+              isGreaterThanOrEqualTo: startDate)
           .where(FirebaseConfig.createdAtField, isLessThanOrEqualTo: endDate)
           .orderBy(FirebaseConfig.createdAtField, descending: true)
           .get();
 
-      return snapshot.docs
-          .map((doc) => DiaryEntry.fromFirestore(doc))
-          .toList();
+      return snapshot.docs.map((doc) => DiaryEntry.fromFirestore(doc)).toList();
     } catch (e) {
-      print('❌ Error fetching entries by date range: $e');
+      AppLogger.debug('�O Error fetching entries by date range: $e');
       rethrow;
     }
   }
@@ -272,7 +271,7 @@ class DiaryService {
           .where((entry) => entry.reflectionDepth >= minDepth)
           .toList();
     } catch (e) {
-      print('❌ Error filtering by depth: $e');
+      AppLogger.debug('�O Error filtering by depth: $e');
       rethrow;
     }
   }
@@ -285,7 +284,7 @@ class DiaryService {
       final entries = await getDiaryEntries(userId, limit: 10000);
       return entries.map((entry) => entry.toJson()).toList();
     } catch (e) {
-      print('❌ Error exporting diary: $e');
+      AppLogger.debug('�O Error exporting diary: $e');
       rethrow;
     }
   }
