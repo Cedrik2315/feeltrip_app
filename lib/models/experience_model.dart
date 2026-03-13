@@ -122,6 +122,7 @@ class TravelerStory {
   final String author;
   final String title;
   final String story;
+  final String? destination;
   final List<String> emotionalHighlights;
   final double rating;
   int likes;
@@ -134,6 +135,7 @@ class TravelerStory {
     this.author = '',
     this.title = '',
     this.story = '',
+    this.destination,
     this.emotionalHighlights = const [],
     this.rating = 0.0,
     this.likes = 0,
@@ -148,6 +150,7 @@ class TravelerStory {
       author: json['author'] ?? '',
       title: json['title'] ?? '',
       story: json['story'] ?? '',
+      destination: json['destination'] as String?,
       emotionalHighlights: List<String>.from(json['emotionalHighlights'] ?? []),
       rating: (json['rating'] ?? 0).toDouble(),
       likes: json['likes'] ?? 0,
@@ -166,6 +169,7 @@ class TravelerStory {
       author: data['author'] ?? '',
       title: data['title'] ?? '',
       story: data['story'] ?? '',
+      destination: data['destination'] as String?,
       emotionalHighlights: List<String>.from(data['emotionalHighlights'] ?? []),
       rating: (data['rating'] ?? 0).toDouble(),
       likes: data['likes'] ?? 0,
@@ -181,6 +185,7 @@ class TravelerStory {
       'author': author,
       'title': title,
       'story': story,
+      'destination': destination,
       'emotionalHighlights': emotionalHighlights,
       'rating': rating,
       'likes': likes,
@@ -190,7 +195,7 @@ class TravelerStory {
   }
 
   Map<String, dynamic> toFirestore() {
-    return {
+    final map = {
       'id': id,
       'userId': userId,
       'author': author,
@@ -202,6 +207,10 @@ class TravelerStory {
       'createdAt': createdAt,
       'imageUrl': imageUrl,
     };
+    if (destination != null) {
+      map['destination'] = destination;
+    }
+    return map;
   }
 }
 

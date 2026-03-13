@@ -8,6 +8,7 @@ import '../controllers/experience_controller.dart';
 import '../controllers/auth_controller.dart';
 import '../services/sharing_service.dart';
 import '../widgets/social_share_sheet.dart';
+import '../widgets/weather_widget.dart';
 import 'comments_screen.dart';
 
 class StoriesScreen extends StatefulWidget {
@@ -323,6 +324,14 @@ class _StoriesScreenState extends State<StoriesScreen> {
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
             const SizedBox(height: 8),
+            WeatherWidget(
+              city: story.destination ??
+                  story.title.split(' ').firstWhere(
+                        (word) => word.length > 2,
+                        orElse: () => 'Madrid',
+                      ),
+            ),
+            const SizedBox(height: 8),
             Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: 8,
@@ -497,6 +506,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
   void _showAddStoryDialog() {
     final storyController = TextEditingController();
     final titleController = TextEditingController();
+    final destinationController = TextEditingController();
     final emotionsSelected = <String>[].obs;
     File? imageFile;
     var rating = 5;
@@ -557,6 +567,15 @@ class _StoriesScreenState extends State<StoriesScreen> {
                             labelText: 'Título de tu historia',
                             border: OutlineInputBorder(),
                             hintText: 'Un título para tu experiencia',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: destinationController,
+                          decoration: const InputDecoration(
+                            labelText: 'Destino (ciudad)',
+                            border: OutlineInputBorder(),
+                            hintText: 'Ej: París, Bali, Buenos Aires',
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -645,7 +664,8 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 .map(
                                   (emotion) => FilterChip(
                                     label: Text(emotion),
-                                    selected: emotionsSelected.contains(emotion),
+                                    selected:
+                                        emotionsSelected.contains(emotion),
                                     selectedColor: Colors.deepPurple
                                         .withValues(alpha: 0.18),
                                     onSelected: (selected) {
@@ -682,20 +702,24 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                         (user?.displayName?.trim().isNotEmpty ==
                                                 true)
                                             ? user!.displayName!
-                                            : (user?.email
-                                                    ?.split('@')
-                                                    .first ??
+                                            : (user?.email?.split('@').first ??
                                                 'Viajero Anónimo');
 
                                     _controller.createStory(
                                       title: titleController.text.trim(),
                                       story: storyController.text.trim(),
+                                      destination: destinationController.text
+                                              .trim()
+                                              .isEmpty
+                                          ? null
+                                          : destinationController.text.trim(),
                                       author: authorName,
                                       emotionalHighlights:
                                           emotionsSelected.toList(),
                                       rating: rating.toDouble(),
                                       imageFile: imageFile,
                                     );
+                                    destinationController.dispose();
                                     Navigator.pop(sheetContext);
                                   }
                                 },

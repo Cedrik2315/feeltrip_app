@@ -58,6 +58,7 @@ import 'controllers/premium_controller.dart';
 import 'services/observability_service.dart';
 import 'screens/agency_profile_screen.dart';
 import 'screens/comments_screen.dart';
+import 'screens/currency_converter_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -323,7 +324,8 @@ class _MyAppState extends State<MyApp> {
           return TripDetailScreen(tripId: tripId);
         },
         '/agency-profile': (context) {
-          final agencyId = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final agencyId = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
           return AgencyProfileScreen(
             agencyId: agencyId['agencyId'] as String,
           );
@@ -332,6 +334,7 @@ class _MyAppState extends State<MyApp> {
           final storyId = ModalRoute.of(context)!.settings.arguments as String;
           return CommentsScreen(storyId: storyId);
         },
+        '/currency-converter': (_) => const CurrencyConverterScreen(),
       },
     );
   }

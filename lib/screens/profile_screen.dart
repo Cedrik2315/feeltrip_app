@@ -9,6 +9,7 @@ import '../controllers/auth_controller.dart';
 import '../widgets/social_share_sheet.dart';
 import 'auth_gate.dart';
 
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -277,6 +278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 24),
+          _buildImprovedListTile(Icons.currency_exchange, 'Convertidor de Monedas', () => Get.toNamed('/currency-converter')),
           _buildImprovedListTile(Icons.bar_chart_outlined, 'Mis Estadísticas',
               () => Navigator.pushNamed(context, '/stats')),
           _buildImprovedListTile(Icons.share_outlined, 'Compartir Perfil',
