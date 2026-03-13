@@ -25,39 +25,41 @@ class AffiliateWidget extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 70,
-            child: Row(
+            height: 160, // Adjusted for 2 rows
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               children: options.map((option) {
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      AnalyticsService.logAffiliateClick(
-                          option.name, destination);
-                      AffiliateService.openAffiliateLink(option.url);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                        color: option.color,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            option.emoji,
-                            style: const TextStyle(fontSize: 24),
+                return GestureDetector(
+                  onTap: () {
+                    AnalyticsService.logAffiliateClick(
+                        option.name, destination);
+                    AffiliateService.openAffiliateLink(option.url);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: option.color,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          option.emoji,
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                        Text(
+                          option.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
                           ),
-                          Text(
-                            option.name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 );

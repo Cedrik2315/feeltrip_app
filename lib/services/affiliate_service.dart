@@ -2,49 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AffiliateOption {
-  final String emoji;
   final String name;
-  final Color color;
   final String url;
-
-  const AffiliateOption({
-    required this.emoji,
-    required this.name,
-    required this.color,
-    required this.url,
-  });
+  final String emoji;
+  final Color color;
+  AffiliateOption(
+      {required this.name,
+      required this.url,
+      required this.emoji,
+      required this.color});
 }
 
 class AffiliateService {
   static List<AffiliateOption> getAffiliateOptions(String destination) {
     return [
-      const AffiliateOption(
-        emoji: '🏨',
-        name: 'Hotel',
-        color: Colors.blue,
-        url:
-            'https://www.booking.com/searchresults.html?dest_id=-2118678&aid=your_affiliate_id', // Bali example
-      ),
       AffiliateOption(
-        emoji: '✈️',
-        name: 'Vuelos',
-        color: Colors.orange,
-        url:
-            'https://www.skyscanner.net/transport/flights/$destination/240101/240131/?adultsv2=1&preferdirects=false',
-      ),
-      const AffiliateOption(
-        emoji: '🚗',
-        name: 'Auto',
-        color: Colors.green,
-        url: 'https://www.rentalcars.com/',
-      ),
+          name: 'Booking',
+          url: 'https://www.booking.com/search.html?ss=$destination',
+          emoji: '🏨',
+          color: Colors.blue),
+      AffiliateOption(
+          name: 'Viator',
+          url:
+              'https://www.viator.com/search/$destination?pid=P00288924&mcid=42383&medium=link',
+          emoji: '🗺️',
+          color: Colors.orange),
+      AffiliateOption(
+          name: 'GetYourGuide',
+          url:
+              'https://www.getyourguide.es/s/?q=$destination&partner_id=ASL9O0I&cmp=share_to_earn',
+          emoji: '🎯',
+          color: Colors.green),
+      AffiliateOption(
+          name: 'Airbnb',
+          url: 'https://www.airbnb.com/s/$destination/homes',
+          emoji: '🏠',
+          color: Colors.red),
     ];
   }
 
   static Future<void> openAffiliateLink(String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
+    if (await canLaunchUrl(uri))
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
   }
 }

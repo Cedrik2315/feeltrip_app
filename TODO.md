@@ -1,9 +1,14 @@
-# Fix Failing Tests Plan ✓
+# Affiliate Service Update Progress
 
-## Steps:
-1. [x] Edit test/services/affiliate_service_test.dart
-2. [x] Edit test/services/auth_service_test.dart
-3. [x] Run flutter test --reporter=compact
-4. [x] Verify and complete
+## Pending
+- [x] 1. Replace lib/services/affiliate_service.dart with new content (4 options)
+- [x] 2. Update lib/widgets/affiliate_widget.dart to 2x2 GridView layout
+- [x] 3. Update test/services/affiliate_service_test.dart to expect 4 options
+- [x] 4. Run `flutter test --reporter=compact` and verify
 
-**Status:** Both tests fixed successfully. `flutter test --reporter=compact` completed with all 6 tests passing (00:24 +6: All tests passed!).
+## Completed
+
+
+## Completed
+
+

@@ -5,7 +5,7 @@ import 'package:feeltrip_app/services/affiliate_service.dart';
 void main() {
   group('AffiliateOption', () {
     test('se crea correctamente', () {
-      const option = AffiliateOption(
+      final option = AffiliateOption(
         name: 'Booking',
         url: 'https://booking.com',
         emoji: '🏨',

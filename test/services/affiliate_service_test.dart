@@ -3,9 +3,9 @@ import 'package:feeltrip_app/services/affiliate_service.dart';
 
 void main() {
   group('AffiliateService', () {
-    test('getAffiliateOptions retorna 3 opciones', () {
+    test('getAffiliateOptions retorna 4 opciones', () {
       final options = AffiliateService.getAffiliateOptions('Paris');
-      expect(options.length, 3);
+      expect(options.length, 4);
     });
 
     test('opciones tienen nombre, url y emoji', () {
