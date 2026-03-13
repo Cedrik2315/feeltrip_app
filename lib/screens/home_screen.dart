@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:get/get.dart';
 import '../models/trip_model.dart';
 import '../models/experience_model.dart';
 import '../services/api_service.dart';
+import '../services/admob_service.dart';
+import '../controllers/premium_controller.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -23,6 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _trips = _apiService.getTrips();
     _loadFeaturedTrips();
     _loadStories();
+
+    AdMobService.initialize();
+    AdMobService.loadBannerAd();
   }
 
   void _loadFeaturedTrips() {
@@ -47,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
           emotionalHighlights: ['Asombro', 'Gratitud', 'Transformación'],
           likes: 347,
           rating: 5.0,
-          createdAt: DateTime.now().subtract(Duration(days: 7)),
+          createdAt: DateTime.now().subtract(const Duration(days: 7)),
         ),
         TravelerStory(
           id: '2',
@@ -58,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
           emotionalHighlights: ['Conexión', 'Paz', 'Esperanza'],
           likes: 512,
           rating: 5.0,
-          createdAt: DateTime.now().subtract(Duration(days: 14)),
+          createdAt: DateTime.now().subtract(const Duration(days: 14)),
         ),
         TravelerStory(
           id: '3',
@@ -69,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
           emotionalHighlights: ['Nostalgia', 'Reflexión', 'Pertenencia'],
           likes: 289,
           rating: 4.8,
-          createdAt: DateTime.now().subtract(Duration(days: 21)),
+          createdAt: DateTime.now().subtract(const Duration(days: 21)),
         ),
       ];
     });
@@ -79,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('FeelTrip - Viajes Transformadores'),
+        title: const Text('FeelTrip - Viajes Transformadores'),
         elevation: 0,
         backgroundColor: Colors.deepPurple,
       ),
@@ -89,11 +97,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // Hero Banner - Experiencias Vivenciales
             Container(
               color: Colors.deepPurple,
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     '✨ Viajes que Transforman',
                     style: TextStyle(
                       color: Colors.white,
@@ -101,15 +109,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     'No solo viajes, sino experiencias que cambian tu perspectiva de vida',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Buscar destino transformador...',
@@ -119,29 +127,29 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide.none,
                       ),
-                      prefixIcon: Icon(Icons.location_on),
+                      prefixIcon: const Icon(Icons.location_on),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {},
-                          icon: Icon(Icons.calendar_today),
-                          label: Text('Fechas'),
+                          icon: const Icon(Icons.calendar_today),
+                          label: const Text('Fechas'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: Colors.deepPurple,
                           ),
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {},
-                          icon: Icon(Icons.people),
-                          label: Text('Viajeros'),
+                          icon: const Icon(Icons.people),
+                          label: const Text('Viajeros'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: Colors.deepPurple,
@@ -153,11 +161,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // CTA: Descubre tu tipo de viajero
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -165,10 +173,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       '🎯 Descubre Tu Tipo de Viajero',
                       style: TextStyle(
                         fontSize: 18,
@@ -176,8 +184,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 8),
-                    Text(
+                    const SizedBox(height: 8),
+                    const Text(
                       'Responde nuestro quiz para recibir recomendaciones personalizadas basadas en tus valores y emociones',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -185,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.white70,
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -196,29 +204,29 @@ class _HomeScreenState extends State<HomeScreen> {
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.deepPurple,
                         ),
-                        child: Text('Empezar Quiz'),
+                        child: const Text('Empezar Quiz'),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // Traveler Archetypes
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Tipos de Experiencias',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -259,22 +267,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // Featured Transformative Trips
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Viajes Destacados',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   if (_featuredTrips.isNotEmpty)
                     Column(
                       children: [
@@ -295,29 +303,29 @@ class _HomeScreenState extends State<HomeScreen> {
                             return TripCard(trip: trip);
                           },
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         AnimatedSmoothIndicator(
                           activeIndex: _carouselIndex,
                           count: _featuredTrips.length,
-                          effect: ExpandingDotsEffect(),
+                          effect: const ExpandingDotsEffect(),
                         ),
                       ],
                     ),
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // Historias de Viajeros Transformados
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Historias de Transformación',
                         style: TextStyle(
                           fontSize: 20,
@@ -328,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.of(context).pushNamed('/stories');
                         },
-                        child: Text(
+                        child: const Text(
                           'Ver todas',
                           style: TextStyle(
                             fontSize: 14,
@@ -339,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   ..._stories
                       .take(2)
                       .map((story) => _buildStoryPreviewCard(story))
@@ -347,22 +355,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // Quick Access Section
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Mi Experiencia',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -375,14 +383,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: _buildQuickAccessCard(
                           '📊',
                           'Mi Impacto',
                           'Mide tu transformación',
                           () {
-                            Navigator.of(context).pushNamed('/impact-dashboard');
+                            Navigator.of(context)
+                                .pushNamed('/impact-dashboard');
                           },
                         ),
                       ),
@@ -391,7 +400,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 32),
+            if (!Get.find<PremiumController>().isPremium.value)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: AdMobService.buildBannerAd(),
+              ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -402,26 +416,26 @@ class _HomeScreenState extends State<HomeScreen> {
       String emoji, String title, String description, Color color) {
     return Container(
       width: 140,
-      margin: EdgeInsets.only(right: 12),
+      margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(emoji, style: TextStyle(fontSize: 28)),
-          SizedBox(height: 8),
+          Text(emoji, style: const TextStyle(fontSize: 28)),
+          const SizedBox(height: 8),
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 13,
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
             description,
             textAlign: TextAlign.center,
@@ -437,9 +451,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildStoryPreviewCard(TravelerStory story) {
     return Card(
-      margin: EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -449,14 +463,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: Colors.deepPurple[200],
                   child: Text(story.author[0]),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         story.author,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
                         story.title,
@@ -470,23 +484,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Row(
                   children: [
-                    Icon(Icons.star, size: 16, color: Colors.amber),
+                    const Icon(Icons.star, size: 16, color: Colors.amber),
                     Text(
                       '${story.rating}',
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               story.story,
-              style: TextStyle(fontSize: 13),
+              style: const TextStyle(fontSize: 13),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 6,
               children: story.emotionalHighlights
@@ -494,19 +508,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     (emotion) => Chip(
                       label: Text(emotion),
                       backgroundColor: Colors.purple[50],
-                      labelStyle: TextStyle(fontSize: 11),
+                      labelStyle: const TextStyle(fontSize: 11),
                     ),
                   )
                   .toList(),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.favorite, size: 16, color: Colors.red),
-                SizedBox(width: 4),
+                const Icon(Icons.favorite, size: 16, color: Colors.red),
+                const SizedBox(width: 4),
                 Text(
                   '${story.likes}',
-                  style: TextStyle(fontSize: 12),
+                  style: const TextStyle(fontSize: 12),
                 ),
               ],
             ),
@@ -522,20 +536,20 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: onTap,
       child: Card(
         child: Padding(
-          padding: EdgeInsets.all(12),
+          padding: const EdgeInsets.all(12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(emoji, style: TextStyle(fontSize: 28)),
-              SizedBox(height: 8),
+              Text(emoji, style: const TextStyle(fontSize: 28)),
+              const SizedBox(height: 8),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
@@ -555,7 +569,7 @@ class _HomeScreenState extends State<HomeScreen> {
 class TripCard extends StatelessWidget {
   final Trip trip;
 
-  const TripCard({required this.trip});
+  const TripCard({super.key, required this.trip});
 
   @override
   Widget build(BuildContext context) {
@@ -564,7 +578,7 @@ class TripCard extends StatelessWidget {
         Navigator.pushNamed(context, '/trip-details', arguments: trip.id);
       },
       child: Card(
-        margin: EdgeInsets.all(8),
+        margin: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -577,21 +591,22 @@ class TripCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     trip.destination,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   if (trip.isTransformative)
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.purple[100],
                         borderRadius: BorderRadius.circular(4),
@@ -605,13 +620,13 @@ class TripCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         '\$${trip.price}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.deepPurple,
@@ -619,8 +634,8 @@ class TripCard extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Icon(Icons.star, size: 16, color: Colors.amber),
-                          SizedBox(width: 4),
+                          const Icon(Icons.star, size: 16, color: Colors.amber),
+                          const SizedBox(width: 4),
                           Text('${trip.rating}'),
                         ],
                       ),

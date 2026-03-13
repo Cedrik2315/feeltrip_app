@@ -34,10 +34,10 @@ class AffiliateService {
           emoji: '🎯',
           color: Colors.green),
       AffiliateOption(
-          name: 'Airbnb',
-          url: 'https://www.airbnb.com/s/$destination/homes',
-          emoji: '🏠',
-          color: Colors.red),
+          name: 'Civitatis',
+          url: 'https://www.civitatis.com/es/$destination/',
+          emoji: '🎭',
+          color: const Color(0xFF00B5E2)),
     ];
   }
 

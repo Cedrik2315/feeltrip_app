@@ -1,0 +1,1 @@
+- [x] 1. Edit lib/services/affiliate_service.dart to replace Airbnb with Civitatis

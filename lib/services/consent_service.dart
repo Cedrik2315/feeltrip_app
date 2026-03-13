@@ -1,4 +1,5 @@
-// TODO: Implementar cuando se agregue google_mobile_ads
+// TODO: Implementar consent real cuando AdMob esté configurado
 class ConsentService {
   static Future<void> initialize() async {}
+  static bool get canShowAds => true;
 }

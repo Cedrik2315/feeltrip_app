@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/trip_model.dart';
 import '../models/booking_model.dart';
 import '../services/api_service.dart';
+import '../widgets/destination_map_widget.dart';
 
 class TripDetailScreen extends StatefulWidget {
   final String tripId;
 
-  const TripDetailScreen({required this.tripId});
+  const TripDetailScreen({Key? key, required this.tripId}) : super(key: key);
 
   @override
   State<TripDetailScreen> createState() => _TripDetailScreenState();
@@ -33,18 +35,18 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            appBar: AppBar(title: Text('Detalles del Viaje')),
-            body: Center(child: CircularProgressIndicator()),
+            appBar: AppBar(title: const Text('Detalles del Viaje')),
+            body: const Center(child: CircularProgressIndicator()),
           );
         } else if (snapshot.hasError) {
           return Scaffold(
-            appBar: AppBar(title: Text('Error')),
+            appBar: AppBar(title: const Text('Error')),
             body: Center(child: Text('Error: ${snapshot.error}')),
           );
         } else if (!snapshot.hasData) {
           return Scaffold(
-            appBar: AppBar(title: Text('No encontrado')),
-            body: Center(child: Text('Viaje no encontrado')),
+            appBar: AppBar(title: const Text('No encontrado')),
+            body: const Center(child: Text('Viaje no encontrado')),
           );
         }
 
@@ -52,11 +54,12 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('Detalles del Viaje'),
+            title: const Text('Detalles del Viaje'),
             backgroundColor: Colors.deepPurple,
             actions: [
               IconButton(
-                icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
+                icon:
+                    Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
                 onPressed: () {
                   setState(() {
                     _isFavorite = !_isFavorite;
@@ -81,15 +84,15 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                               trip.images[index],
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
-                                  Icon(Icons.image_not_supported),
+                                  const Icon(Icons.image_not_supported),
                             );
                           },
                         )
-                      : Icon(Icons.image_not_supported),
+                      : const Icon(Icons.image_not_supported),
                 ),
 
                 Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -103,19 +106,25 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                               children: [
                                 Text(
                                   trip.title,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    Icon(Icons.location_on,
+                                    const Icon(Icons.location_on,
                                         size: 18, color: Colors.grey),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(trip.destination),
                                   ],
+                                ),
+                                const SizedBox(height: 12),
+                                DestinationMapWidget(
+                                  destination: trip.destination,
+                                  latitude: 0.0,
+                                  longitude: 0.0,
                                 ),
                               ],
                             ),
@@ -123,7 +132,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
+                              const Text(
                                 'desde',
                                 style: TextStyle(
                                   color: Colors.grey,
@@ -132,7 +141,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                               ),
                               Text(
                                 '\$${trip.price.toStringAsFixed(2)}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.deepPurple,
@@ -143,7 +152,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         ],
                       ),
 
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
                       // Información general
                       Row(
@@ -167,7 +176,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         ],
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Rating
                       Row(
@@ -180,86 +189,87 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                             itemCount: 5,
                             itemSize: 20,
                             itemBuilder: (context, _) =>
-                                Icon(Icons.star, color: Colors.amber),
+                                const Icon(Icons.star, color: Colors.amber),
                             onRatingUpdate: (_) {},
                             ignoreGestures: true,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text('${trip.reviews} reseñas'),
                         ],
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Descripción
-                      Text(
+                      const Text(
                         'Descripción',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(trip.description),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Destino
-                      Text(
+                      const Text(
                         'Destino',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(trip.country),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Guía
-                      Text(
+                      const Text(
                         'Guía',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(trip.guide),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Destacados
                       if (trip.highlights.isNotEmpty)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Destacados',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: trip.highlights
                                   .map((highlight) => Padding(
-                                        padding: EdgeInsets.only(bottom: 8),
+                                        padding:
+                                            const EdgeInsets.only(bottom: 8),
                                         child: Row(
                                           children: [
-                                            Icon(Icons.check_circle,
+                                            const Icon(Icons.check_circle,
                                                 color: Colors.green, size: 20),
-                                            SizedBox(width: 8),
+                                            const SizedBox(width: 8),
                                             Expanded(child: Text(highlight)),
                                           ],
                                         ),
                                       ))
                                   .toList(),
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                           ],
                         ),
 
@@ -268,14 +278,14 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Incluye',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Wrap(
                               spacing: 8,
                               runSpacing: 8,
@@ -283,34 +293,34 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                                   .map((amenity) => Chip(label: Text(amenity)))
                                   .toList(),
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                           ],
                         ),
 
                       // Fechas
-                      Text(
+                      const Text(
                         'Fechas',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         '${DateFormat('dd/MM/yyyy').format(trip.startDate)} - ${DateFormat('dd/MM/yyyy').format(trip.endDate)}',
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Seleccionar cantidad de personas
-                      Text(
+                      const Text(
                         'Cantidad de Viajeros',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey[300]!),
@@ -320,20 +330,20 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.remove),
+                              icon: const Icon(Icons.remove),
                               onPressed: _selectedPeople > 1
                                   ? () => setState(() => _selectedPeople--)
                                   : null,
                             ),
                             Text(
                               '$_selectedPeople',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.add),
+                              icon: const Icon(Icons.add),
                               onPressed: _selectedPeople < trip.maxParticipants
                                   ? () => setState(() => _selectedPeople++)
                                   : null,
@@ -342,7 +352,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
                       // Botón de reservar
                       SizedBox(
@@ -353,9 +363,9 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurple,
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Reservar Ahora',
                             style: TextStyle(
                               fontSize: 16,
@@ -365,7 +375,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
                       // Botón agregar al carrito
                       SizedBox(
@@ -373,7 +383,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         child: OutlinedButton(
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              const SnackBar(
                                 content: Text(
                                   'Agregado al carrito',
                                 ),
@@ -381,10 +391,10 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                             );
                           },
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.deepPurple),
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                            side: const BorderSide(color: Colors.deepPurple),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Agregar al Carrito',
                             style: TextStyle(
                               fontSize: 16,
@@ -394,7 +404,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -410,20 +420,20 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     return Column(
       children: [
         Icon(icon, color: Colors.deepPurple, size: 28),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           value,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+          style: const TextStyle(
             fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.grey,
+          style: const TextStyle(
             fontSize: 12,
+            color: Colors.grey,
           ),
         ),
       ],
@@ -434,20 +444,20 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmar Reserva'),
+        title: const Text('Confirmar Reserva'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Viaje: ${trip.title}'),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text('Viajeros: $_selectedPeople'),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Total: \$${(trip.price * _selectedPeople).toStringAsFixed(2)}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+              style: const TextStyle(
                 fontSize: 16,
+                fontWeight: FontWeight.bold,
                 color: Colors.deepPurple,
               ),
             ),
@@ -456,13 +466,13 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
+            child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Reserva realizada con éxito'),
                   backgroundColor: Colors.green,
                 ),
@@ -471,7 +481,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
             ),
-            child: Text('Confirmar'),
+            child: const Text('Confirmar'),
           ),
         ],
       ),
