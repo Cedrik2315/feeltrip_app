@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import '../controllers/auth_controller.dart';
+import '../screens/edit_profile_screen.dart';
 import '../services/achievements_service.dart';
 import '../widgets/social_share_sheet.dart';
 import 'auth_gate.dart';
@@ -418,10 +419,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(30),
-                onTap: () {
-                  Get.snackbar('Próximamente',
-                      'La edición de perfil estará disponible pronto.');
-                },
+                onTap: () => Get.to(() => const EditProfileScreen()),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
