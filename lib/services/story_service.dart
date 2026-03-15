@@ -15,7 +15,7 @@ class StoryService {
   // ============ CRUD OPERATIONS ============
 
   /// Obtener todas las historias públicas (ordenadas por más recientes)
-  Future<List<TravelerStory>> getPublicStories({int limit = 50}) async {
+  Future<List<TravelerStory>> getPublicStories({int limit = 20}) async {
     try {
       final snapshot = await _firestore
           .collection(FirebaseConfig.storiesCollection)
@@ -213,7 +213,7 @@ class StoryService {
   // ============ STREAM OPERATIONS ============
 
   /// Stream de historias públicas en tiempo real
-  Stream<List<TravelerStory>> getPublicStoriesStream({int limit = 50}) {
+  Stream<List<TravelerStory>> getPublicStoriesStream({int limit = 20}) {
     try {
       return _firestore
           .collection(FirebaseConfig.storiesCollection)
@@ -258,6 +258,7 @@ class StoryService {
           .collection(FirebaseConfig.storiesCollection)
           .where('title', isGreaterThanOrEqualTo: query)
           .where('title', isLessThan: '${query}z')
+          .limit(20)
           .get();
 
       return snapshot.docs
@@ -276,6 +277,7 @@ class StoryService {
           .collection(FirebaseConfig.storiesCollection)
           .where('emotionalHighlights', arrayContains: emotion)
           .orderBy(FirebaseConfig.createdAtField, descending: true)
+          .limit(20)
           .get();
 
       return snapshot.docs
