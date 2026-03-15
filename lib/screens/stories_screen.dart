@@ -3,14 +3,16 @@ import 'package:get/get.dart';
 import '../models/experience_model.dart';
 import '../controllers/experience_controller.dart';
 import '../services/sharing_service.dart';
+import '../services/auth_service.dart';
+import '../services/story_service.dart';
 import '../mock_data.dart';
 import 'comments_screen.dart';
 import 'agency_profile_screen.dart';
 
 class StoriesScreen extends StatefulWidget {
-  final String? tripId;
+  const StoriesScreen({super.key, this.tripId});
 
-  const StoriesScreen({this.tripId});
+  final String? tripId;
 
   @override
   State<StoriesScreen> createState() => _StoriesScreenState();
@@ -19,6 +21,7 @@ class StoriesScreen extends StatefulWidget {
 class _StoriesScreenState extends State<StoriesScreen> {
   late ExperienceController _controller;
   final TextEditingController _searchController = TextEditingController();
+  String? _selectedTag;
 
   @override
   void initState() {
@@ -26,7 +29,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
     _controller = Get.isRegistered<ExperienceController>()
         ? Get.find<ExperienceController>()
         : Get.put(ExperienceController());
-    
+
     if (_controller.stories.isEmpty) {
       _controller.loadAllData();
     }
@@ -42,39 +45,75 @@ class _StoriesScreenState extends State<StoriesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Historias de Viaje'),
+        title: const Text('Historias de Viaje'),
         backgroundColor: Colors.deepPurple,
       ),
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Buscar historias...',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Obx(() {
+              final allStories = _controller.stories;
+              final uniqueTags = allStories
+                  .expand((s) => s.tags)
+                  .toSet()
+                  .toList()
+                ..insert(0, 'Todas');
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: uniqueTags
+                      .map((tag) => FilterChip(
+                            label: Text(tag),
+                            selected: _selectedTag == tag,
+                            onSelected: (selected) {
+                              setState(() {
+                                _selectedTag = selected ? tag : null;
+                              });
+                            },
+                          ))
+                      .toList(),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 8),
           Expanded(
             child: Obx(() {
-              if (_controller.stories.isEmpty) {
+              var filteredStories = _controller.stories;
+              if (_selectedTag != null && _selectedTag != 'Todas') {
+                filteredStories = _controller.stories
+                    .where((story) => story.tags.contains(_selectedTag))
+                    .toList();
+              }
+              if (filteredStories.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.travel_explore, size: 64, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text('No hay historias aún'),
-                      SizedBox(height: 24),
+                      const Icon(Icons.tag, size: 64, color: Colors.grey),
+                      const SizedBox(height: 16),
+                      Text(_selectedTag == null || _selectedTag == 'Todas'
+                          ? 'No hay historias aún'
+                          : 'No hay historias con el tag "$_selectedTag"'),
+                      const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: () => _showAddStoryDialog(),
-                        icon: Icon(Icons.add),
-                        label: Text('Comparte tu historia'),
+                        icon: const Icon(Icons.add),
+                        label: const Text('Comparte tu historia'),
                       ),
                     ],
                   ),
@@ -82,9 +121,9 @@ class _StoriesScreenState extends State<StoriesScreen> {
               }
 
               return ListView.builder(
-                itemCount: _controller.stories.length,
+                itemCount: filteredStories.length,
                 itemBuilder: (context, index) {
-                  final story = _controller.stories[index];
+                  final story = filteredStories[index];
                   return _buildStoryCard(story);
                 },
               );
@@ -94,17 +133,17 @@ class _StoriesScreenState extends State<StoriesScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddStoryDialog(),
-        icon: Icon(Icons.add),
-        label: Text('Tu Historia'),
+        icon: const Icon(Icons.add),
+        label: const Text('Tu Historia'),
       ),
     );
   }
 
   Widget _buildStoryCard(TravelerStory story) {
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -116,83 +155,136 @@ class _StoriesScreenState extends State<StoriesScreen> {
                     children: [
                       Text(
                         story.title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'Calificación: ${story.rating}/5',
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.deepPurple.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${story.likes} me gusta',
-                    style: TextStyle(fontSize: 12, color: Colors.deepPurple),
+                    style:
+                        const TextStyle(fontSize: 12, color: Colors.deepPurple),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               story.story,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.black87),
+              style: const TextStyle(color: Colors.black87),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               children: story.emotionalHighlights
                   .take(3)
                   .map((highlight) => Chip(
-                    label: Text(highlight, style: TextStyle(fontSize: 11)),
-                    backgroundColor: Colors.blue.shade100,
-                    labelPadding: EdgeInsets.symmetric(horizontal: 8),
-                  ))
+                        label: Text(highlight,
+                            style: const TextStyle(fontSize: 11)),
+                        backgroundColor: Colors.blue.shade100,
+                        labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+                      ))
                   .toList(),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   story.createdAt.toString().split(' ')[0],
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
                 Row(
                   children: [
+                    Obx(() => IconButton(
+                          icon: Icon(
+                            (_controller.stories
+                                        .firstWhereOrNull(
+                                            (s) => s.id == story.id)
+                                        ?.likedBy
+                                        .contains(
+                                            AuthService.currentUser?.uid ??
+                                                '') ??
+                                    false)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: (_controller.stories
+                                        .firstWhereOrNull(
+                                            (s) => s.id == story.id)
+                                        ?.likedBy
+                                        .contains(
+                                            AuthService.currentUser?.uid ??
+                                                '') ??
+                                    false)
+                                ? Colors.red
+                                : null,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            _controller.toggleLike(story.id);
+                          },
+                          constraints:
+                              const BoxConstraints(maxHeight: 32, maxWidth: 32),
+                        )),
                     IconButton(
-                      icon: Icon(Icons.favorite_border, size: 20),
-                      onPressed: () {
-                        _controller.likeStory(story.id);
-                      },
-                      constraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.comment, size: 20),
+                      icon: const Icon(Icons.comment, size: 20),
                       onPressed: () {
                         Get.to(() => CommentsScreen(storyId: story.id));
                       },
-                      constraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
+                      constraints:
+                          const BoxConstraints(maxHeight: 32, maxWidth: 32),
                     ),
                     IconButton(
-                      icon: Icon(Icons.share, size: 20),
+                      icon: const Icon(Icons.share, size: 20),
                       onPressed: () {
                         _shareStory(story);
                       },
-                      constraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
+                      constraints:
+                          const BoxConstraints(maxHeight: 32, maxWidth: 32),
+                    ),
+                    // Reaction buttons (❤️ 🔥 😮 😂)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: ['❤️', '🔥', '😮', '😂']
+                            .map((emoji) => IconButton(
+                                  icon: Icon(
+                                    story.reaction == emoji
+                                        ? Icons.favorite
+                                        : Icons.add_reaction,
+                                    size: 18,
+                                  ),
+                                  onPressed: () {
+                                    StoryService().addReaction(
+                                        story.id,
+                                        AuthService.currentUser?.uid ?? '',
+                                        emoji);
+                                  },
+                                  constraints: const BoxConstraints(
+                                      maxHeight: 28, maxWidth: 28),
+                                ))
+                            .toList(),
+                      ),
                     ),
                   ],
                 ),
@@ -221,63 +313,63 @@ class _StoriesScreenState extends State<StoriesScreen> {
       context: context,
       builder: (dialogContext) => Dialog(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Comparte Tu Historia',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: storyController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Tu historia',
                   border: OutlineInputBorder(),
                   hintText: 'Comparte tu experiencia...',
                 ),
                 maxLines: 5,
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'Emociones:',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Obx(() => Wrap(
-                spacing: 8,
-                children: [
-                  'Transformación',
-                  'Conexión',
-                  'Reflexión',
-                  'Alegría',
-                ]
-                    .map((emotion) => FilterChip(
-                      label: Text(emotion),
-                      selected: emotionsSelected.contains(emotion),
-                      onSelected: (selected) {
-                        if (selected) {
-                          emotionsSelected.add(emotion);
-                        } else {
-                          emotionsSelected.remove(emotion);
-                        }
-                      },
-                    ))
-                    .toList(),
-              )),
-              SizedBox(height: 24),
+                    spacing: 8,
+                    children: [
+                      'Transformación',
+                      'Conexión',
+                      'Reflexión',
+                      'Alegría',
+                    ]
+                        .map((emotion) => FilterChip(
+                              label: Text(emotion),
+                              selected: emotionsSelected.contains(emotion),
+                              onSelected: (selected) {
+                                if (selected) {
+                                  emotionsSelected.add(emotion);
+                                } else {
+                                  emotionsSelected.remove(emotion);
+                                }
+                              },
+                            ))
+                        .toList(),
+                  )),
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(dialogContext),
-                    child: Text('Cancelar'),
+                    child: const Text('Cancelar'),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: () {
                       if (storyController.text.isNotEmpty) {
@@ -291,7 +383,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                         Navigator.pop(dialogContext);
                       }
                     },
-                    child: Text('Publicar'),
+                    child: const Text('Publicar'),
                   ),
                 ],
               ),

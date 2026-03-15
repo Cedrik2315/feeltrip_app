@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import '../services/auth_service.dart';
+import '../services/user_service.dart';
+import 'creator_stats_screen.dart';
+import 'instagram_stories_screen.dart';
+import 'translator_screen.dart';
+import 'ocr_screen.dart';
+
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isEditing = false;
+  bool _isFollowing = false;
+  String? currentUid;
+  final String targetUserId = 'demo_traveler';
+  final UserService userService = UserService();
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
@@ -14,11 +29,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: 'Juan García');
-    _emailController =
-        TextEditingController(text: 'juan.garcia@email.com');
-    _phoneController = TextEditingController(text: '+34 612 345 678');
+    final user = AuthService.currentUser;
+    currentUid = user?.uid;
+    _nameController = TextEditingController(text: user?.displayName ?? user?.email?.split('@')[0].replaceAll('.', ' ') ?? 'Usuario');
+    _emailController = TextEditingController(text: user?.email ?? '');
+    _phoneController = TextEditingController(text: '+34 612 345 678'); // Mock
+    _loadFollowingStatus();
   }
+
+  Future<void> _loadFollowingStatus() async {
+    if (currentUid == null) return;
+    final isFollowing = await userService.isFollowing(currentUid!, targetUserId);
+    if (mounted) {
+      setState(() {
+        _isFollowing = isFollowing;
+      });
+    }
+  }
+
 
   @override
   void dispose() {
@@ -32,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mi Perfil'),
+        title: const Text('Mi Perfil'),
         backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
@@ -51,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Avatar
             Container(
               color: Colors.deepPurple,
-              padding: EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 24),
               width: double.infinity,
               child: Column(
                 children: [
@@ -66,23 +94,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         width: 3,
                       ),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.person,
                       size: 60,
                       color: Colors.deepPurple,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
-                    'Juan García',
-                    style: TextStyle(
+                    AuthService.currentUser?.displayName ?? AuthService.currentUser?.email?.split('@')[0].replaceAll('.', ' ') ?? 'Usuario',
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Text(
+
+                  const SizedBox(height: 4),
+                  const Text(
                     'Miembro desde 2024',
                     style: TextStyle(
                       color: Colors.white70,
@@ -93,34 +122,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // Información personal
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Información Personal',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildTextField(
                     'Nombre',
                     _nameController,
                     Icons.person,
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   _buildTextField(
                     'Email',
                     _emailController,
                     Icons.email,
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   _buildTextField(
                     'Teléfono',
                     _phoneController,
@@ -130,94 +159,198 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-            // Preferencias
+            // Stats and Follow
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Preferencias',
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Seguidores / Siguiendo',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text('Ver todo'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  StreamBuilder<List<String>>(
+                    stream: currentUid != null ? userService.getFollowers(currentUid!) : Stream.value([]),
+                    builder: (context, followerSnapshot) {
+                      final followers = followerSnapshot.data?.length ?? 0;
+                      return StreamBuilder<List<String>>(
+                        stream: currentUid != null ? userService.getFollowing(currentUid!) : Stream.value([]),
+                        builder: (context, followingSnapshot) {
+                          final following = followingSnapshot.data?.length ?? 0;
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          followers.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const Text('Seguidores'),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          following.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const Text('Siguiendo'),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Follow button example
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: currentUid == null ? null : () async {
+                  try {
+                    if (_isFollowing) {
+                      await userService.unfollowUser(currentUid!, targetUserId);
+                    } else {
+                      await userService.followUser(currentUid!, targetUserId);
+                    }
+                    setState(() {
+                      _isFollowing = !_isFollowing;
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                },
+                icon: Icon(_isFollowing ? Icons.person_remove : Icons.person_add),
+                label: Text(_isFollowing ? 'Dejar de seguir Demo Traveler' : 'Seguir Demo Traveler'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _isFollowing ? Colors.grey : Colors.green,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Herramientas UGC',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ListTile(
-                    leading: Icon(Icons.notifications),
-                    title: Text('Notificaciones'),
-                    trailing: Switch(
-                      value: true,
-                      onChanged: (_) {},
-                      activeColor: Colors.deepPurple,
+                    leading: const Icon(Icons.analytics),
+                    title: const Text('Estadísticas del Creador'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreatorStatsScreen(),
+                      ),
                     ),
                   ),
                   ListTile(
-                    leading: Icon(Icons.mail),
-                    title: Text('Emails de Ofertas'),
-                    trailing: Switch(
-                      value: true,
-                      onChanged: (_) {},
-                      activeColor: Colors.deepPurple,
+                    leading: const Icon(Icons.view_module),
+                    title: const Text('Stories tipo Instagram'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => InstagramStoriesScreen(),
+                      ),
                     ),
                   ),
                   ListTile(
-                    leading: Icon(Icons.language),
-                    title: Text('Idioma'),
-                    trailing: DropdownButton<String>(
-                      value: 'Español',
-                      items: ['Español', 'English', 'Français']
-                          .map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {},
+                    leading: const Icon(Icons.translate),
+                    title: const Text('Traductor de texto'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TranslatorScreen(),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Lector OCR'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OCRScreen(),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-            SizedBox(height: 24),
-
             // Acciones
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Contraseña cambio iniciado'),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.lock),
-                      label: Text('Cambiar Contraseña'),
-                    ),
-                  ),
-                  SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () {
                         _showLogoutDialog();
                       },
-                      icon: Icon(Icons.logout, color: Colors.red),
-                      label: Text(
+                      icon: const Icon(Icons.logout, color: Colors.red),
+                      label: const Text(
                         'Cerrar Sesión',
                         style: TextStyle(color: Colors.red),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.red),
+                        side: const BorderSide(color: Colors.red),
                       ),
                     ),
                   ),
@@ -225,30 +358,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // Información legal
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   TextButton(
                     onPressed: () {},
-                    child: Text(
+                    child: const Text(
                       'Términos y Condiciones',
                       style: TextStyle(color: Colors.grey),
                     ),
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: Text(
+                    child: const Text(
                       'Política de Privacidad',
                       style: TextStyle(color: Colors.grey),
                     ),
                   ),
-                  SizedBox(height: 12),
-                  Text(
+                  const SizedBox(height: 12),
+                  const Text(
                     'FeelTrip v1.0.0',
                     style: TextStyle(
                       color: Colors.grey,
@@ -261,7 +394,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-    );
+    )
   }
 
   Widget _buildTextField(
@@ -288,27 +421,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Cerrar Sesión'),
-        content: Text('¿Estás seguro de que deseas cerrar sesión?'),
+        title: const Text('Cerrar Sesión'),
+        content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
+            child: const Text('Cancelar'),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Sesión cerrada'),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+            ElevatedButton(
+              onPressed: () async {
+                await AuthService.signOut();
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Sesión cerrada'),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('Cerrar Sesión'),
             ),
-            child: Text('Cerrar Sesión'),
-          ),
         ],
       ),
     );

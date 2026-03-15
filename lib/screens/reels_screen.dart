@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'dart:convert';
+import 'package:get/get.dart';
+import '../models/experience_model.dart';
 import 'dart:math';
 
 class ReelsScreen extends StatefulWidget {
+  const ReelsScreen({super.key});
+
   @override
   _ReelsScreenState createState() => _ReelsScreenState();
 }
@@ -23,35 +24,47 @@ class _ReelsScreenState extends State<ReelsScreen> {
   }
 
   Future<void> loadEntries() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/diary.json');
-    
-    if (await file.exists()) {
-      final contents = await file.readAsString();
-      final List<dynamic> jsonList = jsonDecode(contents);
-      setState(() {
-        entries = jsonList.map((json) => DiaryEntry.fromJson(json)).toList();
-      });
-    }
+    // Demo data - replace with service call
+    entries = [
+      DiaryEntry(
+        id: 'demo1',
+        location: 'Memory 1',
+        content: 'Amazing sunset...',
+        emotions: ['Gratitud'],
+        photos: [],
+        reflectionDepth: 3,
+        createdAt: DateTime.now().subtract(Duration(hours: 2)),
+      ),
+      DiaryEntry(
+        id: 'demo2',
+        location: 'Memory 2',
+        content: 'Met people who changed my life',
+        emotions: ['Conexión'],
+        photos: [],
+        reflectionDepth: 4,
+        createdAt: DateTime.now().subtract(Duration(days: 1)),
+      ),
+    ];
+    setState(() {});
   }
 
   Future<void> generateReel() async {
     setState(() => isGenerating = true);
-    
+
     // Simulamos la generación del video
     await Future.delayed(Duration(seconds: 3));
-    
+
     // En una implementación real, aquí usarías:
     // - FFmpeg para unir imágenes/videos
     // - Agregar música de fondo
     // - Aplicar transiciones y efectos
-    
+
     // Por ahora, creamos un archivo simulado
     final directory = await getApplicationDocumentsDirectory();
     final videoPath = '${directory.path}/feel_trip_reel.mp4';
     final videoFile = File(videoPath);
     await videoFile.create(recursive: true);
-    
+
     // Guardamos metadata del reel
     final reelData = {
       'entries': entries.map((e) => e.toJson()).toList(),
@@ -59,15 +72,15 @@ class _ReelsScreenState extends State<ReelsScreen> {
       'music': _getRandomMusic(),
       'transitions': _getRandomTransitions(),
     };
-    
+
     final reelFile = File('${directory.path}/last_reel.json');
     await reelFile.writeAsString(jsonEncode(reelData));
-    
+
     setState(() {
       isGenerating = false;
       generatedVideoPath = videoPath;
     });
-    
+
     // Inicializar el reproductor de video
     videoController = VideoPlayerController.file(File(videoPath))
       ..initialize().then((_) {
@@ -87,13 +100,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
   }
 
   List<String> _getRandomTransitions() {
-    final transitions = [
-      'fade',
-      'slide',
-      'zoom',
-      'blur',
-      'rotate'
-    ];
+    final transitions = ['fade', 'slide', 'zoom', 'blur', 'rotate'];
     return transitions.sublist(0, 3);
   }
 
@@ -102,7 +109,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
       // En implementación real usarías:
       // - Share plugin para compartir el archivo
       // - Social media APIs para publicar
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Reel compartido exitosamente! 🎉')),
       );
@@ -166,13 +173,13 @@ class _ReelsScreenState extends State<ReelsScreen> {
                     ),
                   ),
                   onPressed: isGenerating ? null : generateReel,
-                  icon: isGenerating 
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Icon(Icons.movie_creation),
+                  icon: isGenerating
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Icon(Icons.movie_creation),
                   label: Text(
                     isGenerating ? 'Creando magia...' : 'Generar mi reel',
                     style: TextStyle(fontSize: 18),
@@ -219,7 +226,8 @@ class _ReelsScreenState extends State<ReelsScreen> {
                                   ),
                                   SizedBox(width: 20),
                                   IconButton(
-                                    icon: Icon(Icons.share, color: Colors.white),
+                                    icon:
+                                        Icon(Icons.share, color: Colors.white),
                                     onPressed: shareReel,
                                   ),
                                 ],
@@ -254,7 +262,8 @@ class _ReelsScreenState extends State<ReelsScreen> {
                         ),
                         SizedBox(height: 10),
                         Text('🎵 Música: ${_getRandomMusic()}'),
-                        Text('🎬 Transiciones: ${_getRandomTransitions().join(', ')}'),
+                        Text(
+                            '🎬 Transiciones: ${_getRandomTransitions().join(', ')}'),
                         Text('📸 Momentos: ${entries.length}'),
                         Text('⏱️ Duración: 30 segundos'),
                       ],
@@ -279,43 +288,6 @@ class _ReelsScreenState extends State<ReelsScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-// Clase para entradas del diario (copiada del diary_screen)
-class DiaryEntry {
-  final String id;
-  final String text;
-  final String emotion;
-  final DateTime date;
-  final String? imagePath;
-
-  DiaryEntry({
-    required this.id,
-    required this.text,
-    required this.emotion,
-    required this.date,
-    this.imagePath,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'text': text,
-      'emotion': emotion,
-      'date': date.toIso8601String(),
-      'imagePath': imagePath,
-    };
-  }
-
-  factory DiaryEntry.fromJson(Map<String, dynamic> json) {
-    return DiaryEntry(
-      id: json['id'],
-      text: json['text'],
-      emotion: json['emotion'],
-      date: DateTime.parse(json['date']),
-      imagePath: json['imagePath'],
     );
   }
 }

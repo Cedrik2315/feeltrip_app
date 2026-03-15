@@ -107,8 +107,11 @@ class TravelerStory {
   final String title;
   final String story;
   final List<String> emotionalHighlights;
+  final List<String> tags;
   final double rating;
   int likes;
+  List<String> likedBy;
+  String reaction;
   final DateTime createdAt;
 
   TravelerStory({
@@ -117,8 +120,11 @@ class TravelerStory {
     required this.title,
     required this.story,
     required this.emotionalHighlights,
+    this.tags = const [],
     required this.rating,
     required this.likes,
+    this.likedBy = const [],
+    this.reaction = '',
     required this.createdAt,
   });
 
@@ -129,8 +135,11 @@ class TravelerStory {
       title: json['title'] ?? '',
       story: json['story'] ?? '',
       emotionalHighlights: List<String>.from(json['emotionalHighlights'] ?? []),
+      tags: List<String>.from(json['tags'] ?? []),
       rating: (json['rating'] ?? 0).toDouble(),
       likes: json['likes'] ?? 0,
+      likedBy: List<String>.from(json['likedBy'] ?? []),
+      reaction: json['reaction'] ?? '',
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
@@ -145,8 +154,11 @@ class TravelerStory {
       title: data['title'] ?? '',
       story: data['story'] ?? '',
       emotionalHighlights: List<String>.from(data['emotionalHighlights'] ?? []),
+      tags: List<String>.from(data['tags'] ?? []),
       rating: (data['rating'] ?? 0).toDouble(),
       likes: data['likes'] ?? 0,
+      likedBy: List<String>.from(data['likedBy'] ?? []),
+      reaction: data['reaction'] ?? '',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -158,8 +170,11 @@ class TravelerStory {
       'title': title,
       'story': story,
       'emotionalHighlights': emotionalHighlights,
+      'tags': tags,
       'rating': rating,
       'likes': likes,
+      'likedBy': likedBy,
+      'reaction': reaction,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -171,8 +186,11 @@ class TravelerStory {
       'title': title,
       'story': story,
       'emotionalHighlights': emotionalHighlights,
+      'tags': tags,
       'rating': rating,
       'likes': likes,
+      'likedBy': likedBy,
+      'reaction': reaction,
       'createdAt': createdAt,
     };
   }
@@ -183,14 +201,20 @@ class DiaryEntry {
   final String location;
   final String content;
   final List<String> emotions;
+  final List<String> photos;
   final int reflectionDepth;
   final DateTime createdAt;
+  final String tripId;
+  final String userId;
 
   DiaryEntry({
     required this.id,
+    required this.tripId,
+    required this.userId,
     required this.location,
     required this.content,
     required this.emotions,
+    this.photos = const [],
     required this.reflectionDepth,
     required this.createdAt,
   });
@@ -198,9 +222,12 @@ class DiaryEntry {
   factory DiaryEntry.fromJson(Map<String, dynamic> json) {
     return DiaryEntry(
       id: json['id'] ?? '',
+      tripId: json['tripId'] ?? '',
+      userId: json['userId'] ?? '',
       location: json['location'] ?? '',
       content: json['content'] ?? '',
       emotions: List<String>.from(json['emotions'] ?? []),
+      photos: List<String>.from(json['photos'] ?? []),
       reflectionDepth: json['reflectionDepth'] ?? 1,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
@@ -212,9 +239,12 @@ class DiaryEntry {
     final data = doc.data() as Map<String, dynamic>;
     return DiaryEntry(
       id: data['id'] ?? doc.id,
+      tripId: data['tripId'] ?? '',
+      userId: data['userId'] ?? '',
       location: data['location'] ?? '',
       content: data['content'] ?? '',
       emotions: List<String>.from(data['emotions'] ?? []),
+      photos: List<String>.from(data['photos'] ?? []),
       reflectionDepth: data['reflectionDepth'] ?? 1,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -223,9 +253,12 @@ class DiaryEntry {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'tripId': tripId,
+      'userId': userId,
       'location': location,
       'content': content,
       'emotions': emotions,
+      'photos': photos,
       'reflectionDepth': reflectionDepth,
       'createdAt': createdAt.toIso8601String(),
     };
@@ -234,9 +267,12 @@ class DiaryEntry {
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
+      'tripId': tripId,
+      'userId': userId,
       'location': location,
       'content': content,
       'emotions': emotions,
+      'photos': photos,
       'reflectionDepth': reflectionDepth,
       'createdAt': createdAt,
     };

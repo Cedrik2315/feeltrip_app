@@ -13,6 +13,7 @@ import 'screens/onboarding_screen.dart';
 import 'screens/trip_detail_screen.dart';
 import 'screens/stories_screen.dart';
 import 'screens/travel_diary_screen.dart';
+import 'screens/feed_screen.dart';
 import 'screens/emotional_preferences_quiz_screen.dart';
 import 'screens/experience_impact_dashboard_screen.dart';
 import 'services/storage_service.dart';
@@ -31,7 +32,7 @@ void main() async {
 }
 
 class FeelTripApp extends StatelessWidget {
-  const FeelTripApp();
+  const FeelTripApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,7 @@ class FeelTripApp extends StatelessWidget {
           seedColor: Colors.deepPurple,
           brightness: Brightness.light,
         ),
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           elevation: 0,
           centerTitle: true,
           iconTheme: IconThemeData(color: Colors.white),
@@ -59,7 +60,7 @@ class FeelTripApp extends StatelessWidget {
           style: FilledButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -69,7 +70,7 @@ class FeelTripApp extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -78,8 +79,8 @@ class FeelTripApp extends StatelessWidget {
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: Colors.deepPurple,
-            side: BorderSide(color: Colors.deepPurple),
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            side: const BorderSide(color: Colors.deepPurple),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -99,13 +100,14 @@ class FeelTripApp extends StatelessWidget {
         '/onboarding': (context) => OnboardingScreen(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
-        '/home': (context) => MainApp(),
+        '/home': (context) => const MainApp(),
         '/search': (context) => SearchScreen(),
         '/cart': (context) => CartScreen(),
         '/bookings': (context) => BookingsScreen(),
         '/profile': (context) => ProfileScreen(),
-        '/stories': (context) => StoriesScreen(),
-        '/diary': (context) => TravelDiaryScreen(),
+        '/stories': (context) => const StoriesScreen(),
+        '/diary': (context) => const TravelDiaryScreen(),
+        '/feed': (context) => const FeedScreen(),
         '/quiz': (context) => EmotionalPreferencesQuizScreen(),
         '/impact-dashboard': (context) => ExperienceImpactDashboardScreen(),
       },
@@ -123,6 +125,8 @@ class FeelTripApp extends StatelessWidget {
 }
 
 class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
   @override
   State<MainApp> createState() => _MainAppState();
 }
@@ -130,7 +134,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   int _currentIndex = 0;
   final List<Widget> _screens = [
-    HomeScreen(),
+    const HomeScreen(),
     SearchScreen(),
     CartScreen(),
     BookingsScreen(),
@@ -152,7 +156,7 @@ class _MainAppState extends State<MainApp> {
             _currentIndex = index;
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Inicio',

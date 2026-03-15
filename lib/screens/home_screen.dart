@@ -350,14 +350,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 12),
                   ..._stories
                       .take(2)
-                      .map((story) => _buildStoryPreviewCard(story))
-                      .toList(),
+                      .map((story) => _buildStoryPreviewCard(story)),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
-            // Quick Access Section
+// Quick Access Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -400,6 +399,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+            // Herramientas UGC
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Herramientas UGC',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ListTile(
+                    leading: const Icon(Icons.dynamic_feed),
+                    title: const Text('Feed'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => Navigator.of(context).pushNamed('/feed'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.translate),
+                    title: const Text('Traductor'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const TranslatorScreen()),
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Lector OCR'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const OCRScreen()),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             if (!Get.find<PremiumController>().isPremium.value)
               Padding(
                 padding: const EdgeInsets.all(16),

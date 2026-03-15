@@ -21,13 +21,6 @@ class ExperienceController extends GetxController {
   // Variables
   String? userId;
 
-  @override
-  void onInit() {
-    super.onInit();
-    // El userId se debe setear después de autenticación
-    // loadAllData() será llamado cuando userId esté disponible
-  }
-
   // ============ INITIALIZATION ============
 
   /// Inicializar con userId (llamar después de login)
@@ -42,7 +35,7 @@ class ExperienceController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      
+
       await Future.wait([
         loadStories(),
         loadDiaryEntries(),
@@ -103,10 +96,10 @@ class ExperienceController extends GetxController {
       );
 
       await _storyService.createStory(userId!, newStory);
-      
+
       // Agregar a la lista local
       stories.insert(0, newStory);
-      
+
       successMessage.value = '¡Historia compartida exitosamente!';
       print('✅ Story created: ${newStory.id}');
     } catch (e) {
@@ -117,48 +110,36 @@ class ExperienceController extends GetxController {
     }
   }
 
-  /// Like a una historia
-  Future<void> likeStory(String storyId) async {
-    try {
-      await _storyService.likeStory(storyId);
-      
-      // Actualizar en lista local
-      final index = stories.indexWhere((s) => s.id == storyId);
-      if (index != -1) {
-        stories[index].likes++;
-        stories.refresh();
-      }
-      
-      print('✅ Story liked: $storyId');
-    } catch (e) {
-      errorMessage.value = 'Error: $e';
-      print('❌ Error liking story: $e');
+  /// Toggle like en una historia
+  Future<void> toggleLike(String storyId) async {
+    if (userId == null) {
+      errorMessage.value = 'Usuario no autenticado';
+      return;
     }
-  }
 
-  /// Unlike a una historia
-  Future<void> unlikeStory(String storyId) async {
     try {
-      await _storyService.unlikeStory(storyId);
-      
+      await _storyService.toggleLike(storyId, userId!);
+
       // Actualizar en lista local
       final index = stories.indexWhere((s) => s.id == storyId);
       if (index != -1) {
-        stories[index].likes--;
+        stories[index].likedBy.contains(userId!)
+            ? stories[index].likes--
+            : stories[index].likes++;
         stories.refresh();
       }
-      
-      print('✅ Story unliked: $storyId');
+
+      print('✅ Story toggle liked: $storyId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error unliking story: $e');
+      print('❌ Error toggling like: $e');
     }
   }
 
   /// Eliminar historia
   Future<void> deleteStory(String storyId) async {
     if (userId == null) return;
-    
+
     try {
       await _storyService.deleteStory(userId!, storyId);
       stories.removeWhere((s) => s.id == storyId);
@@ -200,7 +181,7 @@ class ExperienceController extends GetxController {
 
   /// Stream de entradas del diario
   Stream<List<DiaryEntry>> getDiaryEntriesStream() {
-    if (userId == null) return Stream.empty();
+    if (userId == null) return const Stream.empty();
     return _diaryService.getDiaryEntriesStream(userId!);
   }
 
@@ -230,13 +211,13 @@ class ExperienceController extends GetxController {
       );
 
       await _diaryService.createDiaryEntry(userId!, entry);
-      
+
       // Agregar a lista local
       diaryEntries.insert(0, entry);
-      
+
       // Recargar estadísticas
       await loadDiaryStats();
-      
+
       successMessage.value = '¡Entrada guardada!';
       print('✅ Diary entry created: ${entry.id}');
     } catch (e) {
@@ -248,7 +229,8 @@ class ExperienceController extends GetxController {
   }
 
   /// Actualizar entrada del diario
-  Future<void> updateDiaryEntry(String entryId, {
+  Future<void> updateDiaryEntry(
+    String entryId, {
     required String location,
     required String content,
     required List<String> emotions,
@@ -258,7 +240,7 @@ class ExperienceController extends GetxController {
 
     try {
       isSavingDiary.value = true;
-      
+
       final updates = {
         'location': location,
         'content': content,
@@ -267,7 +249,7 @@ class ExperienceController extends GetxController {
       };
 
       await _diaryService.updateDiaryEntry(userId!, entryId, updates);
-      
+
       // Actualizar en lista local
       final index = diaryEntries.indexWhere((e) => e.id == entryId);
       if (index != -1) {
@@ -281,10 +263,10 @@ class ExperienceController extends GetxController {
         );
         diaryEntries.refresh();
       }
-      
+
       // Recargar estadísticas
       await loadDiaryStats();
-      
+
       successMessage.value = 'Entrada actualizada';
       print('✅ Diary entry updated: $entryId');
     } catch (e) {
@@ -343,9 +325,8 @@ class ExperienceController extends GetxController {
   /// Obtener profundidad promedio
   double getAverageDepth() {
     if (diaryEntries.isEmpty) return 0;
-    final sum = diaryEntries
-        .map((e) => e.reflectionDepth)
-        .reduce((a, b) => a + b);
+    final sum =
+        diaryEntries.map((e) => e.reflectionDepth).reduce((a, b) => a + b);
     return sum / diaryEntries.length;
   }
 

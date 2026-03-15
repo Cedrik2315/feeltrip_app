@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import '../models/comment_model.dart';
 import '../services/comment_service.dart';
@@ -18,9 +19,7 @@ class CommentsScreen extends StatefulWidget {
 class _CommentsScreenState extends State<CommentsScreen> {
   final CommentService _commentService = CommentService();
   final TextEditingController _commentController = TextEditingController();
-  final String userId = 'user123'; // TODO: Obtener del usuario actual
-  final String userName = 'Usuario'; // TODO: Obtener del perfil del usuario
-  final String userAvatar = 'https://via.placeholder.com/50';
+  final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'anonymous';
 
   final List<String> reactions = ['❤️', '😂', '😍', '🔥', '👍', '😢'];
 
@@ -31,16 +30,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
   }
 
   void _submitComment() {
-    if (_commentController.text.isEmpty) return;
+    if (_commentController.text.trim().isEmpty) return;
 
-    _commentService.addComment(
-      storyId: widget.storyId,
-      userId: userId,
-      userName: userName,
-      userAvatar: userAvatar,
-      content: _commentController.text,
-    );
-
+    _commentService.addComment(widget.storyId, userId, _commentController.text.trim());
     _commentController.clear();
   }
 
@@ -61,7 +53,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                final comments = snapshot.data ?? [];
+                if (comments.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -69,23 +62,17 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         Icon(
                           Icons.comment_bank_outlined,
                           size: 80,
-                          color: Colors.grey[300],
+                          color: Colors.grey,
                         ),
                         const SizedBox(height: 16),
-                        Text(
+                        const Text(
                           'Sin comentarios aún',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                         const SizedBox(height: 8),
-                        Text(
+                        const Text(
                           'Sé el primero en comentar',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[500],
-                          ),
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -93,9 +80,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 }
 
                 return ListView.builder(
-                  itemCount: snapshot.data!.length,
+                  itemCount: comments.length,
                   itemBuilder: (context, index) {
-                    final comment = snapshot.data![index];
+                    final comment = comments[index];
                     return _buildCommentCard(comment);
                   },
                 );
@@ -118,7 +105,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage(comment.userAvatar),
+                backgroundImage: comment.userAvatar.isNotEmpty 
+                  ? NetworkImage(comment.userAvatar) 
+                  : null,
+                child: comment.userAvatar.isEmpty 
+                  ? Icon(Icons.person, size: 20)
+                  : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -136,7 +128,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                       _timeAgo(comment.createdAt),
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: Colors.grey,
                       ),
                     ),
                   ],
@@ -144,16 +136,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
               ),
               if (comment.userId == userId)
                 GestureDetector(
-                  onTap: () {
-                    _commentService.deleteComment(
-                      storyId: widget.storyId,
-                      commentId: comment.id,
-                    );
-                  },
+                  onTap: () => _commentService.deleteComment(comment.id),
                   child: Icon(
                     Icons.close,
                     size: 20,
-                    color: Colors.grey[600],
+                    color: Colors.grey,
                   ),
                 ),
             ],
@@ -167,25 +154,20 @@ class _CommentsScreenState extends State<CommentsScreen> {
           Row(
             children: [
               GestureDetector(
-                onTap: () {
-                  _commentService.likeComment(
-                    storyId: widget.storyId,
-                    commentId: comment.id,
-                  );
-                },
+                onTap: () => _commentService.likeComment(comment.id),
                 child: Row(
                   children: [
                     Icon(
                       Icons.favorite_border,
                       size: 16,
-                      color: Colors.grey[600],
+                      color: Colors.grey,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      comment.likes.toString(),
-                      style: TextStyle(
+                      '${comment.likes}',
+                      style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: Colors.grey,
                       ),
                     ),
                   ],
@@ -193,22 +175,20 @@ class _CommentsScreenState extends State<CommentsScreen> {
               ),
               const SizedBox(width: 16),
               GestureDetector(
-                onTap: () {
-                  _showReactionPicker(comment);
-                },
+                onTap: () => _showReactionPicker(comment),
                 child: Row(
                   children: [
                     Icon(
                       Icons.emoji_emotions_outlined,
                       size: 16,
-                      color: Colors.grey[600],
+                      color: Colors.grey,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      comment.reactions.length.toString(),
-                      style: TextStyle(
+                      '${comment.reactions.length}',
+                      style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: Colors.grey,
                       ),
                     ),
                   ],
@@ -227,10 +207,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
               ),
             ),
           const SizedBox(height: 12),
-          Divider(
-            color: Colors.grey[300],
-            height: 1,
-          ),
+          Divider(color: Colors.grey.shade300),
         ],
       ),
     );
@@ -242,16 +219,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
-          top: BorderSide(
-            color: Colors.grey[200]!,
-          ),
+          top: BorderSide(color: Colors.grey.shade200),
         ),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundImage: NetworkImage(userAvatar),
+            backgroundColor: Colors.blue.shade100,
+            child: Icon(Icons.person, size: 16, color: Colors.blue),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -261,9 +237,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 hintText: 'Agrega un comentario...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(
-                    color: Colors.grey[300]!,
-                  ),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -312,24 +286,17 @@ class _CommentsScreenState extends State<CommentsScreen> {
             Wrap(
               spacing: 16,
               runSpacing: 16,
-              children: reactions
-                  .map((reaction) => GestureDetector(
-                        onTap: () {
-                          _commentService.addReaction(
-                            storyId: widget.storyId,
-                            commentId: comment.id,
-                            reaction: reaction,
-                          );
-                          Get.back();
-                        },
-                        child: Text(
-                          reaction,
-                          style: const TextStyle(fontSize: 32),
-                        ),
-                      ))
-                  .toList(),
+              children: reactions.map((reaction) => GestureDetector(
+                onTap: () {
+                  _commentService.addReaction(comment.id, reaction);
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  reaction,
+                  style: const TextStyle(fontSize: 32),
+                ),
+              )).toList(),
             ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -339,17 +306,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
   String _timeAgo(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-
-    if (difference.inSeconds < 60) {
-      return 'Hace unos segundos';
-    } else if (difference.inMinutes < 60) {
-      return 'Hace ${difference.inMinutes} min';
-    } else if (difference.inHours < 24) {
-      return 'Hace ${difference.inHours} h';
-    } else if (difference.inDays < 7) {
-      return 'Hace ${difference.inDays} d';
-    } else {
-      return 'Hace ${(difference.inDays / 7).floor()} sem';
-    }
+    if (difference.inSeconds < 60) return 'ahora';
+    if (difference.inMinutes < 60) return 'hace ${difference.inMinutes}m';
+    if (difference.inHours < 24) return 'hace ${difference.inHours}h';
+    if (difference.inDays < 7) return 'hace ${difference.inDays}d';
+    return 'hace ${difference.inDays ~/ 7}s';
   }
 }
+

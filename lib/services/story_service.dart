@@ -134,32 +134,56 @@ class StoryService {
     }
   }
 
-  /// Agregar like a una historia
-  Future<void> likeStory(String storyId) async {
+  /// Toggle like en una historia (agrega/quita userId de likedBy)
+  Future<void> toggleLike(String storyId, String userId) async {
     try {
-      await _firestore
-          .collection(FirebaseConfig.storiesCollection)
-          .doc(storyId)
-          .update({'likes': FieldValue.increment(1)});
+      await _firestore.runTransaction((transaction) async {
+        final storyRef = _firestore
+            .collection(FirebaseConfig.storiesCollection)
+            .doc(storyId);
+        final snapshot = await transaction.get(storyRef);
+        if (!snapshot.exists) throw Exception('Story not found');
 
-      print('✅ Story liked: $storyId');
+        final data = snapshot.data()!;
+        final likedBy = List<String>.from(data['likedBy'] ?? []);
+        final likes = (data['likes'] ?? 0) as int;
+
+        if (likedBy.contains(userId)) {
+          // Unlike
+          likedBy.remove(userId);
+          transaction.update(storyRef, {
+            'likes': likes - 1,
+            'likedBy': likedBy,
+          });
+          print('✅ Story unliked by $userId: $storyId');
+        } else {
+          // Like
+          likedBy.add(userId);
+          transaction.update(storyRef, {
+            'likes': likes + 1,
+            'likedBy': likedBy,
+          });
+          print('✅ Story liked by $userId: $storyId');
+        }
+      });
     } catch (e) {
-      print('❌ Error liking story: $e');
+      print('❌ Error toggling like: $e');
       rethrow;
     }
   }
 
-  /// Quitar like de una historia
-  Future<void> unlikeStory(String storyId) async {
+  /// Agregar reacción (emoji) a una historia
+  Future<void> addReaction(String storyId, String userId, String emoji) async {
     try {
       await _firestore
           .collection(FirebaseConfig.storiesCollection)
           .doc(storyId)
-          .update({'likes': FieldValue.increment(-1)});
-
-      print('✅ Story unliked: $storyId');
+          .update({
+        'reaction': emoji,
+      });
+      print('✅ Reaction $emoji added to story $storyId');
     } catch (e) {
-      print('❌ Error unliking story: $e');
+      print('❌ Error adding reaction: $e');
       rethrow;
     }
   }
@@ -233,7 +257,7 @@ class StoryService {
       final snapshot = await _firestore
           .collection(FirebaseConfig.storiesCollection)
           .where('title', isGreaterThanOrEqualTo: query)
-          .where('title', isLessThan: query + 'z')
+          .where('title', isLessThan: '${query}z')
           .get();
 
       return snapshot.docs
