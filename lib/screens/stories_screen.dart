@@ -21,6 +21,7 @@ class StoriesScreen extends StatefulWidget {
 class _StoriesScreenState extends State<StoriesScreen> {
   late ExperienceController _controller;
   final TextEditingController _searchController = TextEditingController();
+  final RxList<TravelerStory> _filteredStories = <TravelerStory>[].obs;
   String? _selectedTag;
 
   @override
@@ -93,13 +94,14 @@ class _StoriesScreenState extends State<StoriesScreen> {
           const SizedBox(height: 8),
           Expanded(
             child: Obx(() {
-              var filteredStories = _controller.stories;
+              var filtered = _controller.stories.toList();
               if (_selectedTag != null && _selectedTag != 'Todas') {
-                filteredStories = _controller.stories
+                filtered = filtered
                     .where((story) => story.tags.contains(_selectedTag))
                     .toList();
               }
-              if (filteredStories.isEmpty) {
+              _filteredStories.assignAll(filtered);
+              if (_filteredStories.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -121,9 +123,9 @@ class _StoriesScreenState extends State<StoriesScreen> {
               }
 
               return ListView.builder(
-                itemCount: filteredStories.length,
+                itemCount: _filteredStories.length,
                 itemBuilder: (context, index) {
-                  final story = filteredStories[index];
+                  final story = _filteredStories[index];
                   return _buildStoryCard(story);
                 },
               );

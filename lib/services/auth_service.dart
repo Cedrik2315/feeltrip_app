@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import '../config/firebase_config.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 
 class AuthService {
@@ -16,7 +16,7 @@ class AuthService {
           email: email, password: password);
       return credential.user;
     } catch (e) {
-      print('Auth error: $e');
+      debugPrint('Auth error: $e');
       return null;
     }
   }
@@ -28,7 +28,7 @@ class AuthService {
           email: email, password: password);
       return credential.user;
     } catch (e) {
-      print('Auth error: $e');
+      debugPrint('Auth error: $e');
       return null;
     }
   }

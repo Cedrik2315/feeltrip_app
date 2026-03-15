@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'models/experience_model.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'models/agency_model.dart';
 import 'models/comment_model.dart';
 import 'models/trip_model.dart';
@@ -278,8 +278,9 @@ class MockData {
     {
       'id': 'story_001',
       'title': 'Mi aventura en Patagonia',
-      'story': 'Fue increíble caminar entre los glaciares. La naturaleza es majestuosa. '
-          'Vi pingüinos y una ballena azul desde la orilla del fiordo.',
+      'story':
+          'Fue increíble caminar entre los glaciares. La naturaleza es majestuosa. '
+              'Vi pingüinos y una ballena azul desde la orilla del fiordo.',
       'author': 'Juan Pérez',
       'userId': 'user123',
       'rating': 4.8,
@@ -291,8 +292,9 @@ class MockData {
     {
       'id': 'story_002',
       'title': 'Atardecer en Bali',
-      'story': 'El atardecer fue mágico. Miles de turistas en las playas, pero el momento '
-          'fue único. Compré souvenirs locales y probé comida tradicional balinesa.',
+      'story':
+          'El atardecer fue mágico. Miles de turistas en las playas, pero el momento '
+              'fue único. Compré souvenirs locales y probé comida tradicional balinesa.',
       'author': 'María García',
       'userId': 'user456',
       'rating': 4.9,
@@ -325,7 +327,8 @@ class MockData {
         'userId': 'user456',
         'userName': 'María García',
         'userAvatar': 'https://via.placeholder.com/40',
-        'content': '¡Qué hermosa aventura! Me encantaría ir a Patagonia algún día.',
+        'content':
+            '¡Qué hermosa aventura! Me encantaría ir a Patagonia algún día.',
         'reactions': ['❤️', '❤️', '😍'],
         'createdAt': Timestamp.now(),
         'likes': 3,
@@ -336,7 +339,8 @@ class MockData {
         'userId': 'user789',
         'userName': 'Carlos López',
         'userAvatar': 'https://via.placeholder.com/40',
-        'content': 'Los glaciares son impresionantes. El cambio climático es real.',
+        'content':
+            'Los glaciares son impresionantes. El cambio climático es real.',
         'reactions': ['🔥'],
         'createdAt': Timestamp.now(),
         'likes': 1,
@@ -375,8 +379,9 @@ class MockData {
     {
       'id': 'agency_001',
       'name': 'FeelTrip Adventures',
-      'description': 'Agencia especializada en aventuras de naturaleza y experiencias transformadoras. '
-          'Con más de 10 años de experiencia en turismo responsable.',
+      'description':
+          'Agencia especializada en aventuras de naturaleza y experiencias transformadoras. '
+              'Con más de 10 años de experiencia en turismo responsable.',
       'logo': 'https://via.placeholder.com/200',
       'city': 'Buenos Aires',
       'country': 'Argentina',
@@ -390,14 +395,18 @@ class MockData {
       'phoneNumber': '+54 11 1234 5678',
       'email': 'info@feeltrip.com',
       'website': 'www.feeltrip.com',
-      'socialMedia': ['https://instagram.com/feeltrip', 'https://facebook.com/feeltrip'],
+      'socialMedia': [
+        'https://instagram.com/feeltrip',
+        'https://facebook.com/feeltrip'
+      ],
       'createdAt': Timestamp.now(),
     },
     {
       'id': 'agency_002',
       'name': 'Wanderlust Experiences',
-      'description': 'Tours personalizados a los destinos más exóticos del mundo. '
-          'Nuestro equipo te acompañará en cada paso de tu viaje.',
+      'description':
+          'Tours personalizados a los destinos más exóticos del mundo. '
+              'Nuestro equipo te acompañará en cada paso de tu viaje.',
       'logo': 'https://via.placeholder.com/200',
       'city': 'Lima',
       'country': 'Perú',
@@ -411,14 +420,18 @@ class MockData {
       'phoneNumber': '+51 1 456 7890',
       'email': 'contact@wanderlust.pe',
       'website': 'www.wanderlustexperiences.pe',
-      'socialMedia': ['https://instagram.com/wanderlust', 'https://tiktok.com/@wanderlust'],
+      'socialMedia': [
+        'https://instagram.com/wanderlust',
+        'https://tiktok.com/@wanderlust'
+      ],
       'createdAt': Timestamp.now(),
     },
     {
       'id': 'agency_003',
       'name': 'Bali Dreams Travel',
-      'description': 'Especialistas en destinos asiáticos. Desde playas hasta templos, '
-          'te llevamos a los lugares más especiales de Indonesia.',
+      'description':
+          'Especialistas en destinos asiáticos. Desde playas hasta templos, '
+              'te llevamos a los lugares más especiales de Indonesia.',
       'logo': 'https://via.placeholder.com/200',
       'city': 'Denpasar',
       'country': 'Indonesia',
@@ -478,7 +491,7 @@ class MockData {
       orElse: () => {},
     );
     if (data.isEmpty) return null;
-    
+
     return Trip(
       id: data['id'],
       title: data['title'],
@@ -562,7 +575,7 @@ class MockData {
       orElse: () => {},
     );
     if (data.isEmpty) return null;
-    
+
     return TravelAgency(
       id: data['id'],
       name: data['name'],
@@ -590,7 +603,8 @@ class MockData {
   /// Obtener agencias por ciudad
   static List<TravelAgency> getAgenciesByCity(String city) {
     return mockAgencies
-        .where((agency) => agency['city'].toLowerCase().contains(city.toLowerCase()))
+        .where((agency) =>
+            agency['city'].toLowerCase().contains(city.toLowerCase()))
         .map((data) {
       return TravelAgency(
         id: data['id'],
@@ -620,9 +634,9 @@ class MockData {
 
 // Función para usar en pruebas
 void main() {
-  print('=== DATOS DE PRUEBA DISPONIBLES ===');
-  print('Usuario: ${MockData.testUser.name}');
-  print('Viajes disponibles: ${MockData.mockTrips.length}');
-  print('Reseñas: ${MockData.mockReviews.length}');
-  print('Reservas: ${MockData.mockBookings.length}');
+  debugPrint('=== DATOS DE PRUEBA DISPONIBLES ===');
+  debugPrint('Usuario: ${MockData.testUser.name}');
+  debugPrint('Viajes disponibles: ${MockData.mockTrips.length}');
+  debugPrint('Reseñas: ${MockData.mockReviews.length}');
+  debugPrint('Reservas: ${MockData.mockBookings.length}');
 }

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:get/get.dart';
 import '../models/experience_model.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 
 class ReelsScreen extends StatefulWidget {
@@ -28,6 +32,8 @@ class _ReelsScreenState extends State<ReelsScreen> {
     entries = [
       DiaryEntry(
         id: 'demo1',
+        tripId: 'reel_trip',
+        userId: FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
         location: 'Memory 1',
         content: 'Amazing sunset...',
         emotions: ['Gratitud'],
@@ -37,6 +43,8 @@ class _ReelsScreenState extends State<ReelsScreen> {
       ),
       DiaryEntry(
         id: 'demo2',
+        tripId: 'reel_trip',
+        userId: FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
         location: 'Memory 2',
         content: 'Met people who changed my life',
         emotions: ['Conexión'],

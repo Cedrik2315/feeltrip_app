@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../models/experience_model.dart';
 import '../services/story_service.dart';
 import '../services/diary_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ExperienceController extends GetxController {
   final StoryService _storyService = StoryService();
@@ -43,7 +44,6 @@ class ExperienceController extends GetxController {
       ]);
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error loading data: $e');
     } finally {
       isLoading.value = false;
     }
@@ -56,8 +56,7 @@ class ExperienceController extends GetxController {
     try {
       final fetchedStories = await _storyService.getPublicStories();
       stories.assignAll(fetchedStories);
-    } catch (e) {
-      print('❌ Error loading stories: $e');
+    } catch (_) {
       errorMessage.value = 'Error cargando historias';
     }
   }
@@ -101,10 +100,8 @@ class ExperienceController extends GetxController {
       stories.insert(0, newStory);
 
       successMessage.value = '¡Historia compartida exitosamente!';
-      print('✅ Story created: ${newStory.id}');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error creating story: $e');
     } finally {
       isSavingStory.value = false;
     }
@@ -128,11 +125,8 @@ class ExperienceController extends GetxController {
             : stories[index].likes++;
         stories.refresh();
       }
-
-      print('✅ Story toggle liked: $storyId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error toggling like: $e');
     }
   }
 
@@ -144,10 +138,8 @@ class ExperienceController extends GetxController {
       await _storyService.deleteStory(userId!, storyId);
       stories.removeWhere((s) => s.id == storyId);
       successMessage.value = 'Historia eliminada';
-      print('✅ Story deleted: $storyId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error deleting story: $e');
     }
   }
 
@@ -157,9 +149,8 @@ class ExperienceController extends GetxController {
       isLoading.value = true;
       final results = await _storyService.searchStoriesByEmotion(emotion);
       stories.assignAll(results);
-    } catch (e) {
+    } catch (_) {
       errorMessage.value = 'Error buscando historias';
-      print('❌ Error searching stories: $e');
     } finally {
       isLoading.value = false;
     }
@@ -173,8 +164,7 @@ class ExperienceController extends GetxController {
     try {
       final entries = await _diaryService.getDiaryEntries(userId!);
       diaryEntries.assignAll(entries);
-    } catch (e) {
-      print('❌ Error loading diary entries: $e');
+    } catch (_) {
       errorMessage.value = 'Error cargando diario';
     }
   }
@@ -203,6 +193,8 @@ class ExperienceController extends GetxController {
 
       final entry = DiaryEntry(
         id: const Uuid().v4(),
+        tripId: 'default',
+        userId: FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
         location: location,
         content: content,
         emotions: emotions,
@@ -219,10 +211,8 @@ class ExperienceController extends GetxController {
       await loadDiaryStats();
 
       successMessage.value = '¡Entrada guardada!';
-      print('✅ Diary entry created: ${entry.id}');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error creating diary entry: $e');
     } finally {
       isSavingDiary.value = false;
     }
@@ -255,6 +245,8 @@ class ExperienceController extends GetxController {
       if (index != -1) {
         diaryEntries[index] = DiaryEntry(
           id: entryId,
+          tripId: 'default',
+          userId: FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
           location: location,
           content: content,
           emotions: emotions,
@@ -268,10 +260,8 @@ class ExperienceController extends GetxController {
       await loadDiaryStats();
 
       successMessage.value = 'Entrada actualizada';
-      print('✅ Diary entry updated: $entryId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error updating diary entry: $e');
     } finally {
       isSavingDiary.value = false;
     }
@@ -286,10 +276,8 @@ class ExperienceController extends GetxController {
       diaryEntries.removeWhere((e) => e.id == entryId);
       await loadDiaryStats();
       successMessage.value = 'Entrada eliminada';
-      print('✅ Diary entry deleted: $entryId');
     } catch (e) {
       errorMessage.value = 'Error: $e';
-      print('❌ Error deleting diary entry: $e');
     }
   }
 
@@ -301,9 +289,7 @@ class ExperienceController extends GetxController {
     try {
       final stats = await _diaryService.getDiaryStats(userId!);
       diaryStats.assignAll(stats);
-    } catch (e) {
-      print('❌ Error loading diary stats: $e');
-    }
+    } catch (_) {}
   }
 
   /// Obtener estadísticas del diario
@@ -359,9 +345,8 @@ class ExperienceController extends GetxController {
       isLoading.value = true;
       final entries = await _diaryService.getEntriesByEmotion(userId!, emotion);
       diaryEntries.assignAll(entries);
-    } catch (e) {
+    } catch (_) {
       errorMessage.value = 'Error filtrando';
-      print('❌ Error filtering: $e');
     } finally {
       isLoading.value = false;
     }
@@ -378,9 +363,8 @@ class ExperienceController extends GetxController {
         endDate,
       );
       diaryEntries.assignAll(entries);
-    } catch (e) {
+    } catch (_) {
       errorMessage.value = 'Error filtrando';
-      print('❌ Error filtering by date: $e');
     } finally {
       isLoading.value = false;
     }
@@ -396,12 +380,5 @@ class ExperienceController extends GetxController {
     userId = null;
     errorMessage.value = '';
     successMessage.value = '';
-  }
-
-  /// Auto-limpiar mensajes después de 3 segundos
-  void _clearMessages() {
-    Future.delayed(const Duration(seconds: 3), () {
-      successMessage.value = '';
-    });
   }
 }

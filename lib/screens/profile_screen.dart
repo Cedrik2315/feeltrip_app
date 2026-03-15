@@ -8,7 +8,6 @@ import 'instagram_stories_screen.dart';
 import 'translator_screen.dart';
 import 'ocr_screen.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -31,7 +30,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     final user = AuthService.currentUser;
     currentUid = user?.uid;
-    _nameController = TextEditingController(text: user?.displayName ?? user?.email?.split('@')[0].replaceAll('.', ' ') ?? 'Usuario');
+    _nameController = TextEditingController(
+        text: user?.displayName ??
+            user?.email?.split('@')[0].replaceAll('.', ' ') ??
+            'Usuario');
     _emailController = TextEditingController(text: user?.email ?? '');
     _phoneController = TextEditingController(text: '+34 612 345 678'); // Mock
     _loadFollowingStatus();
@@ -39,14 +41,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadFollowingStatus() async {
     if (currentUid == null) return;
-    final isFollowing = await userService.isFollowing(currentUid!, targetUserId);
+    final isFollowing =
+        await userService.isFollowing(currentUid!, targetUserId);
     if (mounted) {
       setState(() {
         _isFollowing = isFollowing;
       });
     }
   }
-
 
   @override
   void dispose() {
@@ -102,14 +104,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    AuthService.currentUser?.displayName ?? AuthService.currentUser?.email?.split('@')[0].replaceAll('.', ' ') ?? 'Usuario',
+                    AuthService.currentUser?.displayName ??
+                        AuthService.currentUser?.email
+                            ?.split('@')[0]
+                            .replaceAll('.', ' ') ??
+                        'Usuario',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-
                   const SizedBox(height: 4),
                   const Text(
                     'Miembro desde 2024',
@@ -185,11 +190,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 16),
                   StreamBuilder<List<String>>(
-                    stream: currentUid != null ? userService.getFollowers(currentUid!) : Stream.value([]),
+                    stream: currentUid != null
+                        ? userService.getFollowers(currentUid!)
+                        : Stream.value([]),
                     builder: (context, followerSnapshot) {
                       final followers = followerSnapshot.data?.length ?? 0;
                       return StreamBuilder<List<String>>(
-                        stream: currentUid != null ? userService.getFollowing(currentUid!) : Stream.value([]),
+                        stream: currentUid != null
+                            ? userService.getFollowing(currentUid!)
+                            : Stream.value([]),
                         builder: (context, followingSnapshot) {
                           final following = followingSnapshot.data?.length ?? 0;
                           return Row(
@@ -239,7 +248,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   ),
-
                 ],
               ),
             ),
@@ -247,24 +255,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Follow button example
             Center(
               child: ElevatedButton.icon(
-                onPressed: currentUid == null ? null : () async {
-                  try {
-                    if (_isFollowing) {
-                      await userService.unfollowUser(currentUid!, targetUserId);
-                    } else {
-                      await userService.followUser(currentUid!, targetUserId);
-                    }
-                    setState(() {
-                      _isFollowing = !_isFollowing;
-                    });
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
-                    );
-                  }
-                },
-                icon: Icon(_isFollowing ? Icons.person_remove : Icons.person_add),
-                label: Text(_isFollowing ? 'Dejar de seguir Demo Traveler' : 'Seguir Demo Traveler'),
+                onPressed: currentUid == null
+                    ? null
+                    : () async {
+                        try {
+                          if (_isFollowing) {
+                            await userService.unfollowUser(
+                                currentUid!, targetUserId);
+                          } else {
+                            await userService.followUser(
+                                currentUid!, targetUserId);
+                          }
+                          setState(() {
+                            _isFollowing = !_isFollowing;
+                          });
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error: $e')),
+                          );
+                        }
+                      },
+                icon:
+                    Icon(_isFollowing ? Icons.person_remove : Icons.person_add),
+                label: Text(_isFollowing
+                    ? 'Dejar de seguir Demo Traveler'
+                    : 'Seguir Demo Traveler'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _isFollowing ? Colors.grey : Colors.green,
                 ),
@@ -394,7 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-    )
+    );
   }
 
   Widget _buildTextField(
@@ -428,21 +443,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancelar'),
           ),
-            ElevatedButton(
-              onPressed: () async {
-                await AuthService.signOut();
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Sesión cerrada'),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
-              child: const Text('Cerrar Sesión'),
+          ElevatedButton(
+            onPressed: () async {
+              await AuthService.signOut();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Sesión cerrada'),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
             ),
+            child: const Text('Cerrar Sesión'),
+          ),
         ],
       ),
     );

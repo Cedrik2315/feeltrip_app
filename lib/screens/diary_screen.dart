@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../services/diary_service.dart';
 import '../models/experience_model.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DiaryScreen extends StatefulWidget {
   const DiaryScreen({super.key});
@@ -39,12 +41,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
     '😢'
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    initializeCamera();
-    loadEntries();
-  }
+  // Removed duplicate initState
 
   Future<void> initializeCamera() async {
     final cameras = await availableCameras();
@@ -86,6 +83,8 @@ class _DiaryScreenState extends State<DiaryScreen> {
   void addEntry(String text) async {
     final newEntry = DiaryEntry(
       id: const Uuid().v4(),
+      tripId: 'default',
+      userId: FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
       location: 'Emotional Diary',
       content: text,
       emotions: [selectedEmotion],
@@ -108,6 +107,8 @@ class _DiaryScreenState extends State<DiaryScreen> {
       final image = await cameraController!.takePicture();
       final newEntry = DiaryEntry(
         id: const Uuid().v4(),
+        tripId: 'default',
+        userId: FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
         location: 'Emotional Diary Photo',
         content: 'Foto del momento $selectedEmotion',
         emotions: [selectedEmotion],
@@ -247,7 +248,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
             // Lista de entradas
             Expanded(
-              ListView.builder(
+              child: ListView.builder(
                 itemCount: entries.length,
                 itemBuilder: (context, index) {
                   final entry = entries[index];

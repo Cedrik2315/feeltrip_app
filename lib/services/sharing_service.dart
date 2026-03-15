@@ -1,4 +1,5 @@
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter/foundation.dart';
 
 class SharingService {
   /// Compartir historia a WhatsApp
@@ -16,9 +17,9 @@ class SharingService {
         subject: '¡Mira esta historia en FeelTrip!',
       );
 
-      print('✅ Compartido a WhatsApp exitosamente');
+      debugPrint('✅ Compartido a WhatsApp exitosamente');
     } catch (e) {
-      print('❌ Error compartiendo: $e');
+      debugPrint('❌ Error compartiendo: $e');
       rethrow;
     }
   }
@@ -38,9 +39,9 @@ class SharingService {
         subject: '¡Comparte esta aventura!',
       );
 
-      print('✅ Compartido a Facebook exitosamente');
+      debugPrint('✅ Compartido a Facebook exitosamente');
     } catch (e) {
-      print('❌ Error compartiendo: $e');
+      debugPrint('❌ Error compartiendo: $e');
       rethrow;
     }
   }
@@ -55,9 +56,9 @@ class SharingService {
 
       await Share.share(message, subject: '¡Mira en FeelTrip!');
 
-      print('✅ Compartido a TikTok exitosamente');
+      debugPrint('✅ Compartido a TikTok exitosamente');
     } catch (e) {
-      print('❌ Error compartiendo: $e');
+      debugPrint('❌ Error compartiendo: $e');
       rethrow;
     }
   }
@@ -76,9 +77,9 @@ class SharingService {
         subject: 'Comparte desde FeelTrip',
       );
 
-      print('✅ Compartido exitosamente');
+      debugPrint('✅ Compartido exitosamente');
     } catch (e) {
-      print('❌ Error compartiendo: $e');
+      debugPrint('❌ Error compartiendo: $e');
       rethrow;
     }
   }

@@ -7,6 +7,8 @@ import '../models/experience_model.dart';
 import '../services/api_service.dart';
 import '../services/admob_service.dart';
 import '../controllers/premium_controller.dart';
+import 'translator_screen.dart';
+import 'ocr_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

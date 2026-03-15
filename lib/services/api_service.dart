@@ -4,7 +4,7 @@ import 'dart:async';
 import '../models/trip_model.dart';
 import '../models/booking_model.dart';
 import '../models/review_model.dart';
-import '../models/user_model.dart';
+
 
 class ApiService {
   static const String baseUrl = 'https://api.feeltrip.com/api';

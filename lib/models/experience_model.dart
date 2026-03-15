@@ -198,14 +198,14 @@ class TravelerStory {
 
 class DiaryEntry {
   final String id;
+  final String tripId;
+  final String userId;
   final String location;
   final String content;
   final List<String> emotions;
   final List<String> photos;
   final int reflectionDepth;
   final DateTime createdAt;
-  final String tripId;
-  final String userId;
 
   DiaryEntry({
     required this.id,

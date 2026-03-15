@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/home_screen.dart';
 import 'screens/search_screen.dart';
@@ -24,7 +23,7 @@ void main() async {
   try {
     await dotenv.load();
   } catch (e) {
-    print('⚠️ Warning: Could not load .env file: $e');
+    debugPrint('⚠️ Warning: Could not load .env file: $e');
   }
   await StorageService.init();
   await FirebaseConfig.initialize();
