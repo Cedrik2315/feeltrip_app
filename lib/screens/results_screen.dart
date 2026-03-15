@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'diary_screen.dart';
+import 'travel_diary_screen.dart';
 
 class ResultsScreen extends StatelessWidget {
   final List<String> answers;
 
-  const ResultsScreen({Key? key, required this.answers}) : super(key: key);
+  const ResultsScreen({super.key, required this.answers});
 
   // Función para determinar el viaje según respuestas
   Map<String, dynamic> getRecommendedTrip() {
@@ -16,7 +16,8 @@ class ResultsScreen extends StatelessWidget {
     if (emotion.contains('Lágrima') && season == 'Invierno') {
       return {
         'title': 'Auroras en Tromsø',
-        'description': '5 días para llorar de emoción bajo las auroras boreales',
+        'description':
+            '5 días para llorar de emoción bajo las auroras boreales',
         'price': '€1,290',
         'image': 'tromso_aurora.jpg',
         'emotion': 'Lágrima de emoción',
@@ -29,7 +30,12 @@ class ResultsScreen extends StatelessWidget {
         'price': '€980',
         'image': 'tuscana_nonna.jpg',
         'emotion': 'Abrazo cálido',
-        'includes': ['Vuelos', 'Casa rural', 'Clases de cocina', 'Mercado local']
+        'includes': [
+          'Vuelos',
+          'Casa rural',
+          'Clases de cocina',
+          'Mercado local'
+        ]
       };
     } else if (emotion.contains('Boom')) {
       return {
@@ -126,18 +132,20 @@ class ResultsScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      ...(trip['includes'] as List<String>).map((item) =>
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            children: [
-                              Icon(Icons.check_circle, color: Colors.green, size: 16),
-                              SizedBox(width: 8),
-                              Text(item, style: TextStyle(color: Colors.blue[600])),
-                            ],
-                          ),
-                        )
-                      ).toList(),
+                      ...(trip['includes'] as List<String>)
+                          .map((item) => Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.check_circle,
+                                        color: Colors.green, size: 16),
+                                    SizedBox(width: 8),
+                                    Text(item,
+                                        style:
+                                            TextStyle(color: Colors.blue[600])),
+                                  ],
+                                ),
+                              )),
                       SizedBox(height: 20),
                       Text(
                         'Precio: ${trip['price']}',
@@ -166,7 +174,7 @@ class ResultsScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DiaryScreen(),
+                          builder: (context) => TravelDiaryScreen(),
                         ),
                       );
                     },
