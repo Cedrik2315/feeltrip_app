@@ -15,7 +15,6 @@ import 'screens/travel_diary_screen.dart';
 import 'screens/feed_screen.dart';
 import 'screens/emotional_preferences_quiz_screen.dart';
 import 'screens/experience_impact_dashboard_screen.dart';
-import 'services/storage_service.dart';
 import 'config/firebase_config.dart';
 
 void main() async {
@@ -25,7 +24,6 @@ void main() async {
   } catch (e) {
     debugPrint('⚠️ Warning: Could not load .env file: $e');
   }
-  await StorageService.init();
   await FirebaseConfig.initialize();
   runApp(const FeelTripApp());
 }

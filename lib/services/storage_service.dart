@@ -1,84 +1,56 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import '../models/user_model.dart';
-import '../models/cart_item_model.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class StorageService {
-  static final StorageService _instance = StorageService._internal();
-  static late SharedPreferences _prefs;
+  static final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  factory StorageService() {
-    return _instance;
+  // Subir foto de perfil
+  static Future<String?> uploadProfilePhoto(File file) async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return null;
+      final ref = _storage.ref().child('profiles/$uid/avatar.jpg');
+      await ref.putFile(file);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      return null;
+    }
   }
 
-  StorageService._internal();
-
-  static Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
+  // Subir foto de diario
+  static Future<String?> uploadDiaryPhoto(File file, String entryId) async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return null;
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final ref = _storage.ref().child('diary/$uid/$entryId/$fileName');
+      await ref.putFile(file);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      return null;
+    }
   }
 
-  // User
-  Future<void> saveUser(User user) async {
-    final userJson = json.encode(user.toJson());
-    await _prefs.setString('user', userJson);
+  // Subir foto de historia
+  static Future<String?> uploadStoryPhoto(File file, String storyId) async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return null;
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final ref = _storage.ref().child('stories/$uid/$storyId/$fileName');
+      await ref.putFile(file, SettableMetadata(contentType: 'image/jpeg'));
+      return await ref.getDownloadURL();
+    } catch (e) {
+      return null;
+    }
   }
 
-  User? getUser() {
-    final userJson = _prefs.getString('user');
-    if (userJson == null) return null;
-    return User.fromJson(json.decode(userJson));
-  }
-
-  Future<void> clearUser() async {
-    await _prefs.remove('user');
-  }
-
-  // Token
-  Future<void> saveToken(String token) async {
-    await _prefs.setString('auth_token', token);
-  }
-
-  String? getToken() {
-    return _prefs.getString('auth_token');
-  }
-
-  Future<void> clearToken() async {
-    await _prefs.remove('auth_token');
-  }
-
-  // Cart
-  Future<void> saveCart(List<CartItem> items) async {
-    final cartJson = json.encode(
-      items.map((item) => item.toJson()).toList(),
-    );
-    await _prefs.setString('cart', cartJson);
-  }
-
-  List<CartItem> getCart() {
-    final cartJson = _prefs.getString('cart');
-    if (cartJson == null) return [];
-    final List<dynamic> decoded = json.decode(cartJson);
-    return decoded.map((item) => CartItem.fromJson(item)).toList();
-  }
-
-  Future<void> clearCart() async {
-    await _prefs.remove('cart');
-  }
-
-  // Preferences
-  Future<void> setThemeMode(String mode) async {
-    await _prefs.setString('theme_mode', mode);
-  }
-
-  String getThemeMode() {
-    return _prefs.getString('theme_mode') ?? 'light';
-  }
-
-  Future<void> setLanguage(String language) async {
-    await _prefs.setString('language', language);
-  }
-
-  String getLanguage() {
-    return _prefs.getString('language') ?? 'es';
+  // Eliminar archivo
+  static Future<void> deleteFile(String url) async {
+    try {
+      final ref = _storage.refFromURL(url);
+      await ref.delete();
+    } catch (e) {}
   }
 }
