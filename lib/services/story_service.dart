@@ -27,7 +27,7 @@ class StoryService {
           .map((doc) => TravelerStory.fromFirestore(doc))
           .toList();
     } catch (e) {
-      print('❌ Error fetching public stories: $e');
+      // log eliminado: ❌ Error fetching public stories: $e
       rethrow;
     }
   }
@@ -46,7 +46,7 @@ class StoryService {
           .map((doc) => TravelerStory.fromFirestore(doc))
           .toList();
     } catch (e) {
-      print('❌ Error fetching user stories: $e');
+      // log eliminado: ❌ Error fetching user stories: $e
       rethrow;
     }
   }
@@ -64,7 +64,7 @@ class StoryService {
       }
       return null;
     } catch (e) {
-      print('❌ Error fetching story: $e');
+      // log eliminado: ❌ Error fetching story: $e
       rethrow;
     }
   }
@@ -101,10 +101,10 @@ class StoryService {
           .doc(story.id)
           .set(storyData);
 
-      print('✅ Story created: ${story.id}');
+      // log eliminado: ✅ Story created: ${story.id}
       return story.id;
     } catch (e) {
-      print('❌ Error creating story: $e');
+      // log eliminado: ❌ Error creating story: $e
       rethrow;
     }
   }

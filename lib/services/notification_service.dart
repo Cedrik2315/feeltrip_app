@@ -16,7 +16,7 @@ class NotificationService {
         sound: true,
       );
 
-      print('User granted permission: ${settings.authorizationStatus}');
+      // log eliminado: User granted permission: ${settings.authorizationStatus}
 
       // Get FCM token
       String? token = await _messaging.getToken();
@@ -29,7 +29,7 @@ class NotificationService {
 
       // Foreground messages
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        print('Got foreground message: ${message.notification?.title}');
+        // log eliminado: Got foreground message: ${message.notification?.title}
         // Show local notification or snackbar
       });
 
@@ -43,9 +43,9 @@ class NotificationService {
       FirebaseMessaging.onBackgroundMessage(
           _firebaseMessagingBackgroundHandler);
 
-      print('✅ Notification service initialized');
+      // log eliminado: ✅ Notification service initialized
     } catch (e) {
-      print('❌ Error initializing notifications: $e');
+      // log eliminado: ❌ Error initializing notifications: $e
     }
   }
 
@@ -61,17 +61,17 @@ class NotificationService {
 
       // Send via server or Cloud Function
       // For demo, print
-      print('📱 Sending like notification to $targetUserId for "$storyTitle"');
-      print('Token: $token');
+      // log eliminado: 📱 Sending like notification to $targetUserId for "$storyTitle"
+      // log eliminado: Token: $token
 
       // Real impl would use HTTP to FCM server
     } catch (e) {
-      print('❌ Error sending notification: $e');
+      // log eliminado: ❌ Error sending notification: $e
     }
   }
 }
 
 // Background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('Handling background message: ${message.messageId}');
+  // log eliminado: Handling background message: ${message.messageId}
 }

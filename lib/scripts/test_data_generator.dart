@@ -9,25 +9,26 @@ class TestDataGenerator {
 
   /// Crear datos de prueba completos
   static Future<void> generateAllTestData() async {
-    print('🚀 Generando datos de prueba...');
-    
+    // log eliminado: 🚀 Generando datos de prueba...
+
     try {
       await generateTestStories();
       await generateTestAgencies();
-      print('✅ Datos de prueba generados exitosamente');
+      // log eliminado: ✅ Datos de prueba generados exitosamente
     } catch (e) {
-      print('❌ Error generando datos de prueba: $e');
+      // log eliminado: ❌ Error generando datos de prueba: $e
     }
   }
 
   /// Crear historias de prueba
   static Future<void> generateTestStories() async {
     print('📝 Generando historias de prueba...');
-    
+
     final stories = [
       {
         'title': 'Mi aventura en Patagonia',
-        'story': 'Fue increíble caminar entre los glaciares. La naturaleza es majestuosa y te llena el alma.',
+        'story':
+            'Fue increíble caminar entre los glaciares. La naturaleza es majestuosa y te llena el alma.',
         'author': 'Juan Pérez',
         'userId': 'test_user_1',
         'rating': 4.8,
@@ -37,7 +38,8 @@ class TestDataGenerator {
       },
       {
         'title': 'Yoga en Bali',
-        'story': 'Una experiencia transformadora. El atardecer sobre el océano mientras practicas yoga es simplemente mágico.',
+        'story':
+            'Una experiencia transformadora. El atardecer sobre el océano mientras practicas yoga es simplemente mágico.',
         'author': 'Maria García',
         'userId': 'test_user_2',
         'rating': 4.9,
@@ -47,7 +49,8 @@ class TestDataGenerator {
       },
       {
         'title': 'Aventura en Nueva Zelanda',
-        'story': 'Skydiving sobre Queenstown fue el momento más emocionante de mi vida. Puro adrenalina y belleza.',
+        'story':
+            'Skydiving sobre Queenstown fue el momento más emocionante de mi vida. Puro adrenalina y belleza.',
         'author': 'Carlos López',
         'userId': 'test_user_3',
         'rating': 4.7,
@@ -57,7 +60,8 @@ class TestDataGenerator {
       },
       {
         'title': 'Gastronomía en Italia',
-        'story': 'Pasé 10 días descubriendo los sabores auténticos de Italia. Cada comida era un viaje sensorial.',
+        'story':
+            'Pasé 10 días descubriendo los sabores auténticos de Italia. Cada comida era un viaje sensorial.',
         'author': 'Ana Martínez',
         'userId': 'test_user_4',
         'rating': 4.6,
@@ -80,11 +84,12 @@ class TestDataGenerator {
   /// Crear agencias de prueba
   static Future<void> generateTestAgencies() async {
     print('🏢 Generando agencias de prueba...');
-    
+
     final agencies = [
       {
         'name': 'FeelTrip Adventures',
-        'description': 'Especialistas en experiencias de aventura auténtica en América Latina. Con 15 años de experiencia en turismo vivencial.',
+        'description':
+            'Especialistas en experiencias de aventura auténtica en América Latina. Con 15 años de experiencia en turismo vivencial.',
         'logo': 'https://via.placeholder.com/200?text=FeelTrip+Adventures',
         'city': 'Buenos Aires',
         'country': 'Argentina',
@@ -98,12 +103,16 @@ class TestDataGenerator {
         'phoneNumber': '+54 11 1234 5678',
         'email': 'info@feeltripadventures.com',
         'website': 'www.feeltripadventures.com',
-        'socialMedia': ['instagram.com/feeltripadventures', 'facebook.com/feeltripadventures'],
+        'socialMedia': [
+          'instagram.com/feeltripadventures',
+          'facebook.com/feeltripadventures'
+        ],
         'createdAt': Timestamp.now(),
       },
       {
         'name': 'Serenity Retreat',
-        'description': 'Retiros de bienestar y transformación. Yoga, meditación y conexión con la naturaleza en destinos paradisíacos.',
+        'description':
+            'Retiros de bienestar y transformación. Yoga, meditación y conexión con la naturaleza en destinos paradisíacos.',
         'logo': 'https://via.placeholder.com/200?text=Serenity+Retreat',
         'city': 'Bali',
         'country': 'Indonesia',
@@ -117,12 +126,16 @@ class TestDataGenerator {
         'phoneNumber': '+62 361 1234 567',
         'email': 'hello@serenityretreat.com',
         'website': 'www.serenityretreat.com',
-        'socialMedia': ['instagram.com/serenityretreat', 'facebook.com/serenityretreat'],
+        'socialMedia': [
+          'instagram.com/serenityretreat',
+          'facebook.com/serenityretreat'
+        ],
         'createdAt': Timestamp.now(),
       },
       {
         'name': 'Kiwi Extreme Sports',
-        'description': 'Experiencias de adrenalina y deportes extremos en Nueva Zelanda. Para los que buscan emociones fuertes.',
+        'description':
+            'Experiencias de adrenalina y deportes extremos en Nueva Zelanda. Para los que buscan emociones fuertes.',
         'logo': 'https://via.placeholder.com/200?text=Kiwi+Extreme',
         'city': 'Queenstown',
         'country': 'New Zealand',
@@ -136,12 +149,16 @@ class TestDataGenerator {
         'phoneNumber': '+64 3 442 7100',
         'email': 'contact@kiwiextreme.com',
         'website': 'www.kiwiextreme.com',
-        'socialMedia': ['instagram.com/kiwiextreme', 'facebook.com/kiwiextreme'],
+        'socialMedia': [
+          'instagram.com/kiwiextreme',
+          'facebook.com/kiwiextreme'
+        ],
         'createdAt': Timestamp.now(),
       },
       {
         'name': 'Dolce Vita Tours',
-        'description': 'Tours gastronómicos y culturales en Italia. Descubre la autenticidad italiana comiendo como un local.',
+        'description':
+            'Tours gastronómicos y culturales en Italia. Descubre la autenticidad italiana comiendo como un local.',
         'logo': 'https://via.placeholder.com/200?text=Dolce+Vita',
         'city': 'Roma',
         'country': 'Italy',
@@ -155,7 +172,10 @@ class TestDataGenerator {
         'phoneNumber': '+39 06 1234 5678',
         'email': 'ciao@dolcevitours.com',
         'website': 'www.dolcevitours.com',
-        'socialMedia': ['instagram.com/dolcevitours', 'facebook.com/dolcevitours'],
+        'socialMedia': [
+          'instagram.com/dolcevitours',
+          'facebook.com/dolcevitours'
+        ],
         'createdAt': Timestamp.now(),
       },
     ];

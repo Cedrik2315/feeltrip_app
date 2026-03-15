@@ -26,11 +26,9 @@ class DiaryService {
           .limit(limit)
           .get();
 
-      return snapshot.docs
-          .map((doc) => DiaryEntry.fromFirestore(doc))
-          .toList();
+      return snapshot.docs.map((doc) => DiaryEntry.fromFirestore(doc)).toList();
     } catch (e) {
-      print('❌ Error fetching diary entries: $e');
+      // log eliminado: ❌ Error fetching diary entries: $e
       rethrow;
     }
   }
@@ -50,7 +48,7 @@ class DiaryService {
       }
       return null;
     } catch (e) {
-      print('❌ Error fetching diary entry: $e');
+      // log eliminado: ❌ Error fetching diary entry: $e
       rethrow;
     }
   }
@@ -213,8 +211,7 @@ class DiaryService {
           'avgReflectionDepth': double.parse(avgDepth.toStringAsFixed(2)),
           'uniqueEmotionCount': uniqueEmotions.length,
           'overallImpactScore': impactScore,
-          'lastEntryDate':
-              entries.isNotEmpty ? entries.first.createdAt : null,
+          'lastEntryDate': entries.isNotEmpty ? entries.first.createdAt : null,
           'lastUpdated': DateTime.now(),
         },
       }, SetOptions(merge: true));
@@ -249,14 +246,13 @@ class DiaryService {
           .collection(FirebaseConfig.usersCollection)
           .doc(userId)
           .collection(FirebaseConfig.diaryEntriesSubcollection)
-          .where(FirebaseConfig.createdAtField, isGreaterThanOrEqualTo: startDate)
+          .where(FirebaseConfig.createdAtField,
+              isGreaterThanOrEqualTo: startDate)
           .where(FirebaseConfig.createdAtField, isLessThanOrEqualTo: endDate)
           .orderBy(FirebaseConfig.createdAtField, descending: true)
           .get();
 
-      return snapshot.docs
-          .map((doc) => DiaryEntry.fromFirestore(doc))
-          .toList();
+      return snapshot.docs.map((doc) => DiaryEntry.fromFirestore(doc)).toList();
     } catch (e) {
       print('❌ Error fetching entries by date range: $e');
       rethrow;

@@ -64,7 +64,7 @@ class _CreatorStatsScreenState extends State<CreatorStatsScreen> {
 
       setState(() {});
     } catch (e) {
-      print('Error loading stats: $e');
+      // log eliminado: Error loading stats: $e
     }
   }
 

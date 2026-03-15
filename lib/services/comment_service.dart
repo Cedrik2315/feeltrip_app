@@ -38,7 +38,7 @@ class CommentService {
           .doc(commentId)
           .set(comment.toFirestore());
     } catch (e) {
-      print('❌ Error adding comment: $e');
+      // log eliminado: ❌ Error adding comment: $e
       rethrow;
     }
   }
@@ -47,7 +47,7 @@ class CommentService {
     try {
       await _firestore.collection('comments').doc(commentId).delete();
     } catch (e) {
-      print('❌ Error deleting comment: $e');
+      // log eliminado: ❌ Error deleting comment: $e
       rethrow;
     }
   }
@@ -59,7 +59,7 @@ class CommentService {
           .doc(commentId)
           .update({'likes': FieldValue.increment(1)});
     } catch (e) {
-      print('❌ Error liking comment: $e');
+      // log eliminado: ❌ Error liking comment: $e
     }
   }
 
@@ -69,7 +69,7 @@ class CommentService {
         'reactions': FieldValue.arrayUnion([reaction])
       });
     } catch (e) {
-      print('❌ Error adding reaction: $e');
+      // log eliminado: ❌ Error adding reaction: $e
     }
   }
 }

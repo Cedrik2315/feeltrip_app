@@ -22,9 +22,9 @@ class UserService {
           .doc(currentUserId)
           .set({'followedBy': FieldValue.serverTimestamp()});
 
-      print('✅ Followed user $targetUserId');
+      // log eliminado: ✅ Followed user $targetUserId
     } catch (e) {
-      print('❌ Error following user: $e');
+      // log eliminado: ❌ Error following user: $e
       rethrow;
     }
   }
@@ -48,7 +48,7 @@ class UserService {
           .doc(currentUserId)
           .delete();
 
-      print('✅ Unfollowed user $targetUserId');
+      // log eliminado: ✅ Unfollowed user $targetUserId
     } catch (e) {
       print('❌ Error unfollowing user: $e');
       rethrow;

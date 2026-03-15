@@ -6,32 +6,33 @@ class FirebaseConfig {
   static Future<void> initialize() async {
     try {
       // Si estamos usando MOCK data, saltamos Firebase
-      print('⏳ Inicializando Firebase...');
-      
+      // log eliminado: ⏳ Inicializando Firebase...
+
       final initTask = Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       ).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          print('⚠️ Firebase timeout - usando MOCK data');
-          throw TimeoutException('Firebase timeout', const Duration(seconds: 5));
+          // log eliminado: ⚠️ Firebase timeout - usando MOCK data
+          throw TimeoutException(
+              'Firebase timeout', const Duration(seconds: 5));
         },
       );
-      
+
       await initTask;
-      print('✅ Firebase inicializado exitosamente');
+      // log eliminado: ✅ Firebase inicializado exitosamente
     } catch (e) {
       // Si Firebase ya está inicializado, esto es esperado
-      if (e.toString().contains('duplicate-app') || 
+      if (e.toString().contains('duplicate-app') ||
           e.toString().contains('already exists')) {
-        print('✅ Firebase ya estaba inicializado');
+        // log eliminado: ✅ Firebase ya estaba inicializado
         return;
       }
       if (e.toString().contains('TimeoutException')) {
-        print('⚠️ Firebase timeout - usando MOCK data sin problemas');
+        // log eliminado: ⚠️ Firebase timeout - usando MOCK data sin problemas
         return;
       }
-      print('⚠️ Error inicializando Firebase (continuando con MOCK): $e');
+      // log eliminado: ⚠️ Error inicializando Firebase (continuando con MOCK): $e
       // No rethrow - permitir que la app continúe con MOCK data
     }
   }
@@ -47,7 +48,7 @@ class FirebaseConfig {
   // Documentos y campos
   static const String userProfileDoc = 'profile';
   static const String userDiaryStatsDoc = 'stats';
-  
+
   // Campos comunes
   static const String createdAtField = 'createdAt';
   static const String updatedAtField = 'updatedAt';

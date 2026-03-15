@@ -15,6 +15,14 @@ import 'screens/travel_diary_screen.dart';
 import 'screens/feed_screen.dart';
 import 'screens/emotional_preferences_quiz_screen.dart';
 import 'screens/experience_impact_dashboard_screen.dart';
+import 'screens/comments_screen.dart';
+import 'screens/premium_subscription_screen.dart';
+import 'screens/creator_stats_screen.dart';
+import 'screens/translator_screen.dart';
+import 'screens/ocr_screen.dart';
+import 'screens/instagram_stories_screen.dart';
+import 'screens/agency_profile_screen.dart';
+import 'screens/reels_screen.dart';
 import 'config/firebase_config.dart';
 
 void main() async {
@@ -22,7 +30,7 @@ void main() async {
   try {
     await dotenv.load();
   } catch (e) {
-    debugPrint('⚠️ Warning: Could not load .env file: $e');
+    // log eliminado: ⚠️ Warning: Could not load .env file: $e
   }
   await FirebaseConfig.initialize();
   runApp(const FeelTripApp());
@@ -107,12 +115,32 @@ class FeelTripApp extends StatelessWidget {
         '/feed': (context) => const FeedScreen(),
         '/quiz': (context) => EmotionalPreferencesQuizScreen(),
         '/impact-dashboard': (context) => ExperienceImpactDashboardScreen(),
+        '/comments': (context) => CommentsScreen(storyId: ''),
+        '/premium': (context) => const PremiumSubscriptionScreen(),
+        '/creator-stats': (context) => const CreatorStatsScreen(),
+        '/translator': (context) => const TranslatorScreen(),
+        '/ocr': (context) => const OCRScreen(),
+        '/instagram-stories': (context) => const InstagramStoriesScreen(),
+        '/agency-profile': (context) => AgencyProfileScreen(agencyId: ''),
+        '/reels': (context) => const ReelsScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/trip-details') {
           final tripId = settings.arguments as String;
           return MaterialPageRoute(
             builder: (context) => TripDetailScreen(tripId: tripId),
+          );
+        }
+        if (settings.name == '/comments') {
+          final storyId = settings.arguments as String?;
+          return MaterialPageRoute(
+            builder: (context) => CommentsScreen(storyId: storyId ?? ''),
+          );
+        }
+        if (settings.name == '/agency-profile') {
+          final agencyId = settings.arguments as String?;
+          return MaterialPageRoute(
+            builder: (context) => AgencyProfileScreen(agencyId: agencyId ?? ''),
           );
         }
         return null;

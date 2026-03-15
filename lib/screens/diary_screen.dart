@@ -56,7 +56,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       await cameraController!.initialize();
       setState(() => isCameraReady = true);
     } catch (e) {
-      print('Error initializing camera: $e');
+      // log eliminado: Error initializing camera: $e
     }
   }
 

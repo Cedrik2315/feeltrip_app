@@ -33,7 +33,7 @@ class AgencyService {
           'createdAt': Timestamp.now(),
         };
         MockData.mockAgencies.add(newAgency);
-        print('✅ [MOCK] Agencia creada: $agencyId');
+        // log eliminado: ✅ [MOCK] Agencia creada: $agencyId
         return agencyId;
       }
 
@@ -46,10 +46,10 @@ class AgencyService {
           .doc(agencyId)
           .set(newAgency.toFirestore());
 
-      print('✅ Agencia creada en Firestore: $agencyId');
+      // log eliminado: ✅ Agencia creada en Firestore: $agencyId
       return agencyId;
     } catch (e) {
-      print('❌ Error creando agencia: $e');
+      // log eliminado: ❌ Error creando agencia: $e
       rethrow;
     }
   }
@@ -62,8 +62,7 @@ class AgencyService {
       }
 
       // FIRESTORE REAL
-      final doc =
-          await _firestore.collection('agencies').doc(agencyId).get();
+      final doc = await _firestore.collection('agencies').doc(agencyId).get();
 
       if (!doc.exists) return null;
 
@@ -77,7 +76,8 @@ class AgencyService {
   /// Obtener todas las agencias
   Stream<List<TravelAgency>> getAllAgencies() {
     if (useMockData) {
-      final agencies = MockData.getAgencies()..sort((a, b) => b.rating.compareTo(a.rating));
+      final agencies = MockData.getAgencies()
+        ..sort((a, b) => b.rating.compareTo(a.rating));
       return Stream.value(agencies);
     }
 
@@ -86,15 +86,16 @@ class AgencyService {
         .collection('agencies')
         .orderBy('rating', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => TravelAgency.fromFirestore(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TravelAgency.fromFirestore(doc))
+            .toList());
   }
 
   /// Buscar agencias por ciudad
   Stream<List<TravelAgency>> getAgenciesByCity(String city) {
     if (useMockData) {
       final agencies = MockData.getAgenciesByCity(city)
-          ..sort((a, b) => b.rating.compareTo(a.rating));
+        ..sort((a, b) => b.rating.compareTo(a.rating));
       return Stream.value(agencies);
     }
 
@@ -104,8 +105,9 @@ class AgencyService {
         .where('city', isEqualTo: city)
         .orderBy('rating', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => TravelAgency.fromFirestore(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TravelAgency.fromFirestore(doc))
+            .toList());
   }
 
   /// Buscar agencias por especialidad
@@ -114,7 +116,7 @@ class AgencyService {
       final agencies = MockData.getAgencies()
           .where((agency) => agency.specialties.contains(specialty))
           .toList()
-          ..sort((a, b) => b.rating.compareTo(a.rating));
+        ..sort((a, b) => b.rating.compareTo(a.rating));
       return Stream.value(agencies);
     }
 
@@ -124,8 +126,9 @@ class AgencyService {
         .where('specialties', arrayContains: specialty)
         .orderBy('rating', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => TravelAgency.fromFirestore(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TravelAgency.fromFirestore(doc))
+            .toList());
   }
 
   /// Actualizar agencia
@@ -157,10 +160,7 @@ class AgencyService {
       }
 
       // FIRESTORE REAL
-      await _firestore
-          .collection('agencies')
-          .doc(agencyId)
-          .update({
+      await _firestore.collection('agencies').doc(agencyId).update({
         'experiences': FieldValue.arrayUnion([experienceId])
       });
       print('✅ Experiencia agregada a agencia');
@@ -187,9 +187,7 @@ class AgencyService {
       await _firestore
           .collection('agencies')
           .doc(agencyId)
-          .update({
-        'followers': FieldValue.increment(1)
-      });
+          .update({'followers': FieldValue.increment(1)});
       print('✅ Siguiendo agencia');
     } catch (e) {
       print('❌ Error siguiendo agencia: $e');
@@ -211,10 +209,7 @@ class AgencyService {
       final newTotal = currentTotal + newRating;
       final finalRating = newTotal / (totalReviews + 1);
 
-      await _firestore
-          .collection('agencies')
-          .doc(agencyId)
-          .update({
+      await _firestore.collection('agencies').doc(agencyId).update({
         'rating': finalRating,
         'reviewCount': totalReviews + 1,
       });

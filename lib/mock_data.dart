@@ -634,9 +634,9 @@ class MockData {
 
 // Función para usar en pruebas
 void main() {
-  debugPrint('=== DATOS DE PRUEBA DISPONIBLES ===');
-  debugPrint('Usuario: ${MockData.testUser.name}');
-  debugPrint('Viajes disponibles: ${MockData.mockTrips.length}');
+  // log eliminado: === DATOS DE PRUEBA DISPONIBLES ===
+  // log eliminado: Usuario: ${MockData.testUser.name}
+  // log eliminado: Viajes disponibles: ${MockData.mockTrips.length}
   debugPrint('Reseñas: ${MockData.mockReviews.length}');
   debugPrint('Reservas: ${MockData.mockBookings.length}');
 }
