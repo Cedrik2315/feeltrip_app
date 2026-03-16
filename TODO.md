@@ -1,43 +1,15 @@
-# 🚀 TODO: Limpieza Warnings Deprecados - BLACKBOXAI
-Status: [IN PROGRESS] ✅ Plan Aprobado
+# Real-time Firestore Streams Implementation TODO
 
-## 📋 PASOS DEL PLAN (Fase por Fase)
+## Steps:
+- [x] 1. Update lib/controllers/experience_controller.dart: Add listenToStories() and call in onInit()
 
-### ✅ FASE 1: Deprecations Críticos (Completado cuando ✅)
-- [✅] sharing_service.dart: Migrar 4x Share.share → SharePlus
-- [✅] agency_profile_screen.dart: 6x canLaunch/launch → canLaunchUrl/launchUrl + remove Get
-- [ ] 8 screens withOpacity → withValues(alpha:) (15+ cambios)
+- [x] 2. Update lib/screens/feed_screen.dart: Replace Future pagination with StreamBuilder<QuerySnapshot>
 
-### 📂 FASE 2: Unused Imports
-- [ ] user_model.dart: remove intl
-- [ ] agency_profile_screen.dart: remove Get  
-- [ ] comments_screen.dart: remove Get
-- [ ] reels_screen.dart: remove Get
-- [ ] travel_diary_screen.dart: remove image_picker
-- [ ] creator_stats_screen.dart: remove unused
-- [ ] profile_screen.dart: remove unused
-- [ ] stories_screen.dart: remove unused
-- [ ] trip_detail_screen.dart: remove unused
+- [x] 3. Update lib/screens/stories_screen.dart: Add StreamBuilder<List<TravelerStory>> around ListView
 
-### 🧹 FASE 3: Remove Prints/Debug
-- [ ] agency_service.dart: Eliminar todos print/debugPrint
-- [ ] diary_service.dart: Eliminar todos print/debugPrint
-- [ ] story_service.dart: Eliminar todos print/debugPrint
-- [ ] user_service.dart: Eliminar todos print/debugPrint
-- [ ] feed_screen.dart: Eliminar todos print/debugPrint
+- [ ] 4. Run `flutter analyze` - check for errors
+- [ ] 5. Test real-time updates in app (add story/comment → verify auto-appears)
+- [ ] 6. Complete ✅
 
-### 💰 FASE 4: RevenueCat Update
-- [ ] revenuecat_service.dart: purchasePackage → purchase(PurchaseParams)
-
-### 🔍 FASE 5: Verificación Final
-- [ ] flutter pub get
-- [ ] flutter analyze (0 warnings)
-- [ ] flutter test (pass)
-- [ ] Manual: Test sharing, URLs, UI, purchases, no console spam
-
-### 🎉 COMPLETADO
-- [ ] Marcar TODO.md ✅ 
-- [ ] attempt_completion
-
-**Próximo paso:** Fase 1 ediciones → marcar ✅ → Fase 2...
+**Status:** Starting implementation...
 

@@ -64,30 +64,39 @@ class _StoriesScreenState extends State<StoriesScreen> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Obx(() {
-              final allStories = _controller.stories;
-              final uniqueTags = allStories
-                  .expand((s) => s.tags)
-                  .toSet()
-                  .toList()
-                ..insert(0, 'Todas');
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: uniqueTags
-                      .map((tag) => FilterChip(
-                            label: Text(tag),
-                            selected: _selectedTag == tag,
-                            onSelected: (selected) {
-                              setState(() {
-                                _selectedTag = selected ? tag : null;
-                              });
-                            },
-                          ))
-                      .toList(),
-                ),
-              );
-            }),
+            child: StreamBuilder<List<TravelerStory>>(
+              stream: _controller.getStoriesStream(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text('Error loading stories');
+                }
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                }
+                final allStories = snapshot.data!;
+                final uniqueTags = allStories
+                    .expand((s) => s.tags)
+                    .toSet()
+                    .toList()
+                  ..insert(0, 'Todas');
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: uniqueTags
+                        .map((tag) => FilterChip(
+                              label: Text(tag),
+                              selected: _selectedTag == tag,
+                              onSelected: (selected) {
+                                setState(() {
+                                  _selectedTag = selected ? tag : null;
+                                });
+                              },
+                            ))
+                        .toList(),
+                  ),
+                );
+              },
+            ),
           ),
           const SizedBox(height: 8),
           Expanded(

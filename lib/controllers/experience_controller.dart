@@ -22,6 +22,18 @@ class ExperienceController extends GetxController {
   // Variables
   String? userId;
 
+  @override
+  void onInit() {
+    super.onInit();
+    listenToStories();
+  }
+
+  void listenToStories() {
+    getStoriesStream().listen((data) {
+      stories.assignAll(data);
+    });
+  }
+
   // ============ INITIALIZATION ============
 
   /// Inicializar con userId (llamar después de login)
