@@ -13,7 +13,7 @@ dependencies:
   camera: ^0.12.0
   video_player: ^2.4.7
   path_provider: ^2.0.11
-  provider: ^6.0.5
+
   get: ^4.6.5
   intl: ^0.20.2
   carousel_slider: ^5.1.2

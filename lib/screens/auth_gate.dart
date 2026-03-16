@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:get/get.dart';
 
 import '../services/auth_service.dart';
@@ -14,7 +14,7 @@ import 'onboarding_screen.dart';
 /// Decide qué pantalla mostrar al usuario basado en su estado de autenticación
 /// con Firebase. Maneja los estados de carga, error y éxito.
 class AuthGate extends StatefulWidget {
-  const AuthGate({Key? key}) : super(key: key);
+  const AuthGate({super.key});
 
   @override
   State<AuthGate> createState() => _AuthGateState();
