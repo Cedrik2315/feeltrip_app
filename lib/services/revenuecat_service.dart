@@ -98,6 +98,7 @@ class RevenueCatService {
         await Purchases.logIn(user.uid);
       }
 
+      // ignore: deprecated_member_use
       final result = await Purchases.purchasePackage(package);
 
       if (result.customerInfo.entitlements.active['premium'] != null) {

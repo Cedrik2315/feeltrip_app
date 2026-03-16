@@ -7,18 +7,25 @@ class DestinationMapWidget extends StatefulWidget {
   final double longitude;
 
   const DestinationMapWidget({
-    Key? key,
+    super.key,
     required this.destination,
     required this.latitude,
     required this.longitude,
-  }) : super(key: key);
+  });
 
   @override
   State<DestinationMapWidget> createState() => _DestinationMapWidgetState();
 }
 
 class _DestinationMapWidgetState extends State<DestinationMapWidget> {
+  // ignore: unused_field
   GoogleMapController? _controller;
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

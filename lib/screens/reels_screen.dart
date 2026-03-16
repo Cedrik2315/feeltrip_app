@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:get/get.dart';
 import '../models/experience_model.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -12,7 +11,8 @@ class ReelsScreen extends StatefulWidget {
   const ReelsScreen({super.key});
 
   @override
-  _ReelsScreenState createState() => _ReelsScreenState();
+  // ignore: library_private_types_in_public_api
+  State<ReelsScreen> createState() => _ReelsScreenState();
 }
 
 class _ReelsScreenState extends State<ReelsScreen> {

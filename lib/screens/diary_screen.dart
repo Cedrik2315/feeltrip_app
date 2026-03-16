@@ -9,8 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 class DiaryScreen extends StatefulWidget {
   const DiaryScreen({super.key});
 
+// ignore: library_private_types_in_public_api
   @override
-  _DiaryScreenState createState() => _DiaryScreenState();
+  State<DiaryScreen> createState() => _DiaryScreenState();
 }
 
 class _DiaryScreenState extends State<DiaryScreen> {
@@ -64,7 +65,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
     try {
       entries = await _diaryService.getDiaryEntries(mockUserId!);
       setState(() {});
-    } catch (e) {}
+    } catch (e) {
+      // ignore: empty_catches
+    }
   }
 
   Future<void> saveEntry(DiaryEntry entry) async {
@@ -72,7 +75,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
     try {
       await _diaryService.createDiaryEntry(mockUserId!, entry);
       loadEntries(); // Reload list
-    } catch (e) {}
+    } catch (e) {
+      // ignore: empty_catches
+    }
   }
 
   void addEntry(String text) async {
@@ -90,6 +95,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
     await saveEntry(newEntry);
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Momento guardado 💖')),
     );
@@ -114,10 +120,13 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
       await saveEntry(newEntry);
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Foto guardada 📸')),
       );
-    } catch (e) {}
+    } catch (e) {
+      // ignore: empty_catches
+    }
   }
 
   @override

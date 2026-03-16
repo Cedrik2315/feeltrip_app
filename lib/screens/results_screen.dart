@@ -12,13 +12,12 @@ class ResultsScreen extends StatelessWidget {
     String season = answers[3];
     String budget = answers[2];
 
-    // Lógica de recomendación básica
+   // Lógica de recomendación básica
     if (emotion.contains('Lágrima') && season == 'Invierno') {
       return {
         'title': 'Auroras en Tromsø',
-        'description':
-            '5 días para llorar de emoción bajo las auroras boreales',
-        'price': '€1,290',
+        'description': '5 días para llorar de emoción bajo las auroras boreales',
+        'price': budget.contains('Alto') ? '€1,290' : '€890',
         'image': 'tromso_aurora.jpg',
         'emotion': 'Lágrima de emoción',
         'includes': ['Vuelos', 'Cabaña de cristal', 'Sauna', 'Guía local']
@@ -27,21 +26,16 @@ class ResultsScreen extends StatelessWidget {
       return {
         'title': 'Cocina con Nonna',
         'description': '7 días de abrazos italianos y pasta casera',
-        'price': '€980',
+        'price': budget.contains('Alto') ? '€980' : '€650',
         'image': 'tuscana_nonna.jpg',
         'emotion': 'Abrazo cálido',
-        'includes': [
-          'Vuelos',
-          'Casa rural',
-          'Clases de cocina',
-          'Mercado local'
-        ]
+        'includes': ['Vuelos', 'Casa rural', 'Clases de cocina', 'Mercado local']
       };
     } else if (emotion.contains('Boom')) {
       return {
         'title': 'Aventura en Queenstown',
         'description': '6 días de adrenalina pura en Nueva Zelanda',
-        'price': '€1,450',
+        'price': budget.contains('Alto') ? '€1,450' : '€980',
         'image': 'queenstown_adventure.jpg',
         'emotion': 'Explosión de adrenalina',
         'includes': ['Vuelos', 'Hotel 4★', 'Paracaídas', 'Bungee', 'Rafting']
@@ -50,7 +44,7 @@ class ResultsScreen extends StatelessWidget {
       return {
         'title': 'Meditación en Bali',
         'description': '8 días de paz profunda y yoga',
-        'price': '€850',
+        'price': budget.contains('Alto') ? '€850' : '€550',
         'image': 'bali_yoga.jpg',
         'emotion': 'Paz interior',
         'includes': ['Vuelos', 'Retiro', 'Yoga diario', 'Meditación', 'Spa']

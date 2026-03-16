@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class EmotionalPreferencesQuizScreen extends StatefulWidget {
+  const EmotionalPreferencesQuizScreen({super.key});
   @override
   State<EmotionalPreferencesQuizScreen> createState() =>
       _EmotionalPreferencesQuizScreenState();
@@ -11,7 +12,7 @@ class _EmotionalPreferencesQuizScreenState
     extends State<EmotionalPreferencesQuizScreen> {
   final PageController _pageController = PageController();
   int _currentQuestion = 0;
-  Map<String, int> _scores = {
+  final Map<String, int> _scores = {
     'conexion': 0,
     'transformacion': 0,
     'aventura': 0,
@@ -26,15 +27,15 @@ class _EmotionalPreferencesQuizScreenState
         QuizAnswer('Conectar con nuevas personas y culturas', 'conexion'),
         QuizAnswer('Transformar mi perspectiva de la vida', 'transformacion'),
         QuizAnswer('Vivir aventuras y emociones fuertes', 'aventura'),
-        QuizAnswer(
-            'Reflexionar y encontrar paz interior', 'reflexion'),
+        QuizAnswer('Reflexionar y encontrar paz interior', 'reflexion'),
       ],
     ),
     QuizQuestion(
       question: '¿Qué tipo de experiencia te impacta más?',
       answers: [
         QuizAnswer('Momentos auténticos con gente local', 'conexion'),
-        QuizAnswer('Epifanías que cambian mi forma de pensar', 'transformacion'),
+        QuizAnswer(
+            'Epifanías que cambian mi forma de pensar', 'transformacion'),
         QuizAnswer('Hazañas que me sacan de mi zona de confort', 'aventura'),
         QuizAnswer('Silencio y contemplación de la belleza', 'reflexion'),
       ],
@@ -43,15 +44,12 @@ class _EmotionalPreferencesQuizScreenState
       question: '¿Cuándo sabes que un viaje fue exitoso?',
       answers: [
         QuizAnswer(
-            'Cuando he hecho amigos que durarán para siempre',
-            'conexion'),
-        QuizAnswer('Cuando regreso siendo una persona diferente',
-            'transformacion'),
-        QuizAnswer('Cuando he hecho cosas que no pensé posibles',
-            'aventura'),
+            'Cuando he hecho amigos que durarán para siempre', 'conexion'),
         QuizAnswer(
-            'Cuando tengo claridad sobre quién soy realmente',
-            'reflexion'),
+            'Cuando regreso siendo una persona diferente', 'transformacion'),
+        QuizAnswer('Cuando he hecho cosas que no pensé posibles', 'aventura'),
+        QuizAnswer(
+            'Cuando tengo claridad sobre quién soy realmente', 'reflexion'),
       ],
     ),
     QuizQuestion(
@@ -66,8 +64,7 @@ class _EmotionalPreferencesQuizScreenState
     QuizQuestion(
       question: '¿Cuál es tu mayor miedo en un viaje?',
       answers: [
-        QuizAnswer(
-            'Sentirme solo y desconectado', 'conexion'),
+        QuizAnswer('Sentirme solo y desconectado', 'conexion'),
         QuizAnswer('Que nada cambie en mí', 'transformacion'),
         QuizAnswer('Que sea aburrido o sin desafíos', 'aventura'),
         QuizAnswer('No tener tiempo para reflexionar', 'reflexion'),
@@ -85,30 +82,20 @@ class _EmotionalPreferencesQuizScreenState
     QuizQuestion(
       question: '¿Cuál es tu ideal de un recuerdo de viaje?',
       answers: [
+        QuizAnswer('Una foto con amigos que hice en el camino', 'conexion'),
         QuizAnswer(
-            'Una foto con amigos que hice en el camino',
-            'conexion'),
-        QuizAnswer(
-            'Un diario lleno de reflexiones personales',
-            'transformacion'),
+            'Un diario lleno de reflexiones personales', 'transformacion'),
         QuizAnswer('Un video de una hazaña increíble', 'aventura'),
-        QuizAnswer('Una sensación indescriptible en el pecho',
-            'reflexion'),
+        QuizAnswer('Una sensación indescriptible en el pecho', 'reflexion'),
       ],
     ),
     QuizQuestion(
       question: '¿Cómo prefieres aprender del viaje?',
       answers: [
-        QuizAnswer(
-            'Conversando profundamente con locales',
-            'conexion'),
-        QuizAnswer(
-            'Enfrentando mis miedos y limitaciones',
-            'transformacion'),
-        QuizAnswer('Probando actividades nuevas y extremas',
-            'aventura'),
-        QuizAnswer('Observando la naturaleza y la cultura',
-            'reflexion'),
+        QuizAnswer('Conversando profundamente con locales', 'conexion'),
+        QuizAnswer('Enfrentando mis miedos y limitaciones', 'transformacion'),
+        QuizAnswer('Probando actividades nuevas y extremas', 'aventura'),
+        QuizAnswer('Observando la naturaleza y la cultura', 'reflexion'),
       ],
     ),
   ];
@@ -276,8 +263,7 @@ class _EmotionalPreferencesQuizScreenState
       child: ElevatedButton(
         onPressed: () {
           setState(() {
-            _scores[answer.category] =
-                (_scores[answer.category] ?? 0) + 1;
+            _scores[answer.category] = (_scores[answer.category] ?? 0) + 1;
           });
           if (_currentQuestion < questions.length - 1) {
             _pageController.nextPage(
@@ -308,9 +294,8 @@ class _EmotionalPreferencesQuizScreenState
 
   void _showResults() {
     // Encontrar la categoría con mayor puntuación
-    String topCategory = _scores.entries
-        .reduce((a, b) => a.value > b.value ? a : b)
-        .key;
+    String topCategory =
+        _scores.entries.reduce((a, b) => a.value > b.value ? a : b).key;
 
     Map<String, Map<String, dynamic>> results = {
       'conexion': {
@@ -389,6 +374,7 @@ class QuizResultsScreen extends StatelessWidget {
   final Map<String, dynamic> resultData;
 
   const QuizResultsScreen({
+    super.key,
     required this.category,
     required this.resultData,
   });
@@ -453,9 +439,7 @@ class QuizResultsScreen extends StatelessWidget {
                       color: Colors.grey[800],
                     ),
                   ),
-
                   SizedBox(height: 24),
-
                   Text(
                     'Viajes perfectos para ti',
                     style: TextStyle(
@@ -472,9 +456,7 @@ class QuizResultsScreen extends StatelessWidget {
                       color: Colors.grey[800],
                     ),
                   ),
-
                   SizedBox(height: 32),
-
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -495,7 +477,6 @@ class QuizResultsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   SizedBox(height: 32),
                 ],
               ),

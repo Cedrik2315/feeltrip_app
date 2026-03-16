@@ -19,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ApiService _apiService = ApiService();
-  late Future<List<Trip>> _trips;
+  late Future<List<Trip>> trips;
   int _carouselIndex = 0;
   List<Trip> _featuredTrips = [];
   List<TravelerStory> _stories = [];
@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _trips = _apiService.getTrips();
+    trips = _apiService.getTrips();
     _loadFeaturedTrips();
     _loadStories();
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/experience_model.dart';
-import 'package:image_picker/image_picker.dart';
 import '../controllers/experience_controller.dart';
 
 class TravelDiaryScreen extends StatefulWidget {

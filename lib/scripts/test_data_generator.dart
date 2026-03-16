@@ -22,8 +22,6 @@ class TestDataGenerator {
 
   /// Crear historias de prueba
   static Future<void> generateTestStories() async {
-    print('📝 Generando historias de prueba...');
-
     final stories = [
       {
         'title': 'Mi aventura en Patagonia',
@@ -77,14 +75,11 @@ class TestDataGenerator {
         'id': storyId,
         ...story,
       });
-      print('  ✅ Story creada: ${story['title']}');
     }
   }
 
   /// Crear agencias de prueba
   static Future<void> generateTestAgencies() async {
-    print('🏢 Generando agencias de prueba...');
-
     final agencies = [
       {
         'name': 'FeelTrip Adventures',
@@ -186,7 +181,6 @@ class TestDataGenerator {
         'id': agencyId,
         ...agency,
       });
-      print('  ✅ Agencia creada: ${agency['name']}');
     }
   }
 }

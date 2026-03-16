@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ExperienceImpactDashboardScreen extends StatefulWidget {
+  const ExperienceImpactDashboardScreen({super.key});
   @override
   State<ExperienceImpactDashboardScreen> createState() =>
       _ExperienceImpactDashboardScreenState();
@@ -368,7 +369,7 @@ class _ExperienceImpactDashboardScreenState
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -487,7 +488,7 @@ class _ExperienceImpactDashboardScreenState
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.2),
+                      color: color.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -514,7 +515,8 @@ class _ExperienceImpactDashboardScreenState
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('•', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('•',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           SizedBox(width: 8),
           Expanded(
             child: Text(

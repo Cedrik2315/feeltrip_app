@@ -5,8 +5,7 @@ import '../services/affiliate_service.dart';
 class AffiliateWidget extends StatelessWidget {
   final String destination;
 
-  const AffiliateWidget({Key? key, required this.destination})
-      : super(key: key);
+  const AffiliateWidget({super.key, required this.destination});
 
   @override
   Widget build(BuildContext context) {

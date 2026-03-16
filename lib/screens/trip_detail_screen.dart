@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/trip_model.dart';
-import '../models/booking_model.dart';
 import '../services/api_service.dart';
 import '../widgets/destination_map_widget.dart';
 
 class TripDetailScreen extends StatefulWidget {
   final String tripId;
 
-  const TripDetailScreen({Key? key, required this.tripId}) : super(key: key);
+  const TripDetailScreen({super.key, required this.tripId});
 
   @override
   State<TripDetailScreen> createState() => _TripDetailScreenState();

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
 import '../services/user_service.dart';
 import 'creator_stats_screen.dart';
@@ -266,10 +264,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             await userService.followUser(
                                 currentUid!, targetUserId);
                           }
+                          if (!mounted) return;
                           setState(() {
                             _isFollowing = !_isFollowing;
                           });
                         } catch (e) {
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Error: $e')),
                           );
@@ -446,12 +446,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () async {
               await AuthService.signOut();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Sesión cerrada'),
-                ),
-              );
+              if (!mounted) return;
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Sesión cerrada'),
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

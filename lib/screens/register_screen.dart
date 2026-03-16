@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
@@ -309,9 +310,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (!_agreedToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Debes aceptar los términos y condiciones')),
+        SnackBar(content: Text('Debes aceptar los términos y condiciones')),
       );
       return;
     }
@@ -321,10 +320,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     Future.delayed(Duration(seconds: 2), () {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
       Navigator.pushReplacementNamed(context, '/home');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('¡Cuenta creada exitosamente!'),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 
 class CreatorStatsScreen extends StatefulWidget {
@@ -67,10 +66,8 @@ class _CreatorStatsScreenState extends State<CreatorStatsScreen> {
   }
 
   void _generateMockMonthlyData() {
-    final now = DateTime.now();
     monthlyData = [];
     for (int i = 11; i >= 0; i--) {
-      final month = DateTime(now.year, now.month - i, 1);
       monthlyData.add(
           FlSpot(i.toDouble(), (20 + (i * 3)).toDouble())); // Mock activity
     }

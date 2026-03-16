@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
@@ -136,7 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [page.color.withOpacity(0.1), Colors.white],
+          colors: [page.color.withValues(alpha: 0.1), Colors.white],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),

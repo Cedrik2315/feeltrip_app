@@ -126,10 +126,7 @@ class StoryService {
           .collection(FirebaseConfig.storiesCollection)
           .doc(storyId)
           .update(updates);
-
-      print('✅ Story updated: $storyId');
     } catch (e) {
-      print('❌ Error updating story: $e');
       rethrow;
     }
   }
@@ -155,7 +152,6 @@ class StoryService {
             'likes': likes - 1,
             'likedBy': likedBy,
           });
-          print('✅ Story unliked by $userId: $storyId');
         } else {
           // Like
           likedBy.add(userId);
@@ -163,11 +159,9 @@ class StoryService {
             'likes': likes + 1,
             'likedBy': likedBy,
           });
-          print('✅ Story liked by $userId: $storyId');
         }
       });
     } catch (e) {
-      print('❌ Error toggling like: $e');
       rethrow;
     }
   }
@@ -181,9 +175,7 @@ class StoryService {
           .update({
         'reaction': emoji,
       });
-      print('✅ Reaction $emoji added to story $storyId');
     } catch (e) {
-      print('❌ Error adding reaction: $e');
       rethrow;
     }
   }
@@ -202,10 +194,7 @@ class StoryService {
           .collection(FirebaseConfig.storiesCollection)
           .doc(storyId)
           .delete();
-
-      print('✅ Story deleted: $storyId');
     } catch (e) {
-      print('❌ Error deleting story: $e');
       rethrow;
     }
   }
@@ -224,7 +213,6 @@ class StoryService {
               .map((doc) => TravelerStory.fromFirestore(doc))
               .toList());
     } catch (e) {
-      print('❌ Error setting up stories stream: $e');
       rethrow;
     }
   }
@@ -242,7 +230,6 @@ class StoryService {
               .map((doc) => TravelerStory.fromFirestore(doc))
               .toList());
     } catch (e) {
-      print('❌ Error setting up user stories stream: $e');
       rethrow;
     }
   }
@@ -265,7 +252,6 @@ class StoryService {
           .map((doc) => TravelerStory.fromFirestore(doc))
           .toList();
     } catch (e) {
-      print('❌ Error searching stories: $e');
       rethrow;
     }
   }
@@ -284,7 +270,6 @@ class StoryService {
           .map((doc) => TravelerStory.fromFirestore(doc))
           .toList();
     } catch (e) {
-      print('❌ Error searching by emotion: $e');
       rethrow;
     }
   }

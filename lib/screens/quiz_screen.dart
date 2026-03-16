@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'results_screen.dart';
 
 class QuizScreen extends StatefulWidget {
+  const QuizScreen({super.key});
   @override
-  _QuizScreenState createState() => _QuizScreenState();
+  // ignore: library_private_types_in_public_api
+  State<QuizScreen> createState() => _QuizScreenState();
 }
 
 class _QuizScreenState extends State<QuizScreen> {
@@ -13,7 +15,14 @@ class _QuizScreenState extends State<QuizScreen> {
   final questions = [
     {
       'question': '¿Qué querés sentir en tu próximo viaje?',
-      'options': ['😍 Deseo', '🤗 Abrazo', '😭 Lágrima', '😱 Susto', '🤯 Boom', '😌 Paz']
+      'options': [
+        '😍 Deseo',
+        '🤗 Abrazo',
+        '😭 Lágrima',
+        '😱 Susto',
+        '🤯 Boom',
+        '😌 Paz'
+      ]
     },
     {
       'question': '¿Con quién compartirás esa sensación?',
@@ -21,7 +30,13 @@ class _QuizScreenState extends State<QuizScreen> {
     },
     {
       'question': '¿Cuánto podés gastar sin culpa?',
-      'options': ['0-500 €', '500-1500 €', '1500-3000 €', '3000+ €', 'No me importa']
+      'options': [
+        '0-500 €',
+        '500-1500 €',
+        '1500-3000 €',
+        '3000+ €',
+        'No me importa'
+      ]
     },
     {
       'question': '¿En qué estación te gustaría respirar el aire nuevo?',
@@ -29,7 +44,12 @@ class _QuizScreenState extends State<QuizScreen> {
     },
     {
       'question': '¿Qué tamaño de lugar te hace más ruido en el pecho?',
-      'options': ['Ciudad que nunca duerme', 'Pueblo que silencia', 'Naturaleza que respira', 'Desierto que absorbe']
+      'options': [
+        'Ciudad que nunca duerme',
+        'Pueblo que silencia',
+        'Naturaleza que respira',
+        'Desierto que absorbe'
+      ]
     },
     {
       'question': '¿Cómo querés que pase el tiempo?',
@@ -94,29 +114,28 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
               ),
               SizedBox(height: 40),
-              ...(questions[currentQuestion]['options'] as List<String>).map((option) =>
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.blue[800],
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+              ...(questions[currentQuestion]['options'] as List<String>)
+                  .map((option) => Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.blue[800],
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            onPressed: () => nextQuestion(option),
+                            child: Text(
+                              option,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
                         ),
-                      ),
-                      onPressed: () => nextQuestion(option),
-                      child: Text(
-                        option,
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ),
-                )
-              ).toList(),
+                      )),
             ],
           ),
         ),

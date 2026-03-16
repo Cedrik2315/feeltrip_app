@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
 import '../models/comment_model.dart';
 import '../services/comment_service.dart';
 
@@ -8,9 +7,9 @@ class CommentsScreen extends StatefulWidget {
   final String storyId;
 
   const CommentsScreen({
-    Key? key,
+    super.key,
     required this.storyId,
-  }) : super(key: key);
+  });
 
   @override
   State<CommentsScreen> createState() => _CommentsScreenState();
@@ -32,7 +31,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
   void _submitComment() {
     if (_commentController.text.trim().isEmpty) return;
 
-    _commentService.addComment(widget.storyId, userId, _commentController.text.trim());
+    _commentService.addComment(
+        widget.storyId, userId, _commentController.text.trim());
     _commentController.clear();
   }
 
@@ -105,12 +105,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: comment.userAvatar.isNotEmpty 
-                  ? NetworkImage(comment.userAvatar) 
-                  : null,
-                child: comment.userAvatar.isEmpty 
-                  ? Icon(Icons.person, size: 20)
-                  : null,
+                backgroundImage: comment.userAvatar.isNotEmpty
+                    ? NetworkImage(comment.userAvatar)
+                    : null,
+                child: comment.userAvatar.isEmpty
+                    ? Icon(Icons.person, size: 20)
+                    : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -286,16 +286,18 @@ class _CommentsScreenState extends State<CommentsScreen> {
             Wrap(
               spacing: 16,
               runSpacing: 16,
-              children: reactions.map((reaction) => GestureDetector(
-                onTap: () {
-                  _commentService.addReaction(comment.id, reaction);
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  reaction,
-                  style: const TextStyle(fontSize: 32),
-                ),
-              )).toList(),
+              children: reactions
+                  .map((reaction) => GestureDetector(
+                        onTap: () {
+                          _commentService.addReaction(comment.id, reaction);
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          reaction,
+                          style: const TextStyle(fontSize: 32),
+                        ),
+                      ))
+                  .toList(),
             ),
           ],
         ),
@@ -313,4 +315,3 @@ class _CommentsScreenState extends State<CommentsScreen> {
     return 'hace ${difference.inDays ~/ 7}s';
   }
 }
-

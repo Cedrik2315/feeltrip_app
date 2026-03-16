@@ -51,6 +51,8 @@ class StorageService {
     try {
       final ref = _storage.refFromURL(url);
       await ref.delete();
-    } catch (e) {}
+    } catch (_) {
+      // Ignorar error si el archivo no existe
+    }
   }
 }

@@ -42,10 +42,12 @@ class _OCRScreenState extends State<OCRScreen> {
       final RecognizedText recognizedText =
           await _textRecognizer.processImage(inputImage);
 
+      if (!mounted) return;
       setState(() {
         _extractedText = recognizedText.text;
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error en OCR: $e')),
       );
