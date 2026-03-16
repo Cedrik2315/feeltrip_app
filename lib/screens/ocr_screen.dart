@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'dart:io';
 import 'translator_screen.dart';
+import 'package:flutter/services.dart';
 
 class OCRScreen extends StatefulWidget {
   const OCRScreen({super.key});
@@ -17,6 +18,7 @@ class _OCRScreenState extends State<OCRScreen> {
       TextRecognizer(script: TextRecognitionScript.latin);
   File? _image;
   String _extractedText = '';
+  late final TextEditingController _extractedTextController;
   bool _isProcessing = false;
 
   Future<void> _pickImage(ImageSource source) async {
@@ -45,6 +47,7 @@ class _OCRScreenState extends State<OCRScreen> {
       if (!mounted) return;
       setState(() {
         _extractedText = recognizedText.text;
+        _extractedTextController.text = recognizedText.text;
       });
     } catch (e) {
       if (!mounted) return;
@@ -59,7 +62,14 @@ class _OCRScreenState extends State<OCRScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _extractedTextController = TextEditingController();
+  }
+
+  @override
   void dispose() {
+    _extractedTextController.dispose();
     _textRecognizer.close();
     super.dispose();
   }
@@ -130,27 +140,58 @@ class _OCRScreenState extends State<OCRScreen> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey[300]!),
                 ),
-                child: SingleChildScrollView(child: Text(_extractedText)),
+                child: TextField(
+                  controller: _extractedTextController,
+                  maxLines: null,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Texto editable...',
+                  ),
+                  style: const TextStyle(fontSize: 16),
+                ),
               ),
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TranslatorScreen(),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Clipboard.setData(
+                            ClipboardData(text: _extractedTextController.text));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Texto copiado')),
+                        );
+                      },
+                      icon: const Icon(Icons.copy),
+                      label: const Text('Copiar texto'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.translate),
-                  label: const Text('Traducir este texto'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TranslatorScreen(
+                                initialText: _extractedTextController.text),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.translate),
+                      label: const Text('Traducir este texto'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ],

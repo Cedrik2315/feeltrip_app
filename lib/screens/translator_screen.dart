@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter/services.dart';
 
 class TranslatorScreen extends StatefulWidget {
-  const TranslatorScreen({super.key});
+  final String? initialText;
+  const TranslatorScreen({super.key, this.initialText});
 
   @override
   State<TranslatorScreen> createState() => _TranslatorScreenState();
@@ -25,6 +27,9 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
   void initState() {
     super.initState();
     _initTts();
+    if (widget.initialText != null) {
+      _inputController.text = widget.initialText!;
+    }
   }
 
   Future<void> _initTts() async {
@@ -192,7 +197,12 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                         IconButton(
                           icon: const Icon(Icons.copy),
                           onPressed: () {
-                            // Copy to clipboard
+                            Clipboard.setData(
+                                ClipboardData(text: _translation));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Traducción copiada')),
+                            );
                           },
                         ),
                       ],
@@ -221,7 +231,13 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
             const Spacer(),
             Center(
               child: ElevatedButton.icon(
-                onPressed: () {}, // Swap languages
+                onPressed: () {
+                  setState(() {
+                    final temp = _fromLang;
+                    _fromLang = _toLang;
+                    _toLang = temp;
+                  });
+                },
                 icon: const Icon(Icons.swap_horiz),
                 label: const Text('Invertir idiomas'),
               ),

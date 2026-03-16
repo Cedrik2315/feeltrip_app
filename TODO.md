@@ -1,13 +1,17 @@
-# Syntax Fixes - Agency & Trip Screens
+# Implementation Plan: OCR, Translator, Instagram Stories
 
-## Progress
-✅ **Plan approved by user**
+## [x] Step 1: Plan created and approved
 
-## Steps:
-- [x] 1. Create TODO.md for tracking
-- [x] 2. Edit agency_profile_screen.dart (remove _agencyService - FULLY rewritten with fixes)
-- [x] 3. Rewrite trip_detail_screen.dart (added declaration, fixed braces, Colors)
-- [x] 4. Run `flutter analyze`
-- [x] 5. Update TODO.md and complete
+## [x] Step 2: Create lib/models/instagram_story.dart ✅
 
-**All syntax fixes complete. Remaining linter issues are minor constants or project-wide.**
+## [x] Step 3: Create lib/services/instagram_story_service.dart ✅
+
+## [x] Step 4: Edit lib/screens/ocr_screen.dart ✅
+
+## [x] Step 5: Edit lib/screens/translator_screen.dart ✅ (constructor, clipboard, swap)
+
+## [ ] Step 6: Edit lib/screens/instagram_stories_screen.dart
+
+## [ ] Step 7: Run flutter analyze
+
+## [ ] Step 8: Test features

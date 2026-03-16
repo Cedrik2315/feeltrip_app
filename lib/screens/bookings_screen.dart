@@ -207,6 +207,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
             onPressed: () async {
               Navigator.pop(context);
               await docRef.update({'status': 'cancelled'});
+              if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text('Reserva cancelada'),

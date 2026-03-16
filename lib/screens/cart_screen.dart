@@ -67,7 +67,7 @@ class _CartScreenState extends State<CartScreen> {
           }).toList();
 
           final subtotal =
-              cartItems.fold<double>(0, (sum, item) => sum + item.total);
+              cartItems.fold<double>(0, (total, item) => total + item.total);
           final tax = subtotal * 0.1;
           final total = subtotal + tax;
 
