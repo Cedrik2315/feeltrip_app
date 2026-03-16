@@ -1,126 +1,49 @@
-﻿class Trip {
-  final String id;
-  final String title;
-  final String description;
-  final String destination;
-  final String country;
-  final double price;
-  final double rating;
-  final int reviews;
-  final int duration;
-  final String difficulty;
-  final List<String> images;
-  final List<String> highlights;
-  final DateTime startDate;
-  final DateTime endDate;
-  final int maxParticipants;
-  final int currentParticipants;
-  final String category;
-  final List<String> amenities;
-  final String guide;
-  final bool isFeatured;
-  // Vivenciales
-  final String experienceType;
-  final List<String> emotions;
-  final List<String> learnings;
-  final String transformationMessage;
-  final List<String> culturalConnections;
-  final bool isTransformative;
+﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-  Trip({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.destination,
-    required this.country,
-    required this.price,
-    this.rating = 0.0,
-    this.reviews = 0,
-    required this.duration,
-    required this.difficulty,
-    required this.images,
-    required this.highlights,
-    required this.startDate,
-    required this.endDate,
-    required this.maxParticipants,
-    this.currentParticipants = 0,
-    required this.category,
-    this.amenities = const [],
-    required this.guide,
-    this.isFeatured = false,
-    this.experienceType = '',
-    this.emotions = const [],
-    this.learnings = const [],
-    this.transformationMessage = '',
-    this.culturalConnections = const [],
-    this.isTransformative = false,
-  });
+part 'trip_model.freezed.dart';
+part 'trip_model.g.dart';
 
-  factory Trip.fromJson(Map<String, dynamic> json) {
-    return Trip(
-      id: json['id'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      destination: json['destination'] ?? '',
-      country: json['country'] ?? '',
-      price: (json['price'] ?? 0).toDouble(),
-      rating: (json['rating'] ?? 0).toDouble(),
-      reviews: json['reviews'] ?? 0,
-      duration: json['duration'] ?? 0,
-      difficulty: json['difficulty'] ?? 'Moderado',
-      images: List<String>.from(json['images'] ?? []),
-      highlights: List<String>.from(json['highlights'] ?? []),
-      startDate: json['startDate'] != null
-          ? DateTime.parse(json['startDate'])
-          : DateTime.now(),
-      endDate: json['endDate'] != null
-          ? DateTime.parse(json['endDate'])
-          : DateTime.now(),
-      maxParticipants: json['maxParticipants'] ?? 0,
-      currentParticipants: json['currentParticipants'] ?? 0,
-      category: json['category'] ?? '',
-      amenities: List<String>.from(json['amenities'] ?? []),
-      guide: json['guide'] ?? '',
-      isFeatured: json['isFeatured'] ?? false,
-      experienceType: json['experienceType'] ?? '',
-      emotions: List<String>.from(json['emotions'] ?? []),
-      learnings: List<String>.from(json['learnings'] ?? []),
-      transformationMessage: json['transformationMessage'] ?? '',
-      culturalConnections: List<String>.from(json['culturalConnections'] ?? []),
-      isTransformative: json['isTransformative'] ?? false,
-    );
-  }
+DateTime? _parseDateTime(dynamic date) {
+  if (date == null) return null;
+  if (date is Timestamp) return date.toDate();
+  if (date is String) return DateTime.tryParse(date);
+  return null;
+}
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'destination': destination,
-      'country': country,
-      'price': price,
-      'rating': rating,
-      'reviews': reviews,
-      'duration': duration,
-      'difficulty': difficulty,
-      'images': images,
-      'highlights': highlights,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
-      'maxParticipants': maxParticipants,
-      'currentParticipants': currentParticipants,
-      'category': category,
-      'amenities': amenities,
-      'guide': guide,
-      'isFeatured': isFeatured,
-      'experienceType': experienceType,
-      'emotions': emotions,
-      'learnings': learnings,
-      'transformationMessage': transformationMessage,
-      'culturalConnections': culturalConnections,
-      'isTransformative': isTransformative,
-      
-      
-    };
-  }
+dynamic _toJsonDateTime(DateTime? date) => date?.toIso8601String();
+
+@freezed
+class Trip with _$Trip {
+  const factory Trip({
+    required String id,
+    required String title,
+    required String description,
+    required String destination,
+    required String country,
+    required String category,
+    required double price,
+    @Default(0.0) double rating,
+    @Default([]) List<dynamic> reviews,
+    @Default([]) List<String> images,
+    @Default([]) List<String> highlights,
+    @Default([]) List<String> amenities,
+    @Default(false) bool isFeatured,
+    @Default(false) bool isTransformative,
+    String? guide,
+    String? agencyId,
+    required String difficulty,
+    required int duration,
+    @JsonKey(fromJson: _parseDateTime, toJson: _toJsonDateTime) DateTime? startDate,
+    @JsonKey(fromJson: _parseDateTime, toJson: _toJsonDateTime) DateTime? endDate,
+    @Default(0) int maxParticipants,
+    @Default(0) int currentParticipants,
+    String? experienceType,
+    @Default([]) List<String> emotions,
+    @Default([]) List<String> learnings,
+    String? transformationMessage,
+    @Default([]) List<String> culturalConnections,
+  }) = _Trip;
+
+  factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
 }

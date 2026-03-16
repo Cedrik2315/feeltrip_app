@@ -11,14 +11,11 @@ import 'models/user_model.dart';
 /// Una vez arreglado Firebase, estos se pueden eliminar
 class MockData {
   // Usuarios de prueba
-  static final User testUser = User(
+  static final UserModel testUser = UserModel(
     id: 'user_1',
     email: 'juan.garcia@email.com',
     name: 'Juan García',
-    phone: '+34 612 345 678',
-    profileImage: '',
-    createdAt: DateTime(2024, 1, 15),
-    favoriteTrips: ['trip_1', 'trip_3'],
+    bio: 'Viajero apasionado',
   );
 
   // Viajes disponibles
@@ -32,7 +29,7 @@ class MockData {
       country: 'Noruega',
       price: 1290.00,
       rating: 4.8,
-      reviews: 248,
+      reviews: [],
       duration: 5,
       difficulty: 'Moderado',
       images: [
@@ -48,7 +45,6 @@ class MockData {
       startDate: DateTime(2026, 2, 15),
       endDate: DateTime(2026, 2, 20),
       maxParticipants: 20,
-      currentParticipants: 12,
       category: 'Aventura',
       amenities: [
         'Alojamiento en cabaña',
@@ -69,7 +65,7 @@ class MockData {
       country: 'Italia',
       price: 980.00,
       rating: 4.9,
-      reviews: 156,
+      reviews: [],
       duration: 7,
       difficulty: 'Fácil',
       images: [
@@ -85,7 +81,6 @@ class MockData {
       startDate: DateTime(2026, 3, 10),
       endDate: DateTime(2026, 3, 17),
       maxParticipants: 8,
-      currentParticipants: 5,
       category: 'Gastronomía',
       amenities: [
         'Alojamiento en casa de campo',
@@ -105,7 +100,7 @@ class MockData {
       country: 'Indonesia',
       price: 750.00,
       rating: 4.7,
-      reviews: 312,
+      reviews: [],
       duration: 10,
       difficulty: 'Fácil',
       images: [
@@ -121,7 +116,6 @@ class MockData {
       startDate: DateTime(2026, 4, 1),
       endDate: DateTime(2026, 4, 11),
       maxParticipants: 25,
-      currentParticipants: 18,
       category: 'Bienestar',
       amenities: [
         'Resort de lujo',
@@ -142,7 +136,7 @@ class MockData {
       country: 'Perú',
       price: 1450.00,
       rating: 4.9,
-      reviews: 189,
+      reviews: [],
       duration: 6,
       difficulty: 'Difícil',
       images: [
@@ -158,7 +152,6 @@ class MockData {
       startDate: DateTime(2026, 5, 1),
       endDate: DateTime(2026, 5, 7),
       maxParticipants: 15,
-      currentParticipants: 10,
       category: 'Aventura',
       amenities: [
         'Guía arqueológico',
@@ -178,7 +171,7 @@ class MockData {
       country: 'Francia',
       price: 1100.00,
       rating: 4.6,
-      reviews: 421,
+      reviews: [],
       duration: 5,
       difficulty: 'Fácil',
       images: [
@@ -194,7 +187,6 @@ class MockData {
       startDate: DateTime(2026, 6, 1),
       endDate: DateTime(2026, 6, 6),
       maxParticipants: 30,
-      currentParticipants: 22,
       category: 'Cultural',
       amenities: [
         'Hotel 4 estrellas',
@@ -461,25 +453,18 @@ class MockData {
         country: 'Argentina',
         price: 0.0,
         rating: data['rating'],
-        reviews: 0,
+        reviews: [],
         duration: 5,
         difficulty: 'Fácil',
         images: [data['imageUrl']],
-        highlights: data['emotionalHighlights'],
+        highlights: List<String>.from(data['emotionalHighlights'] ?? []),
         startDate: (data['createdAt'] as Timestamp).toDate(),
         endDate: (data['createdAt'] as Timestamp).toDate(),
         maxParticipants: 30,
-        currentParticipants: 0,
         category: 'Aventura',
         amenities: [],
         guide: '',
         isFeatured: true,
-        experienceType: 'adventure',
-        emotions: [],
-        learnings: [],
-        transformationMessage: '',
-        culturalConnections: [],
-        isTransformative: false,
       );
     }).toList();
   }
@@ -497,28 +482,21 @@ class MockData {
       title: data['title'],
       description: data['story'],
       destination: data['author'],
-      country: 'Argentina',
+        country: 'Argentina',
       price: 0.0,
       rating: data['rating'],
-      reviews: 0,
-      duration: 5,
-      difficulty: 'Fácil',
+        reviews: [],
+        duration: 5,
+        difficulty: 'Fácil',
       images: [data['imageUrl']],
-      highlights: data['emotionalHighlights'],
-      startDate: (data['createdAt'] as Timestamp).toDate(),
-      endDate: (data['createdAt'] as Timestamp).toDate(),
-      maxParticipants: 30,
-      currentParticipants: 0,
-      category: 'Aventura',
-      amenities: [],
-      guide: '',
-      isFeatured: true,
-      experienceType: 'adventure',
-      emotions: [],
-      learnings: [],
-      transformationMessage: '',
-      culturalConnections: [],
-      isTransformative: false,
+        highlights: List<String>.from(data['emotionalHighlights'] ?? []),
+        startDate: (data['createdAt'] as Timestamp).toDate(),
+        endDate: (data['createdAt'] as Timestamp).toDate(),
+        maxParticipants: 30,
+        category: 'Aventura',
+        amenities: [],
+        guide: '',
+        isFeatured: true,
     );
   }
 

@@ -105,10 +105,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: comment.userAvatar.isNotEmpty
-                    ? NetworkImage(comment.userAvatar)
+                backgroundImage: (comment.userAvatar?.isNotEmpty ?? false)
+                    ? NetworkImage(comment.userAvatar!)
                     : null,
-                child: comment.userAvatar.isEmpty
+                child: (comment.userAvatar?.isEmpty ?? true)
                     ? Icon(Icons.person, size: 20)
                     : null,
               ),
@@ -125,7 +125,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                       ),
                     ),
                     Text(
-                      _timeAgo(comment.createdAt),
+                      comment.createdAt != null ? _timeAgo(comment.createdAt!) : '',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey,

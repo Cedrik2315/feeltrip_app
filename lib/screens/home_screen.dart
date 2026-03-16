@@ -4,7 +4,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:get/get.dart';
 import '../models/trip_model.dart';
 import '../models/experience_model.dart';
-import '../services/api_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/admob_service.dart';
 import '../controllers/premium_controller.dart';
 import 'translator_screen.dart';
@@ -18,8 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ApiService _apiService = ApiService();
-  late Future<List<Trip>> trips;
+  List<Trip> trips = [];
   int _carouselIndex = 0;
   List<Trip> _featuredTrips = [];
   List<TravelerStory> _stories = [];
@@ -27,21 +26,27 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    trips = _apiService.getTrips();
-    _loadFeaturedTrips();
+    FirebaseFirestore.instance
+        .collection('trips')
+        .limit(10)
+        .get()
+        .then((snapshot) {
+      if (mounted) {
+        setState(() {
+          trips = snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return Trip.fromJson(data);
+          }).toList();
+          _featuredTrips =
+              trips.where((trip) => trip.isFeatured).toList().take(5).toList();
+        });
+      }
+    });
     _loadStories();
 
     AdMobService.initialize();
     AdMobService.loadBannerAd();
-  }
-
-  void _loadFeaturedTrips() {
-    _apiService.getTrips().then((trips) {
-      setState(() {
-        _featuredTrips =
-            trips.where((trip) => trip.isFeatured).toList().take(5).toList();
-      });
-    });
   }
 
   void _loadStories() {

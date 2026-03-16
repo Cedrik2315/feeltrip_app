@@ -221,7 +221,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         ignoreGestures: true,
                       ),
                       const SizedBox(width: 8),
-                      Text('${trip.reviews} reseñas'),
+                      Text('${trip.reviews.length} reseñas'),
                     ],
                   ),
 
@@ -262,7 +262,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(trip.guide),
+                  Text(trip.guide ?? 'Sin guía asignado'),
 
                   const SizedBox(height: 20),
 

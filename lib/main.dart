@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/home_screen.dart';
@@ -25,15 +26,26 @@ import 'screens/agency_profile_screen.dart';
 import 'screens/reels_screen.dart';
 import 'config/firebase_config.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await dotenv.load();
-  } catch (e) {
-    // log eliminado: ⚠️ Warning: Could not load .env file: $e
-  }
-  await FirebaseConfig.initialize();
-  runApp(const FeelTripApp());
+Future<void> main() async {
+  await SentryFlutter.init(
+    (options) {
+      options.dsn =
+          const String.fromEnvironment('SENTRY_DSN', defaultValue: '');
+      options.tracesSampleRate = 1.0;
+      options.environment =
+          const String.fromEnvironment('FLUTTER_ENV', defaultValue: 'development');
+    },
+    appRunner: () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      try {
+        await dotenv.load();
+      } catch (e) {
+        // log eliminado: ⚠️ Warning: Could not load .env file: $e
+      }
+      await FirebaseConfig.initialize();
+      runApp(const FeelTripApp());
+    },
+  );
 }
 
 class FeelTripApp extends StatelessWidget {

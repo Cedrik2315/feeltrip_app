@@ -4,7 +4,7 @@ import 'package:feeltrip_app/models/user_model.dart';
 void main() {
   group('UserModel', () {
     test('se crea con campos requeridos', () {
-      final user = User(
+      final user = UserModel(
         id: 'user1',
         email: 'juan@test.com',
         name: 'Juan',
@@ -27,13 +27,13 @@ void main() {
         'createdAt': DateTime.now().toIso8601String(),
         'favoriteTrips': [],
       };
-      final user = User.fromJson(json);
+      final user = UserModel.fromJson(json);
       expect(user.id, 'user1');
       expect(user.name, 'Juan');
     });
 
     test('toJson serializa correctamente', () {
-      final user = User(
+      final user = UserModel(
         id: 'user1',
         email: 'juan@test.com',
         name: 'Juan',
