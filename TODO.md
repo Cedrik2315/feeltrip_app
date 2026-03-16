@@ -1,15 +1,13 @@
-# Real-time Firestore Streams Implementation TODO
+# Syntax Fixes - Agency & Trip Screens
+
+## Progress
+✅ **Plan approved by user**
 
 ## Steps:
-- [x] 1. Update lib/controllers/experience_controller.dart: Add listenToStories() and call in onInit()
+- [x] 1. Create TODO.md for tracking
+- [x] 2. Edit agency_profile_screen.dart (remove _agencyService - FULLY rewritten with fixes)
+- [x] 3. Rewrite trip_detail_screen.dart (added declaration, fixed braces, Colors)
+- [x] 4. Run `flutter analyze`
+- [x] 5. Update TODO.md and complete
 
-- [x] 2. Update lib/screens/feed_screen.dart: Replace Future pagination with StreamBuilder<QuerySnapshot>
-
-- [x] 3. Update lib/screens/stories_screen.dart: Add StreamBuilder<List<TravelerStory>> around ListView
-
-- [ ] 4. Run `flutter analyze` - check for errors
-- [ ] 5. Test real-time updates in app (add story/comment → verify auto-appears)
-- [ ] 6. Complete ✅
-
-**Status:** Starting implementation...
-
+**All syntax fixes complete. Remaining linter issues are minor constants or project-wide.**

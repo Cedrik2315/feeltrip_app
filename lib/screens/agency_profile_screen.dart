@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/agency_model.dart';
-import '../services/agency_service.dart';
 import '../services/sharing_service.dart';
 
 class AgencyProfileScreen extends StatefulWidget {
@@ -18,161 +17,197 @@ class AgencyProfileScreen extends StatefulWidget {
 }
 
 class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
-  final AgencyService _agencyService = AgencyService();
+  TravelAgency? _agency;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection('agencies')
+        .doc(widget.agencyId)
+        .snapshots()
+        .listen((doc) {
+      if (doc.exists && mounted) {
+        setState(() {
+          _agency = TravelAgency.fromJson(doc.data()!);
+        });
+      }
+    });
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) setState(() => _isLoading = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<TravelAgency?>(
-        future: _agencyService.getAgencyById(widget.agencyId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    if (_isLoading || _agency == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
-          if (!snapshot.hasData || snapshot.data == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.business_outlined,
-                    size: 80,
-                    color: Colors.grey[300],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Agencia no encontrada',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+    if (_agency == null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.business_outlined,
+                size: 80,
+                color: Colors.grey[300]!,
               ),
-            );
-          }
+              const SizedBox(height: 16),
+              const Text(
+                'Agencia no encontrada',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF757575),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
-          final agency = snapshot.data!;
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 200,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.blue[400]!,
-                          Colors.blue[800]!,
-                        ],
-                      ),
-                    ),
-                    child: Center(
-                      child: Image.network(
-                        agency.logo,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                          Icons.business,
-                          size: 80,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+    final agency = _agency!;
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          expandedHeight: 200,
+          pinned: true,
+          flexibleSpace: FlexibleSpaceBar(
+            background: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue[400]!,
+                    Colors.blue[800]!,
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Image.network(
+                  agency.logo,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.business,
+                    size: 80,
+                    color: Colors.white,
                   ),
                 ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: () => _shareAgency(agency),
-                  ),
-                ],
               ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () => _shareAgency(agency),
+            ),
+          ],
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            agency.name,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${agency.city}, ${agency.country}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600]!,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (agency.verified)
+                      const Tooltip(
+                        message: 'Verificado',
+                        child: Icon(
+                          Icons.verified,
+                          color: Colors.blue,
+                          size: 24,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _buildStat(
+                      icon: Icons.star,
+                      value: agency.rating.toStringAsFixed(1),
+                      label: 'Rating',
+                    ),
+                    const SizedBox(width: 24),
+                    _buildStat(
+                      icon: Icons.people,
+                      value: agency.followers.toString(),
+                      label: 'Followers',
+                    ),
+                    const SizedBox(width: 24),
+                    _buildStat(
+                      icon: Icons.tour,
+                      value: agency.experiences.length.toString(),
+                      label: 'Experiencias',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Sobre nosotros',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  agency.description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                if (agency.specialties.isNotEmpty)
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  agency.name,
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.location_on,
-                                      size: 16,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${agency.city}, ${agency.country}',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (agency.verified)
-                            const Tooltip(
-                              message: 'Verificado',
-                              child: Icon(
-                                Icons.verified,
-                                color: Colors.blue,
-                                size: 24,
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Rating y followers
-                      Row(
-                        children: [
-                          _buildStat(
-                            icon: Icons.star,
-                            value: agency.rating.toStringAsFixed(1),
-                            label: 'Rating',
-                          ),
-                          const SizedBox(width: 24),
-                          _buildStat(
-                            icon: Icons.people,
-                            value: agency.followers.toString(),
-                            label: 'Followers',
-                          ),
-                          const SizedBox(width: 24),
-                          _buildStat(
-                            icon: Icons.tour,
-                            value: agency.experiences.length.toString(),
-                            label: 'Experiencias',
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Descripción
                       Text(
-                        'Sobre nosotros',
+                        'Especialidades',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -180,47 +215,52 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        agency.description,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                          height: 1.5,
-                        ),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: agency.specialties
+                            .map((specialty) => Chip(
+                                  label: Text(specialty),
+                                  backgroundColor: Colors.blue[100],
+                                ))
+                            .toList(),
                       ),
                       const SizedBox(height: 24),
-
-                      // Especialidades
-                      if (agency.specialties.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Especialidades',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: agency.specialties
-                                  .map((specialty) => Chip(
-                                        label: Text(specialty),
-                                        backgroundColor: Colors.blue[100],
-                                      ))
-                                  .toList(),
-                            ),
-                            const SizedBox(height: 24),
-                          ],
-                        ),
-
-                      // Contacto
+                    ],
+                  ),
+                Text(
+                  'Contacto',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildContactButton(
+                  icon: Icons.phone,
+                  label: agency.phoneNumber,
+                  onTap: () => _launchPhone(agency.phoneNumber),
+                ),
+                const SizedBox(height: 8),
+                _buildContactButton(
+                  icon: Icons.email,
+                  label: agency.email,
+                  onTap: () => _launchEmail(agency.email),
+                ),
+                const SizedBox(height: 8),
+                _buildContactButton(
+                  icon: Icons.language,
+                  label: agency.website,
+                  onTap: () => _launchWebsite(agency.website),
+                ),
+                const SizedBox(height: 24),
+                if (agency.socialMedia.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        'Contacto',
+                        'Redes Sociales',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -228,76 +268,37 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      _buildContactButton(
-                        icon: Icons.phone,
-                        label: agency.phoneNumber,
-                        onTap: () => _launchPhone(agency.phoneNumber),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildContactButton(
-                        icon: Icons.email,
-                        label: agency.email,
-                        onTap: () => _launchEmail(agency.email),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildContactButton(
-                        icon: Icons.language,
-                        label: agency.website,
-                        onTap: () => _launchWebsite(agency.website),
+                      Wrap(
+                        spacing: 12,
+                        children: agency.socialMedia
+                            .map((social) => _buildSocialIcon(social))
+                            .toList(),
                       ),
                       const SizedBox(height: 24),
-
-                      // Redes sociales
-                      if (agency.socialMedia.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Redes Sociales',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 12,
-                              children: agency.socialMedia
-                                  .map((social) => _buildSocialIcon(social))
-                                  .toList(),
-                            ),
-                            const SizedBox(height: 24),
-                          ],
-                        ),
-
-                      // Botón de seguir
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.person_add),
-                          label: const Text('Seguir'),
-                          onPressed: () {
-                            _agencyService.followAgency(widget.agencyId);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('¡Siguiendo a esta agencia!'),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.person_add),
+                    label: const Text('Seguir'),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('¡Siguiendo a esta agencia!'),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
-      ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -321,7 +322,7 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: Colors.grey[600]!,
           ),
         ),
       ],

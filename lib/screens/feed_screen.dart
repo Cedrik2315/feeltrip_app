@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../config/firebase_config.dart';
 import '../models/experience_model.dart';
-import '../services/story_service.dart';
 import 'stories_screen.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -14,8 +13,6 @@ class FeedScreen extends StatefulWidget {
 }
 
 class _FeedScreenState extends State<FeedScreen> {
-  final StoryService _storyService = StoryService();
-
   @override
   void initState() {
     super.initState();
