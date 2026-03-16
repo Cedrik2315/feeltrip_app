@@ -162,7 +162,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
               Text(
                 'Convertí tus momentos en una película',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 16,
                 ),
               ),
@@ -255,7 +255,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                   child: Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
@@ -287,7 +287,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                     'Aún no hay momentos guardados.\nEmpezá a crear tu diario!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 16,
                     ),
                   ),

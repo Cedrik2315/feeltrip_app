@@ -3,8 +3,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
-import '../services/story_service.dart';
-import '../services/comment_service.dart';
 
 class CreatorStatsScreen extends StatefulWidget {
   const CreatorStatsScreen({super.key});
@@ -127,7 +125,7 @@ class _CreatorStatsScreenState extends State<CreatorStatsScreen> {
                       barWidth: 3,
                       belowBarData: BarAreaData(
                         show: true,
-                        color: Colors.deepPurple.withOpacity(0.3),
+                        color: Colors.deepPurple.withAlpha(77),
                       ),
                     ),
                   ],

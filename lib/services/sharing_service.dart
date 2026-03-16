@@ -12,10 +12,10 @@ class SharingService {
       final message =
           '📸 $storyTitle\n\n$storyDescription\n\n✨ Descubre más historias en FeelTrip:\n$deepLink';
 
-      await Share.share(
-        message,
+      await SharePlus.instance.share(ShareParams(
+        text: message,
         subject: '¡Mira esta historia en FeelTrip!',
-      );
+      ));
 
       debugPrint('✅ Compartido a WhatsApp exitosamente');
     } catch (e) {
@@ -34,10 +34,10 @@ class SharingService {
       final message =
           '🌍 $storyTitle\n\n$storyDescription\n\n🎒 FeelTrip: Conecta con viajeros\n$deepLink';
 
-      await Share.share(
-        message,
+      await SharePlus.instance.share(ShareParams(
+        text: message,
         subject: '¡Comparte esta aventura!',
-      );
+      ));
 
       debugPrint('✅ Compartido a Facebook exitosamente');
     } catch (e) {
@@ -54,7 +54,8 @@ class SharingService {
     try {
       final message = '🎬 $storyTitle\n\nMira esto en FeelTrip:\n$deepLink';
 
-      await Share.share(message, subject: '¡Mira en FeelTrip!');
+      await SharePlus.instance
+          .share(ShareParams(text: message, subject: '¡Mira en FeelTrip!'));
 
       debugPrint('✅ Compartido a TikTok exitosamente');
     } catch (e) {
@@ -72,10 +73,10 @@ class SharingService {
     try {
       final fullMessage = '$title\n\n$description\n\n$deepLink';
 
-      await Share.share(
-        fullMessage,
+      await SharePlus.instance.share(ShareParams(
+        text: fullMessage,
         subject: 'Comparte desde FeelTrip',
-      );
+      ));
 
       debugPrint('✅ Compartido exitosamente');
     } catch (e) {

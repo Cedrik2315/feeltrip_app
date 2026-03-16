@@ -46,9 +46,7 @@ class _FeedScreenState extends State<FeedScreen> {
       } else {
         _lastDocument = null;
       }
-    } catch (e) {
-      print('Error loading stories: $e');
-    }
+    } catch (_) {}
     _isLoading = false;
     if (mounted) setState(() {});
   }
@@ -79,9 +77,7 @@ class _FeedScreenState extends State<FeedScreen> {
       } else {
         _lastDocument = null;
       }
-    } catch (e) {
-      print('Error loading more stories: $e');
-    }
+    } catch (_) {}
     _isLoadingMore = false;
     if (mounted) setState(() {});
   }

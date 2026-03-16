@@ -3,11 +3,9 @@ import 'package:get/get.dart';
 import '../models/experience_model.dart';
 import '../controllers/experience_controller.dart';
 import '../services/sharing_service.dart';
-import '../services/auth_service.dart';
 import '../services/story_service.dart';
-import '../mock_data.dart';
+import '../services/auth_service.dart';
 import 'comments_screen.dart';
-import 'agency_profile_screen.dart';
 
 class StoriesScreen extends StatefulWidget {
   const StoriesScreen({super.key, this.tripId});
@@ -176,7 +174,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.withOpacity(0.2),
+                    color: Colors.deepPurple.withAlpha(51),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

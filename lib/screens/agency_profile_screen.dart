@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 import '../models/agency_model.dart';
 import '../services/agency_service.dart';
@@ -9,9 +9,9 @@ class AgencyProfileScreen extends StatefulWidget {
   final String agencyId;
 
   const AgencyProfileScreen({
-    Key? key,
+    super.key,
     required this.agencyId,
-  }) : super(key: key);
+  });
 
   @override
   State<AgencyProfileScreen> createState() => _AgencyProfileScreenState();
@@ -76,10 +76,10 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
                         agency.logo,
                         errorBuilder: (context, error, stackTrace) =>
                             const Icon(
-                              Icons.business,
-                              size: 80,
-                              color: Colors.white,
-                            ),
+                          Icons.business,
+                          size: 80,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -387,23 +387,23 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
 
   Future<void> _launchPhone(String phoneNumber) async {
     final url = 'tel:$phoneNumber';
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     }
   }
 
   Future<void> _launchEmail(String email) async {
-    final url = 'mailto:$email';
-    if (await canLaunch(url)) {
-      await launch(url);
+    final uri = Uri.parse('mailto:$email');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     }
   }
 
   Future<void> _launchWebsite(String website) async {
-    final url =
-        website.startsWith('http') ? website : 'https://$website';
-    if (await canLaunch(url)) {
-      await launch(url);
+    final uri =
+        Uri.parse(website.startsWith('http') ? website : 'https://$website');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     }
   }
 }

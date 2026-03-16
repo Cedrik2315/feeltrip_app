@@ -47,10 +47,7 @@ class UserService {
           .collection('followers')
           .doc(currentUserId)
           .delete();
-
-      // log eliminado: ✅ Unfollowed user $targetUserId
     } catch (e) {
-      print('❌ Error unfollowing user: $e');
       rethrow;
     }
   }
@@ -85,8 +82,7 @@ class UserService {
           .doc(targetUserId)
           .get();
       return doc.exists;
-    } catch (e) {
-      print('❌ Error checking following status: $e');
+    } catch (_) {
       return false;
     }
   }

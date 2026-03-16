@@ -67,8 +67,7 @@ class AgencyService {
       if (!doc.exists) return null;
 
       return TravelAgency.fromFirestore(doc);
-    } catch (e) {
-      print('❌ Error obteniendo agencia: $e');
+    } catch (_) {
       return null;
     }
   }
@@ -135,15 +134,12 @@ class AgencyService {
   Future<void> updateAgency(String agencyId, Map<String, dynamic> data) async {
     try {
       if (useMockData) {
-        print('✅ [MOCK] Agencia actualizada');
         return;
       }
 
       // FIRESTORE REAL
       await _firestore.collection('agencies').doc(agencyId).update(data);
-      print('✅ Agencia actualizada');
     } catch (e) {
-      print('❌ Error actualizando agencia: $e');
       rethrow;
     }
   }
@@ -155,7 +151,6 @@ class AgencyService {
   }) async {
     try {
       if (useMockData) {
-        print('✅ [MOCK] Experiencia agregada a agencia');
         return;
       }
 
@@ -163,9 +158,7 @@ class AgencyService {
       await _firestore.collection('agencies').doc(agencyId).update({
         'experiences': FieldValue.arrayUnion([experienceId])
       });
-      print('✅ Experiencia agregada a agencia');
     } catch (e) {
-      print('❌ Error agregando experiencia: $e');
       rethrow;
     }
   }
@@ -178,7 +171,6 @@ class AgencyService {
             .firstWhere((a) => a['id'] == agencyId, orElse: () => {});
         if (agency.isNotEmpty) {
           agency['followers'] = (agency['followers'] ?? 0) + 1;
-          print('✅ [MOCK] Siguiendo agencia');
         }
         return;
       }
@@ -188,9 +180,7 @@ class AgencyService {
           .collection('agencies')
           .doc(agencyId)
           .update({'followers': FieldValue.increment(1)});
-      print('✅ Siguiendo agencia');
     } catch (e) {
-      print('❌ Error siguiendo agencia: $e');
       rethrow;
     }
   }
@@ -213,10 +203,7 @@ class AgencyService {
         'rating': finalRating,
         'reviewCount': totalReviews + 1,
       });
-
-      print('✅ Rating de agencia actualizado: $finalRating');
     } catch (e) {
-      print('❌ Error actualizando rating: $e');
       rethrow;
     }
   }
@@ -225,9 +212,7 @@ class AgencyService {
   Future<void> deleteAgency(String agencyId) async {
     try {
       await _firestore.collection('agencies').doc(agencyId).delete();
-      print('✅ Agencia eliminada');
     } catch (e) {
-      print('❌ Error eliminando agencia: $e');
       rethrow;
     }
   }

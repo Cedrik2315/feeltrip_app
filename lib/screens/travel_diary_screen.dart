@@ -260,7 +260,8 @@ class _TravelDiaryScreenState extends State<TravelDiaryScreen> {
                   children: entry.emotions
                       .map((emotion) => Chip(
                             label: Text(emotion),
-                            backgroundColor: Colors.deepPurple.withOpacity(0.2),
+                            backgroundColor:
+                                Colors.deepPurple.withValues(alpha: 0.2),
                           ))
                       .toList(),
                 ),

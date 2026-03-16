@@ -76,11 +76,8 @@ class DiaryService {
 
       // Actualizar estadísticas del usuario
       await _updateUserDiaryStats(userId);
-
-      print('✅ Diary entry created: ${entry.id}');
       return entry.id;
     } catch (e) {
-      print('❌ Error creating diary entry: $e');
       rethrow;
     }
   }
@@ -100,10 +97,7 @@ class DiaryService {
 
       // Actualizar estadísticas
       await _updateUserDiaryStats(userId);
-
-      print('✅ Diary entry updated: $entryId');
     } catch (e) {
-      print('❌ Error updating diary entry: $e');
       rethrow;
     }
   }
@@ -120,10 +114,7 @@ class DiaryService {
 
       // Actualizar estadísticas
       await _updateUserDiaryStats(userId);
-
-      print('✅ Diary entry deleted: $entryId');
     } catch (e) {
-      print('❌ Error deleting diary entry: $e');
       rethrow;
     }
   }
@@ -143,7 +134,6 @@ class DiaryService {
               .map((doc) => DiaryEntry.fromFirestore(doc))
               .toList());
     } catch (e) {
-      print('❌ Error setting up diary stream: $e');
       rethrow;
     }
   }
@@ -160,8 +150,7 @@ class DiaryService {
 
       final stats = doc.data()?['diaryStats'] ?? {};
       return stats;
-    } catch (e) {
-      print('❌ Error fetching diary stats: $e');
+    } catch (_) {
       return {};
     }
   }
@@ -215,11 +204,7 @@ class DiaryService {
           'lastUpdated': DateTime.now(),
         },
       }, SetOptions(merge: true));
-
-      print('✅ Diary stats updated for user: $userId');
-    } catch (e) {
-      print('❌ Error updating diary stats: $e');
-    }
+    } catch (_) {}
   }
 
   // ============ FILTERS ============
@@ -233,7 +218,6 @@ class DiaryService {
           .where((entry) => entry.emotions.contains(emotion))
           .toList();
     } catch (e) {
-      print('❌ Error filtering by emotion: $e');
       rethrow;
     }
   }
@@ -254,7 +238,6 @@ class DiaryService {
 
       return snapshot.docs.map((doc) => DiaryEntry.fromFirestore(doc)).toList();
     } catch (e) {
-      print('❌ Error fetching entries by date range: $e');
       rethrow;
     }
   }
@@ -268,7 +251,6 @@ class DiaryService {
           .where((entry) => entry.reflectionDepth >= minDepth)
           .toList();
     } catch (e) {
-      print('❌ Error filtering by depth: $e');
       rethrow;
     }
   }
@@ -281,7 +263,6 @@ class DiaryService {
       final entries = await getDiaryEntries(userId, limit: 10000);
       return entries.map((entry) => entry.toJson()).toList();
     } catch (e) {
-      print('❌ Error exporting diary: $e');
       rethrow;
     }
   }
