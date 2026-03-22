@@ -4,7 +4,7 @@ import 'package:feeltrip_app/core/error/failures.dart';
 import 'package:feeltrip_app/core/local_storage/isar_service.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'package:feeltrip_app/core/network/sync_service.dart';
-import 'package:feeltrip_app/features/booking/domain/models/booking_model.dart'; // Ajusta según tu ruta real
+import 'package:feeltrip_app/models/booking_model.dart';
 import 'package:feeltrip_app/services/currency_service.dart';
 import 'package:feeltrip_app/services/destination_service.dart';
 import 'package:feeltrip_app/services/mercado_pago_service.dart';
@@ -25,8 +25,9 @@ class BookingService {
   }) async {
     try {
       // 1. Lógica de Clima y Descuento
-      await DestinationService.getDestinationDetails(destinationId: destinationId);
-      const discount = 0.1; 
+      await DestinationService.getDestinationDetails(
+          destinationId: destinationId);
+      const discount = 0.1;
       final finalPrice = priceUsd * (1 - discount);
 
       // 2. Conversión de moneda segura
@@ -48,6 +49,8 @@ class BookingService {
 
       // 4. Llamada al servicio de pago (Asegúrate que coincida con la firma del método)
       final prefIdEither = await MercadoPagoService.createPreference(
+        amount: convertedPrice,
+        title: 'FeelTrip Booking',
         items: items,
       );
 
@@ -65,10 +68,10 @@ class BookingService {
           );
 
           // 5. Persistencia Local (Isar)
-          await _isar.saveBooking(booking);
-          
+          await _isar.saveBooking(booking.toJson());
+
           // 6. Sincronización (Sync)
-          _sync.addToSyncQueue(booking); 
+          await _sync.addToSyncQueue(booking);
 
           AppLogger.i('Booking creada localmente y enviada a cola: $prefId');
           return right(prefId);
@@ -76,16 +79,18 @@ class BookingService {
       );
     } catch (e) {
       AppLogger.e('Error en el flujo de Booking: $e');
-      return left(ServerFailure('Error al procesar la reserva: ${e.toString()}'));
+      return left(ServerFailure());
     }
   }
 
   Future<void> confirmBooking(String prefId, String status) async {
     if (status == 'approved') {
       // Obtenemos de Isar las reservas que coinciden con este prefId o que están pendientes
-      final pendingBookings = await _isar.getPendingBookings();
-      
-      for (final booking in pendingBookings) {
+      final pendingBookingsData = await _isar.getPendingBookings();
+
+      for (final bookingData in pendingBookingsData) {
+        final booking =
+            BookingModel.fromJson(bookingData as Map<String, dynamic>);
         try {
           await _firestore
               .collection('users')

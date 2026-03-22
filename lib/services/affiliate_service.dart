@@ -1,50 +1,86 @@
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-class AffiliateOption {
-  final String name;
-  final String url;
-  final String emoji;
-  final Color color;
-  AffiliateOption(
-      {required this.name,
-      required this.url,
-      required this.emoji,
-      required this.color});
-}
+import 'package:feeltrip_app/core/logger/app_logger.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AffiliateService {
-  static List<AffiliateOption> getAffiliateOptions(String destination) {
-    return [
-      AffiliateOption(
-          name: 'Booking',
-          url: 'https://www.booking.com/search.html?ss=$destination',
-          emoji: '🏨',
-          color: Colors.blue),
-      AffiliateOption(
-          name: 'Viator',
-          url:
-              'https://www.viator.com/search/$destination?pid=P00288924&mcid=42383&medium=link',
-          emoji: '🗺️',
-          color: Colors.orange),
-      AffiliateOption(
-          name: 'GetYourGuide',
-          url:
-              'https://www.getyourguide.es/s/?q=$destination&partner_id=ASL9O0I&cmp=share_to_earn',
-          emoji: '🎯',
-          color: Colors.green),
-      AffiliateOption(
-          name: 'Civitatis',
-          url: 'https://www.civitatis.com/es/$destination/',
-          emoji: '🎭',
-          color: const Color(0xFF00B5E2)),
-    ];
+  static String get baseUrl =>
+      dotenv.env['AFFILIATE_API_URL'] ??
+      'https://api.feeltrip.app/v1/affiliate';
+
+  /// Genera un enlace de afiliado para una agencia/experiencia
+  static Future<String> generateAffiliateLink({
+    required String agencyId,
+    required String experienceId,
+    required double commissionRate,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/generate'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'agencyId': agencyId,
+          'experienceId': experienceId,
+          'commissionRate': commissionRate,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // CORRECCIÓN: Casteo explícito de dynamic a Map para evitar avoid_dynamic_calls
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final String link = data['link'] as String? ?? '';
+
+        AppLogger.i('Affiliate link generated: $link');
+        return link;
+      }
+      throw Exception('Failed to generate affiliate link');
+    } catch (e) {
+      AppLogger.e('Affiliate error: $e');
+      // Fallback mock link con tipado seguro
+      return 'https://feeltrip.app/agency/$agencyId/exp/$experienceId?aff=ref_${DateTime.now().millisecondsSinceEpoch}';
+    }
   }
 
-  static Future<void> openAffiliateLink(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+  /// Rastrea una conversión de afiliado
+  static Future<bool> trackConversion({
+    required String affiliateId,
+    required String bookingId,
+    required double amount,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/track'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'affiliateId': affiliateId,
+          'bookingId': bookingId,
+          'amount': amount,
+        }),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      AppLogger.e('Track conversion error: $e');
+      return false;
+    }
+  }
+
+  /// Obtiene estadísticas de afiliado
+  static Future<Map<String, dynamic>> getStats(String affiliateId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/stats/$affiliateId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // CORRECCIÓN: Casteo explícito a Map<String, dynamic>
+        return json.decode(response.body) as Map<String, dynamic>;
+      }
+      return {'clicks': 0, 'conversions': 0, 'revenue': 0.0};
+    } catch (e) {
+      AppLogger.e('Affiliate stats error: $e');
+      return {'clicks': 0, 'conversions': 0, 'revenue': 0.0};
     }
   }
 }

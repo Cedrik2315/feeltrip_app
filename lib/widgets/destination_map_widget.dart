@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DestinationMapWidget extends StatefulWidget {
-  final String destination;
-  final double latitude;
-  final double longitude;
-
   const DestinationMapWidget({
-    super.key,
     required this.destination,
     required this.latitude,
     required this.longitude,
+    super.key,
   });
+  final String destination;
+  final double latitude;
+  final double longitude;
 
   @override
   State<DestinationMapWidget> createState() => _DestinationMapWidgetState();

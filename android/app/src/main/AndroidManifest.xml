@@ -67,6 +67,11 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9067451109299541~8356542986"/>
+
+        <!-- FIX: Añadir la API Key de Google Maps para Android -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyC7t5MPjy1ZJ8-gOwZqJR88KidbXqaIhIg"/>
         
     </application>
     <!-- Required to query activities that can process text, see:

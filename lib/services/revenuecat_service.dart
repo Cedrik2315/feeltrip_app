@@ -1,249 +1,85 @@
-import 'dart:developer' as developer;
-
+import 'dart:io';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
 
-/// Servicio de suscripciones premium usando RevenueCat
-/// Gestiona compras, suscripciones y entitlements
 class RevenueCatService {
-  RevenueCatService({
-    FirebaseAuth? auth,
-  }) : _auth = auth ?? FirebaseAuth.instance;
+  Future<void> init() async {
+    // CORRECCIÓN: setDebugLogsEnabled ahora es setLogLevel
+    await Purchases.setLogLevel(LogLevel.debug);
 
-  final FirebaseAuth _auth;
+    late PurchasesConfiguration configuration;
 
-  // Configuración de RevenueCat
-  // Reemplaza con tu API key de RevenueCat
-  static const String _apiKey = 'YOUR_REVENUECAT_API_KEY';
+    if (Platform.isAndroid) {
+      configuration = PurchasesConfiguration(
+          dotenv.env['REVENUECAT_ANDROID_KEY'] ?? 'goog_android_api_key');
+    } else if (Platform.isIOS) {
+      configuration = PurchasesConfiguration(
+          dotenv.env['REVENUECAT_IOS_KEY'] ?? 'appl_ios_api_key');
+    } else {
+      AppLogger.e('RevenueCat: Plataforma no soportada');
+      return;
+    }
 
-  bool _isInitialized = false;
-  CustomerInfo? _customerInfo;
-
-  // Getters
-  bool get isPremium => _customerInfo?.entitlements.active['premium'] != null;
-  CustomerInfo? get customerInfo => _customerInfo;
-
-  /// Inicializa el SDK de RevenueCat
-  Future<void> initialize() async {
-    if (_isInitialized) return;
-
+    // CORRECCIÓN: setup ahora es configure(configuration)
     try {
-      await Purchases.setLogLevel(LogLevel.debug);
-
-      // Configurar usuario autenticado si existe
-      final user = _auth.currentUser;
-      if (user != null) {
-        await Purchases.logIn(user.uid);
-      }
-
-      await Purchases.configure(PurchasesConfiguration(_apiKey));
-      _isInitialized = true;
-
-      // Obtener info del cliente
-      await _fetchCustomerInfo();
-
-      developer.log(
-        'RevenueCat initialized successfully',
-        name: 'RevenueCatService',
-      );
+      await Purchases.configure(configuration);
+      AppLogger.i('RevenueCat initialized successfully');
     } catch (e) {
-      developer.log(
-        'Error initializing RevenueCat: $e',
-        name: 'RevenueCatService',
-        error: e,
-      );
+      AppLogger.e('RevenueCat configuration error: $e');
     }
   }
 
-  /// Obtiene la información del cliente
-  Future<void> _fetchCustomerInfo() async {
-    try {
-      _customerInfo = await Purchases.getCustomerInfo();
-      developer.log(
-        'Customer info fetched: ${_customerInfo?.entitlements.active.keys}',
-        name: 'RevenueCatService',
-      );
-    } catch (e) {
-      developer.log(
-        'Error fetching customer info: $e',
-        name: 'RevenueCatService',
-        error: e,
-      );
-    }
-  }
-
-  /// Obtiene los paquetes disponibles
-  Future<List<Package>> getAvailablePackages() async {
+  // CORRECCIÓN: getOfferings ahora devuelve una lista de Offering de forma más directa
+  Future<List<Offering>> getOfferings() async {
     try {
       final offerings = await Purchases.getOfferings();
+      // Retornamos la lista de offerings disponibles
       if (offerings.current != null) {
-        return offerings.current!.availablePackages;
+        // Podrías devolver solo el 'current' o todos los 'all'
+        return offerings.all.values.toList();
       }
       return [];
     } catch (e) {
-      developer.log(
-        'Error getting packages: $e',
-        name: 'RevenueCatService',
-        error: e,
-      );
+      AppLogger.e('RevenueCat offerings error: $e');
       return [];
     }
   }
 
-  /// Compra un paquete
-  Future<bool> purchasePackage(Package package) async {
+  Future<CustomerInfo> purchasePackage(Package package) async {
     try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        await Purchases.logIn(user.uid);
-      }
-
-      // ignore: deprecated_member_use
-      final result = await Purchases.purchasePackage(package);
-
-      if (result.customerInfo.entitlements.active['premium'] != null) {
-        developer.log(
-          'Purchase successful! User is now premium.',
-          name: 'RevenueCatService',
-        );
-        await _fetchCustomerInfo();
-        return true;
-      }
-      return false;
+      // purchasePackage sigue funcionando igual, pero devuelve CustomerInfo
+      final customerInfo = await Purchases.purchasePackage(package);
+      AppLogger.i(
+          'Purchase success. Active entitlements: ${customerInfo.entitlements.active.keys}');
+      return customerInfo;
     } catch (e) {
-      developer.log(
-        'Error purchasing package: $e',
-        name: 'RevenueCatService',
-        error: e,
-      );
-      return false;
+      AppLogger.e('Purchase error: $e');
+      rethrow;
     }
   }
 
-  /// Restaura compras anteriores
-  Future<bool> restorePurchases() async {
+  Future<CustomerInfo> restorePurchases() async {
     try {
-      // Usar el método correcto de RevenueCat
-      final result = await Purchases.getCustomerInfo();
-      await _fetchCustomerInfo();
+      final customerInfo = await Purchases.restorePurchases();
+      AppLogger.i('Purchases restored');
+      return customerInfo;
+    } catch (e) {
+      AppLogger.e('Restore error: $e');
+      rethrow;
+    }
+  }
 
-      final isPremium = result.entitlements.active['premium'] != null;
-      developer.log(
-        'Restore result: isPremium=$isPremium',
-        name: 'RevenueCatService',
-      );
+  Future<bool> isPremium() async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      // Un usuario es premium si tiene cualquier entitlement activo
+      final isPremium = customerInfo.entitlements.active.isNotEmpty;
+      AppLogger.i('Premium status check: $isPremium');
       return isPremium;
     } catch (e) {
-      developer.log(
-        'Error restoring purchases: $e',
-        name: 'RevenueCatService',
-        error: e,
-      );
+      AppLogger.e('Premium check error: $e');
       return false;
     }
   }
-
-  /// Cancela la suscripción (solo indica la UI)
-  Future<void> showCancelation() async {
-    // RevenueCat no permite cancelación programática
-    // Redirigir a la tienda correspondiente
-    developer.log(
-      'User requested cancellation - redirect to store',
-      name: 'RevenueCatService',
-    );
-  }
-
-  /// Obtiene el estado premium actual
-  Future<bool> checkPremiumStatus() async {
-    try {
-      await _fetchCustomerInfo();
-      return isPremium;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Sincroniza el usuario después del login
-  Future<void> syncUserAfterLogin(String uid) async {
-    try {
-      await Purchases.logIn(uid);
-      await _fetchCustomerInfo();
-    } catch (e) {
-      developer.log(
-        'Error syncing user: $e',
-        name: 'RevenueCatService',
-        error: e,
-      );
-    }
-  }
-
-  /// Desconecta el usuario en logout
-  Future<void> syncUserAfterLogout() async {
-    try {
-      await Purchases.logOut();
-      _customerInfo = null;
-    } catch (e) {
-      developer.log(
-        'Error logging out user from RevenueCat: $e',
-        name: 'RevenueCatService',
-        error: e,
-      );
-    }
-  }
-
-  /// Identifica atributos del usuario para analytics
-  Future<void> setUserAttributes({
-    String? email,
-    String? displayName,
-  }) async {
-    try {
-      final attributes = <String, String>{};
-      if (email != null) attributes['email'] = email;
-      if (displayName != null) attributes['display_name'] = displayName;
-
-      await Purchases.setAttributes(attributes);
-    } catch (e) {
-      developer.log(
-        'Error setting user attributes: $e',
-        name: 'RevenueCatService',
-        error: e,
-      );
-    }
-  }
-}
-
-/// Extension para obtener información de los paquetes
-extension PackageExtension on Package {
-  String get priceString => storeProduct.priceString;
-  PackageType get type => packageType;
-
-  String get periodString {
-    switch (packageType) {
-      case PackageType.monthly:
-        return 'mes';
-      case PackageType.annual:
-        return 'año';
-      case PackageType.lifetime:
-        return 'vida';
-      default:
-        return '';
-    }
-  }
-}
-
-/// Clase para representar información de suscripción
-class SubscriptionInfo {
-  final bool isPremium;
-  final DateTime? expirationDate;
-  final String? planName;
-
-  SubscriptionInfo({
-    required this.isPremium,
-    this.expirationDate,
-    this.planName,
-  });
-
-  bool get isActive =>
-      isPremium &&
-      (expirationDate == null || expirationDate!.isAfter(DateTime.now()));
 }

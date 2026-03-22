@@ -9,14 +9,14 @@ class TestDataGenerator {
 
   /// Crear datos de prueba completos
   static Future<void> generateAllTestData() async {
-    // log eliminado: 🚀 Generando datos de prueba...
+    // log eliminado: ðŸš€ Generando datos de prueba...
 
     try {
       await generateTestStories();
       await generateTestAgencies();
-      // log eliminado: ✅ Datos de prueba generados exitosamente
+      // log eliminado: âœ… Datos de prueba generados exitosamente
     } catch (e) {
-      // log eliminado: ❌ Error generando datos de prueba: $e
+      // log eliminado: âŒ Error generando datos de prueba: $e
     }
   }
 
@@ -25,8 +25,8 @@ class TestDataGenerator {
     final stories = [
       {
         'title': 'Mi aventura en Patagonia',
-        'story':
-            'Fue increíble caminar entre los glaciares. La naturaleza es majestuosa y te llena el alma.',
+        'story': 'Fue increí­ble caminar entre los glaciares. La naturaleza es '
+            'majestuosa y te llena el alma.',
         'author': 'Juan Pérez',
         'userId': 'test_user_1',
         'rating': 4.8,
@@ -36,8 +36,9 @@ class TestDataGenerator {
       },
       {
         'title': 'Yoga en Bali',
-        'story':
-            'Una experiencia transformadora. El atardecer sobre el océano mientras practicas yoga es simplemente mágico.',
+        'story': 'Una experiencia transformadora. El atardecer sobre el '
+            'ocÃ©ano '
+            'mientras practicas yoga es simplemente mágico.',
         'author': 'Maria García',
         'userId': 'test_user_2',
         'rating': 4.9,
@@ -47,8 +48,9 @@ class TestDataGenerator {
       },
       {
         'title': 'Aventura en Nueva Zelanda',
-        'story':
-            'Skydiving sobre Queenstown fue el momento más emocionante de mi vida. Puro adrenalina y belleza.',
+        'story': 'Skydiving sobre Queenstown fue el momento más '
+            'emocionante de '
+            'mi vida. Puro adrenalina y belleza.',
         'author': 'Carlos López',
         'userId': 'test_user_3',
         'rating': 4.7,
@@ -58,8 +60,8 @@ class TestDataGenerator {
       },
       {
         'title': 'Gastronomía en Italia',
-        'story':
-            'Pasé 10 días descubriendo los sabores auténticos de Italia. Cada comida era un viaje sensorial.',
+        'story': 'Pasé 10 días descubriendo los sabores auténticos de Italia. '
+            'Cada comida era un viaje sensorial.',
         'author': 'Ana Martínez',
         'userId': 'test_user_4',
         'rating': 4.6,
@@ -69,7 +71,7 @@ class TestDataGenerator {
       },
     ];
 
-    for (var story in stories) {
+    for (final story in stories) {
       final storyId = const Uuid().v4();
       await _firestore.collection('stories').doc(storyId).set({
         'id': storyId,
@@ -83,8 +85,9 @@ class TestDataGenerator {
     final agencies = [
       {
         'name': 'FeelTrip Adventures',
-        'description':
-            'Especialistas en experiencias de aventura auténtica en América Latina. Con 15 años de experiencia en turismo vivencial.',
+        'description': 'Especialistas en experiencias de aventura auténtica en '
+            'América Latina. Con 15 aÃ±os de experiencia en turismo '
+            'vivencial.',
         'logo': 'https://via.placeholder.com/200?text=FeelTrip+Adventures',
         'city': 'Buenos Aires',
         'country': 'Argentina',
@@ -100,14 +103,15 @@ class TestDataGenerator {
         'website': 'www.feeltripadventures.com',
         'socialMedia': [
           'instagram.com/feeltripadventures',
-          'facebook.com/feeltripadventures'
+          'facebook.com/feeltripadventures',
         ],
         'createdAt': Timestamp.now(),
       },
       {
         'name': 'Serenity Retreat',
         'description':
-            'Retiros de bienestar y transformación. Yoga, meditación y conexión con la naturaleza en destinos paradisíacos.',
+            'Retiros de bienestar y transformación. Yoga, meditación y '
+                'conexión con la naturaleza en destinos paradisíacos.',
         'logo': 'https://via.placeholder.com/200?text=Serenity+Retreat',
         'city': 'Bali',
         'country': 'Indonesia',
@@ -123,14 +127,15 @@ class TestDataGenerator {
         'website': 'www.serenityretreat.com',
         'socialMedia': [
           'instagram.com/serenityretreat',
-          'facebook.com/serenityretreat'
+          'facebook.com/serenityretreat',
         ],
         'createdAt': Timestamp.now(),
       },
       {
         'name': 'Kiwi Extreme Sports',
         'description':
-            'Experiencias de adrenalina y deportes extremos en Nueva Zelanda. Para los que buscan emociones fuertes.',
+            'Experiencias de adrenalina y deportes extremos en Nueva '
+                'Zelanda. Para los que buscan emociones fuertes.',
         'logo': 'https://via.placeholder.com/200?text=Kiwi+Extreme',
         'city': 'Queenstown',
         'country': 'New Zealand',
@@ -146,14 +151,15 @@ class TestDataGenerator {
         'website': 'www.kiwiextreme.com',
         'socialMedia': [
           'instagram.com/kiwiextreme',
-          'facebook.com/kiwiextreme'
+          'facebook.com/kiwiextreme',
         ],
         'createdAt': Timestamp.now(),
       },
       {
         'name': 'Dolce Vita Tours',
         'description':
-            'Tours gastronómicos y culturales en Italia. Descubre la autenticidad italiana comiendo como un local.',
+            'Tours gastronÃ³micos y culturales en Italia. Descubre la '
+                'autenticidad italiana comiendo como un local.',
         'logo': 'https://via.placeholder.com/200?text=Dolce+Vita',
         'city': 'Roma',
         'country': 'Italy',
@@ -169,13 +175,13 @@ class TestDataGenerator {
         'website': 'www.dolcevitours.com',
         'socialMedia': [
           'instagram.com/dolcevitours',
-          'facebook.com/dolcevitours'
+          'facebook.com/dolcevitours',
         ],
         'createdAt': Timestamp.now(),
       },
     ];
 
-    for (var agency in agencies) {
+    for (final agency in agencies) {
       final agencyId = const Uuid().v4();
       await _firestore.collection('agencies').doc(agencyId).set({
         'id': agencyId,

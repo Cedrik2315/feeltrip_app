@@ -148,12 +148,12 @@ static String generateAgencyDeepLink(String agencyId)
 
 **En stories_screen.dart:**
 - Botón compartir en cada historia
-- Usa `SharingService.generateStoryDeepLink()` automáticamente
+- Usa `ref.read(sharingServiceProvider).generateStoryDeepLink()`
 - Permite compartir el título, descripción y link a la historia
 
 ```dart
 IconButton(
-  icon: Icon(Icons.share, size: 20),
+  icon: const Icon(Icons.share, size: 20),
   onPressed: () {
     _shareStory(story);
   },

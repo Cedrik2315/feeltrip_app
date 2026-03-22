@@ -1,6 +1,7 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'dart:async';
+
+import 'package:feeltrip_app/config/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseConfig {
   static Future<void> initialize() async {
@@ -15,7 +16,9 @@ class FirebaseConfig {
         onTimeout: () {
           // log eliminado: ⚠️ Firebase timeout - usando MOCK data
           throw TimeoutException(
-              'Firebase timeout', const Duration(seconds: 5));
+            'Firebase timeout',
+            const Duration(seconds: 5),
+          );
         },
       );
 
@@ -32,7 +35,7 @@ class FirebaseConfig {
         // log eliminado: ⚠️ Firebase timeout - usando MOCK data sin problemas
         return;
       }
-      // log eliminado: ⚠️ Error inicializando Firebase (continuando con MOCK): $e
+      // log eliminado: Error inicializando Firebase (MOCK): $e
       // No rethrow - permitir que la app continúe con MOCK data
     }
   }

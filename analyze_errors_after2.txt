@@ -1,0 +1,41 @@
+  error - Target of URI hasn't been generated: 'package:feeltrip_app/models/booking_model.g.dart' - lib\models\booking_model.dart:5:6 - uri_has_not_been_generated
+  error - The method '_$BookingFromJson' isn't defined for the type 'Booking' - lib\models\booking_model.dart:37:7 - undefined_method
+  error - The constructor being called isn't a const constructor - lib\models\user_model.dart:52:33 - const_with_non_const
+  error - The named parameter 'ticksBorderData' isn't defined - lib\screens\archetype_detail_screen.dart:144:25 - undefined_named_parameter
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\bookings_screen.dart:146:21 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\bookings_screen.dart:166:56 - argument_type_not_assignable
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\creator_stats_screen.dart:24:30 - static_access_to_instance_member
+  error - The method 'loginWithGoogle' isn't defined for the type 'LoginController' - lib\screens\login_screen.dart:300:36 - undefined_method
+  error - The method 'loginWithFacebook' isn't defined for the type 'LoginController' - lib\screens\login_screen.dart:315:36 - undefined_method
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:174:42 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:174:42 - avoid_dynamic_calls
+  error - The returned type 'dynamic' isn't returnable from a 'bool' function, as required by the closure's context - lib\screens\premium_subscription_screen.dart:174:42 - return_of_invalid_type_from_closure
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Spread elements in list or set literals must implement 'Iterable' - lib\screens\premium_subscription_screen.dart:278:22 - not_iterable_spread
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Package'.  - lib\screens\premium_subscription_screen.dart:279:68 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:302:43 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:302:43 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:304:37 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:307:33 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:307:33 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\premium_subscription_screen.dart:307:33 - argument_type_not_assignable
+  error - Expected to find ')' - lib\screens\register_screen.dart:295:6 - expected_token
+  error - Undefined class 'Trip' - lib\screens\search_screen.dart:153:5 - undefined_class
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\screens\smart_camera_screen.dart:183:55 - argument_type_not_assignable
+  error - A value of type 'dynamic' can't be assigned to a variable of type 'String' - lib\screens\translator_screen.dart:88:29 - invalid_assignment
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\translator_screen.dart:88:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\translator_screen.dart:88:29 - avoid_dynamic_calls
+  error - Arguments of a constant creation must be constant expressions - lib\screens\travel_diary_screen.dart:251:18 - const_with_non_constant_argument
+  error - The method 'push' isn't defined for the type 'BuildContext' - lib\screens\travel_diary_screen.dart:282:30 - undefined_method
+  error - Too many positional arguments: 1 expected, but 2 found - lib\screens\trip_detail_screen.dart:36:43 - extra_positional_arguments
+  error - Undefined name 'context' - lib\screens\trip_detail_screen.dart:303:27 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\trip_detail_screen.dart:322:27 - undefined_identifier
+  error - Method invocation or property access on a 'dynamic' target - lib\services\agency_service.dart:173:33 - avoid_dynamic_calls
+  error - A value of type 'dynamic' can't be returned from the method 'getDiaryStats' because it has a return type of 'Future<Map<String, dynamic>>' - lib\services\diary_service.dart:156:14 - return_of_invalid_type
+  error - The getter 'customerInfo' isn't defined for the type 'CustomerInfo' - lib\services\revenuecat_service.dart:104:18 - undefined_getter
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\services\story_service.dart:143:43 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\trip_detail_screen.dart:54:36 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\trip_detail_screen.dart:54:36 - avoid_dynamic_calls
+  error - 3 positional arguments expected by 'openAffiliateLink', but 1 found - lib\widgets\affiliate_widget.dart:40:66 - not_enough_positional_arguments

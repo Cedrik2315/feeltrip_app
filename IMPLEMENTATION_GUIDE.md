@@ -1,6 +1,7 @@
 # 📖 Guía de Implementación - Nuevas Características FeelTrip
 
 ## 🎯 Objetivo
+
 Esta guía te ayuda a integrar y activar las 3 nuevas características:
 1. ✅ Comentarios con reacciones
 2. ✅ Compartir en redes sociales

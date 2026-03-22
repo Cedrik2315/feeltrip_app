@@ -8,13 +8,13 @@ BACKEND (100% Completado)
 ├── ✅ FirebaseOptions - Configuración por plataforma  
 ├── ✅ StoryService - CRUD + Streams + Search
 ├── ✅ DiaryService - CRUD + Stats automáticas + Filters
-├── ✅ ExperienceController - GetX state management
+├── ✅ ExperienceNotifier - Riverpod state management
 └── ✅ Models - fromFirestore/toFirestore methods
 
 UI INTEGRATION (100% Completado)
-├── ✅ main.dart - Firebase.initializeApp()
-├── ✅ StoriesScreen - Usa controller + Obx()
-├── ✅ TravelDiaryScreen - Usa controller + Obx()
+├── ✅ main.dart - Firebase.initializeApp() y ProviderScope
+├── ✅ StoriesScreen - Usa ConsumerWidget + ref.watch
+├── ✅ TravelDiaryScreen - Usa ConsumerWidget + ref.watch
 └── ✅ Experiential screens actualizadas
 
 DOCUMENTACIÓN (100% Completado)
@@ -26,7 +26,6 @@ CONFIGURACIÓN (0% - Usuario debe hacer)
 ├── ⏳ Crear proyecto en Firebase Console
 ├── ⏳ Descargar google-services.json
 ├── ⏳ Crear archivo .env
-└── ⏳ flutter pub add flutter_dotenv
 ```
 
 ## 📋 Archivos Creados/Modificados

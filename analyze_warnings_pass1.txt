@@ -1,0 +1,758 @@
+Analyzing feeltrip_app...                                       
+
+warning - Unused import: 'package:feeltrip_app/screens/stories_screen.dart' - app_router.dart:11:8 - unused_import
+   info - The line length exceeds the 80-character limit - booking_success_screen.dart:36:81 - lines_longer_than_80_chars
+   info - 'AutoDisposeRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead - cache_providers.dart:8:32 - deprecated_member_use
+   info - Sort directive sections alphabetically - checkout_screen.dart:7:1 - directives_ordering
+   info - Missing a required trailing comma - checkout_screen.dart:16:63 - require_trailing_commas
+   info - To-do comment doesn't follow the Flutter style - checkout_screen.dart:52:9 - flutter_style_todos
+   info - Missing a required trailing comma - checkout_screen.dart:136:68 - require_trailing_commas
+   info - Missing a newline at the end of the file - checkout_screen.dart:219:2 - eol_at_end_of_file
+   info - The referenced name isn't visible in scope - custom_map_screen.dart:38:20 - comment_references
+   info - The line length exceeds the 80-character limit - custom_map_screen.dart:44:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - custom_map_screen.dart:46:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\config\firebase_config.dart:38:81 - lines_longer_than_80_chars
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:4:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:5:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:6:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:7:8 - always_use_package_imports
+   info - Closure should be a tearoff - lib\controllers\experience_controller.dart:18:3 - unnecessary_lambdas
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:71:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:156:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:169:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:226:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:252:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:309:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:323:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:339:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\controllers\experience_controller.dart:358:2 - eol_at_end_of_file
+warning - Unused import: 'package:feeltrip_app/services/analytics_service.dart' - lib\main.dart:3:8 - unused_import
+   info - Sort directive sections alphabetically - lib\main.dart:4:1 - directives_ordering
+warning - Unused import: 'package:feeltrip_app/screens/agency_profile_screen.dart' - lib\main.dart:6:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/bookings_screen.dart' - lib\main.dart:7:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/cart_screen.dart' - lib\main.dart:8:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/comments_screen.dart' - lib\main.dart:9:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/creator_stats_screen.dart' - lib\main.dart:10:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/emotional_preferences_quiz_screen.dart' - lib\main.dart:11:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/experience_impact_dashboard_screen.dart' - lib\main.dart:12:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/feed_screen.dart' - lib\main.dart:13:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/home_screen.dart' - lib\main.dart:14:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/instagram_stories_screen.dart' - lib\main.dart:15:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/login_screen.dart' - lib\main.dart:16:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/ocr_screen.dart' - lib\main.dart:17:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/onboarding_screen.dart' - lib\main.dart:18:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/premium_subscription_screen.dart' - lib\main.dart:19:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/profile_screen.dart' - lib\main.dart:20:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/reels_screen.dart' - lib\main.dart:21:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/register_screen.dart' - lib\main.dart:22:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/search_screen.dart' - lib\main.dart:23:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/stories_screen.dart' - lib\main.dart:24:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/translator_screen.dart' - lib\main.dart:25:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/travel_diary_screen.dart' - lib\main.dart:26:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/trip_detail_screen.dart' - lib\main.dart:27:8 - unused_import
+   info - Unnecessary duplication of receiver - lib\main.dart:38:7 - cascade_invocations
+   info - Unnecessary duplication of receiver - lib\main.dart:39:7 - cascade_invocations
+   info - Missing a newline at the end of the file - lib\main.dart:128:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:27:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:63:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:98:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:134:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:168:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:209:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:219:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:229:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\mock_data.dart:242:19 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\mock_data.dart:254:19 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:269:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:283:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:284:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:296:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:297:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:370:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:440:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:444:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:452:81 - lines_longer_than_80_chars
+   info - Unnecessary use of parentheses - lib\mock_data.dart:457:30 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:457:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:479:9 - avoid_redundant_argument_values
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:488:9 - avoid_redundant_argument_values
+   info - Unnecessary type annotation on a local variable - lib\mock_data.dart:497:11 - omit_local_variable_types
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:497:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:511:7 - avoid_redundant_argument_values
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:520:7 - avoid_redundant_argument_values
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:566:22 - avoid_redundant_argument_values
+   info - Unnecessary type annotation on a local variable - lib\mock_data.dart:574:11 - omit_local_variable_types
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:574:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:599:20 - avoid_redundant_argument_values
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:631:26 - avoid_redundant_argument_values
+   info - Missing a newline at the end of the file - lib\mock_data.dart:645:2 - eol_at_end_of_file
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:42:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:47:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:53:9 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\models\agency_model.dart:58:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\models\experience_model.dart:129:62 - require_trailing_commas
+   info - Missing a required trailing comma - lib\models\experience_model.dart:149:62 - require_trailing_commas
+   info - The referenced name isn't visible in scope - lib\models\experience_model.dart:286:31 - comment_references
+   info - The line length exceeds the 80-character limit - lib\models\instagram_story.dart:13:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\models\observer.dart:52:81 - lines_longer_than_80_chars
+   info - Constructor declarations should be before non-constructor declarations - lib\models\story_model.dart:20:11 - sort_constructors_first
+   info - Missing a required trailing comma - lib\models\user_model.dart:17:49 - require_trailing_commas
+   info - Unnecessary use of parentheses - lib\models\user_model.dart:64:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\user_model.dart:67:9 - unnecessary_parenthesis
+   info - Missing a newline at the end of the file - lib\models\user_model.dart:98:2 - eol_at_end_of_file
+   info - Missing a newline at the end of the file - lib\screens\app_logger.dart:9:2 - eol_at_end_of_file
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\archetype_detail_screen.dart:9:9 - sort_constructors_first
+   info - Required named parameters should be before optional named parameters - lib\screens\archetype_detail_screen.dart:9:57 - always_put_required_named_parameters_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\archetype_detail_screen.dart:73:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\archetype_detail_screen.dart:84:43 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\archetype_detail_screen.dart:139:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\archetype_detail_screen.dart:139:85 - avoid_redundant_argument_values
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:142:67 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\archetype_detail_screen.dart:148:58 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:163:27 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:194:68 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:202:79 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:204:59 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:207:24 - require_trailing_commas
+warning - Unused import: 'package:feeltrip_app/screens/login_screen.dart' - lib\screens\auth_gate.dart:1:8 - unused_import
+warning - Unused import: 'package:firebase_auth/firebase_auth.dart' - lib\screens\auth_gate.dart:5:8 - unused_import
+   info - The line length exceeds the 80-character limit - lib\screens\auth_gate.dart:38:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\auth_gate.dart:139:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\bookings_screen.dart:31:67 - require_trailing_commas
+warning - Use 'const' with the constructor to improve performance - lib\screens\bookings_screen.dart:34:19 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:46:81 - lines_longer_than_80_chars
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\bookings_screen.dart:86:28 - cast_nullable_to_non_nullable
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\bookings_screen.dart:92:28 - cast_nullable_to_non_nullable
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\bookings_screen.dart:98:28 - cast_nullable_to_non_nullable
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:105:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\bookings_screen.dart:116:78 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\bookings_screen.dart:120:71 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\bookings_screen.dart:120:72 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:176:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the function 'showDialog' can't be inferred - lib\screens\bookings_screen.dart:276:5 - inference_failure_on_function_invocation
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:281:81 - lines_longer_than_80_chars
+   info - Sort directive sections alphabetically - lib\screens\cart_screen.dart:7:1 - directives_ordering
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:130:42 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\cart_screen.dart:192:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:203:66 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:207:49 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\cart_screen.dart:246:33 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:275:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:285:60 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:292:48 - require_trailing_commas
+warning - The type argument(s) of the function 'showModalBottomSheet' can't be inferred - lib\screens\comments_screen.dart:275:5 - inference_failure_on_function_invocation
+   info - The line length exceeds the 80-character limit - lib\screens\creator_stats_screen.dart:134:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\creator_stats_screen.dart:181:2 - eol_at_end_of_file
+   info - Unnecessary use of a 'double' literal - lib\screens\currency_converter_screen.dart:100:39 - prefer_int_literals
+   info - The value of the argument is redundant because it matches the default value - lib\screens\currency_converter_screen.dart:112:37 - avoid_redundant_argument_values
+   info - Unnecessary use of a 'double' literal - lib\screens\currency_converter_screen.dart:116:69 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\currency_converter_screen.dart:119:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\currency_converter_screen.dart:169:66 - require_trailing_commas
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\currency_converter_screen.dart:186:7 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\currency_converter_screen.dart:238:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\currency_converter_screen.dart:249:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\destination_detail_screen.dart:3:1 - directives_ordering
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:91:60 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:96:29 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:154:74 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:154:75 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\destination_detail_screen.dart:162:41 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:172:48 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:173:22 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:180:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:182:15 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:196:51 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:279:9 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\destination_detail_screen.dart:286:45 - prefer_int_literals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:290:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:293:53 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:300:51 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:302:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:317:70 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:321:81 - lines_longer_than_80_chars
+warning - The declaration '_buildInfoRow' isn't referenced - lib\screens\destination_detail_screen.dart:329:10 - unused_element
+   info - Unnecessary use of a 'double' literal - lib\screens\destination_detail_screen.dart:384:47 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:388:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:390:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\destination_detail_screen.dart:397:29 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:399:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:402:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:405:19 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:416:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:423:43 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:431:48 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:446:7 - require_trailing_commas
+   info - Unnecessary type annotation on a local variable - lib\screens\edit_profile_screen.dart:79:5 - omit_local_variable_types
+warning - Local variables should be final - lib\screens\edit_profile_screen.dart:79:5 - prefer_final_locals
+   info - Unnecessary type annotation on a local variable - lib\screens\edit_profile_screen.dart:101:7 - omit_local_variable_types
+   info - Unnecessary type annotation on a local variable - lib\screens\edit_profile_screen.dart:116:13 - omit_local_variable_types
+   info - The line length exceeds the 80-character limit - lib\screens\edit_profile_screen.dart:158:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\screens\edit_profile_screen.dart:171:39 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:189:59 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:201:60 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:263:64 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:271:58 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:271:59 - require_trailing_commas
+   info - Missing a newline at the end of the file - lib\screens\edit_profile_screen.dart:280:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\emotional_preferences_quiz_screen.dart:4:1 - directives_ordering
+   info - Sort directive sections alphabetically - lib\screens\emotional_preferences_quiz_screen.dart:5:1 - directives_ordering
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\emotional_preferences_quiz_screen.dart:27:9 - sort_constructors_first
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:40:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:47:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:54:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:55:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:61:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:68:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:75:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:82:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:89:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:90:81 - lines_longer_than_80_chars
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\emotional_preferences_quiz_screen.dart:101:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\emotional_preferences_quiz_screen.dart:108:9 - sort_constructors_first
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:112:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:113:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:115:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:115:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:115:36 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:115:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:116:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:116:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:116:31 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:117:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:117:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:117:30 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:118:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:118:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:118:30 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:118:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:121:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:122:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:124:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:124:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:124:26 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:125:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:125:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:125:28 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:126:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:126:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:126:35 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:126:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:127:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:127:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:127:34 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:127:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:130:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:131:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:133:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:133:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:133:38 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:134:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:134:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:134:28 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:135:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:135:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:135:36 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:135:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:136:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:136:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:136:36 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:139:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:140:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:142:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:142:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:142:32 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:142:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:143:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:143:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:143:32 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:143:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:144:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:144:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:144:35 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:145:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:145:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:145:29 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:148:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:149:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:151:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:151:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:151:33 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:151:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:152:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:152:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:152:26 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:153:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:153:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:153:30 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:153:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:154:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:154:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:154:38 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:154:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:157:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:158:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:160:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:160:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:160:29 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:160:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:161:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:161:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:161:25 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:162:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:162:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:162:28 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:163:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:163:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:163:27 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:163:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:166:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:167:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:169:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:169:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:169:34 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:169:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:170:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:170:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:170:35 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:170:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:171:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:171:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:171:34 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:171:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:172:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:172:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:172:33 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:172:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:175:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:176:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:178:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:178:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:178:40 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:178:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:179:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:179:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:179:26 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:180:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:180:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:180:30 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:180:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:181:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:181:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:181:36 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:181:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:184:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:185:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:187:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:187:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:187:39 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:188:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:188:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:188:39 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:189:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:189:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:189:35 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:189:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:190:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:190:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:190:32 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:190:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:193:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:194:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:196:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:196:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:196:40 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:196:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:197:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:197:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:197:30 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:198:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:198:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:198:31 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:198:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:199:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:199:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:199:39 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:199:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\emotional_preferences_quiz_screen.dart:263:30 - avoid_redundant_argument_values
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:318:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:338:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:340:66 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:346:23 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\emotional_preferences_quiz_screen.dart:364:49 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:390:63 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\emotional_preferences_quiz_screen.dart:394:52 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:403:75 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:419:60 - require_trailing_commas
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\emotional_preferences_quiz_screen.dart:467:9 - sort_constructors_first
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:488:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\emotional_preferences_quiz_screen.dart:503:33 - avoid_redundant_argument_values
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\emotional_preferences_quiz_screen.dart:514:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\emotional_preferences_quiz_screen.dart:545:39 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:564:54 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:569:72 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:573:26 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:591:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:591:82 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:600:60 - require_trailing_commas
+   info - Sort directive sections alphabetically - lib\screens\experience_impact_dashboard_screen.dart:2:1 - directives_ordering
+   info - Unnecessary use of a 'double' literal - lib\screens\experience_impact_dashboard_screen.dart:66:41 - prefer_int_literals
+   info - Unnecessary use of parentheses - lib\screens\experience_impact_dashboard_screen.dart:84:25 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:88:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:154:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:187:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:188:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:189:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:212:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:260:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:289:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:334:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\experience_impact_dashboard_screen.dart:420:30 - deprecated_member_use
+   info - Missing a newline at the end of the file - lib\screens\experience_impact_dashboard_screen.dart:586:2 - eol_at_end_of_file
+warning - The type argument(s) of the function 'to' can't be inferred - lib\screens\feed_screen.dart:74:30 - inference_failure_on_function_invocation
+warning - Unused import: 'package:go_router/go_router.dart' - lib\screens\historial_screen.dart:3:8 - unused_import
+   info - Unnecessary use of a 'double' literal - lib\screens\historial_screen.dart:91:45 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\historial_screen.dart:96:57 - prefer_int_literals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\historial_screen.dart:100:58 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\historial_screen.dart:103:81 - lines_longer_than_80_chars
+   info - To-do comment doesn't follow the Flutter style - lib\screens\historial_screen.dart:110:23 - flutter_style_todos
+   info - The line length exceeds the 80-character limit - lib\screens\historial_screen.dart:110:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\historial_screen.dart:121:2 - eol_at_end_of_file
+   info - The local variable '_featuredTrips' starts with an underscore - lib\screens\home_screen.dart:36:11 - no_leading_underscores_for_local_identifiers
+   info - The line length exceeds the 80-character limit - lib\screens\home_screen.dart:70:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\home_screen.dart:142:81 - lines_longer_than_80_chars
+   info - Use interpolation to compose strings and values - lib\screens\home_screen.dart:152:29 - prefer_interpolation_to_compose_strings
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\home_screen.dart:375:23 - inference_failure_on_instance_creation
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\home_screen.dart:385:23 - inference_failure_on_instance_creation
+   info - Missing a newline at the end of the file - lib\screens\home_screen.dart:668:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\instagram_stories_screen.dart:6:1 - directives_ordering
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:17:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:20:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:46:81 - lines_longer_than_80_chars
+   info - Closure should be a tearoff - lib\screens\instagram_stories_screen.dart:48:20 - unnecessary_lambdas
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:94:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\instagram_stories_screen.dart:202:42 - deprecated_member_use
+   info - Missing a newline at the end of the file - lib\screens\instagram_stories_screen.dart:227:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\login_screen.dart:2:1 - directives_ordering
+   info - Unnecessary use of a 'double' literal - lib\screens\login_screen.dart:143:39 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\login_screen.dart:143:49 - prefer_int_literals
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:150:24 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\login_screen.dart:152:29 - prefer_const_literals_to_create_immutables
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:167:21 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:168:21 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:170:30 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:200:19 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:202:28 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:247:47 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\login_screen.dart:288:66 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\login_screen.dart:292:66 - require_trailing_commas
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:297:19 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\login_screen.dart:298:31 - prefer_const_literals_to_create_immutables
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:299:23 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:299:39 - prefer_const_constructors
+   info - Missing a required trailing comma - lib\screens\login_screen.dart:303:68 - require_trailing_commas
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:305:23 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:305:39 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:362:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:364:48 - deprecated_member_use
+   info - Missing a newline at the end of the file - lib\screens\login_screen.dart:412:2 - eol_at_end_of_file
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\ocr_screen.dart:180:27 - inference_failure_on_instance_creation
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\onboarding_screen.dart:138:31 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\premium_subscription_screen.dart:165:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\premium_subscription_screen.dart:240:81 - lines_longer_than_80_chars
+   info - Unnecessary use of 'toList' in a spread - lib\screens\premium_subscription_screen.dart:280:24 - unnecessary_to_list_in_spreads
+   info - Sort directive sections alphabetically - lib\screens\preview_entry_screen.dart:4:1 - directives_ordering
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\preview_entry_screen.dart:9:9 - sort_constructors_first
+   info - Required named parameters should be before optional named parameters - lib\screens\preview_entry_screen.dart:9:54 - always_put_required_named_parameters_first
+   info - Unnecessary use of a 'double' literal - lib\screens\preview_entry_screen.dart:19:39 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\preview_entry_screen.dart:52:24 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\preview_entry_screen.dart:53:27 - prefer_int_literals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\preview_entry_screen.dart:57:60 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\preview_entry_screen.dart:59:24 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\preview_entry_screen.dart:72:81 - lines_longer_than_80_chars
+   info - To-do comment doesn't follow the Flutter style - lib\screens\preview_entry_screen.dart:82:19 - flutter_style_todos
+   info - The line length exceeds the 80-character limit - lib\screens\preview_entry_screen.dart:82:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\preview_entry_screen.dart:93:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:43:81 - lines_longer_than_80_chars
+   info - 'bool' parameters should be named parameters - lib\screens\profile_provider.dart:73:19 - avoid_positional_boolean_parameters
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:107:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:116:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\profile_provider.dart:138:4 - eol_at_end_of_file
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:7:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:8:8 - always_use_package_imports
+warning - Unused import: '../services/user_service.dart' - lib\screens\profile_screen.dart:8:8 - unused_import
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:9:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:10:8 - always_use_package_imports
+warning - Unused import: 'creator_stats_screen.dart' - lib\screens\profile_screen.dart:10:8 - unused_import
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:11:8 - always_use_package_imports
+warning - Unused import: 'instagram_stories_screen.dart' - lib\screens\profile_screen.dart:11:8 - unused_import
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:12:8 - always_use_package_imports
+warning - Unused import: 'translator_screen.dart' - lib\screens\profile_screen.dart:12:8 - unused_import
+   info - Sort directive sections alphabetically - lib\screens\profile_screen.dart:13:1 - directives_ordering
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:13:8 - always_use_package_imports
+warning - Unused import: 'ocr_screen.dart' - lib\screens\profile_screen.dart:13:8 - unused_import
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:95:17 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:110:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:190:46 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:190:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:237:76 - require_trailing_commas
+   info - To-do comment doesn't follow the Flutter style - lib\screens\profile_screen.dart:245:35 - flutter_style_todos
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:270:74 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:284:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:286:58 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:292:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:296:52 - require_trailing_commas
+warning - The declaration '_buildFollowerStats' isn't referenced - lib\screens\profile_screen.dart:346:10 - unused_element
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:354:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:370:35 - deprecated_member_use
+warning - Use 'const' with the constructor to improve performance - lib\screens\profile_screen.dart:378:13 - prefer_const_constructors
+warning - The type argument(s) of the function 'showDialog' can't be inferred - lib\screens\profile_screen.dart:390:5 - inference_failure_on_function_invocation
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\profile_screen.dart:404:42 - use_build_context_synchronously
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:416:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:432:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\profile_screen.dart:432:160 - prefer_const_constructors
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\profile_screen.dart:438:19 - inference_failure_on_instance_creation
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:440:64 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:515:70 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:532:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:534:52 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:534:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\profile_screen.dart:565:29 - avoid_redundant_argument_values
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\reels_screen.dart:40:19 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\reels_screen.dart:41:17 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\reels_screen.dart:51:19 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\reels_screen.dart:52:17 - prefer_const_literals_to_create_immutables
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - lib\screens\reels_screen.dart:64:11 - inference_failure_on_instance_creation
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\screens\reels_screen.dart:95:22 - unawaited_futures
+   info - Missing a required trailing comma - lib\screens\reels_screen.dart:239:60 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\reels_screen.dart:275:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:67:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\referral_screen.dart:94:42 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:117:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:141:81 - lines_longer_than_80_chars
+   info - Sort directive sections alphabetically - lib\screens\register_screen.dart:2:1 - directives_ordering
+warning - Unused import: 'package:flutter/gestures.dart' - lib\screens\register_screen.dart:3:8 - unused_import
+   info - Closure should be a tearoff - lib\screens\register_screen.dart:57:3 - unnecessary_lambdas
+   info - Missing a required trailing comma - lib\screens\register_screen.dart:172:75 - require_trailing_commas
+warning - The return type of ' Function(String)?' can't be inferred - lib\screens\register_screen.dart:214:5 - inference_failure_on_function_return_type
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\register_screen.dart:218:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\register_screen.dart:220:48 - deprecated_member_use
+warning - The declaration '_buildPasswordStrengthIndicator' isn't referenced - lib\screens\register_screen.dart:249:10 - unused_element
+   info - Unnecessary use of a raw string - lib\screens\register_screen.dart:253:34 - unnecessary_raw_strings
+   info - Unnecessary use of a raw string - lib\screens\register_screen.dart:254:34 - unnecessary_raw_strings
+   info - Statements in an if should be enclosed in a block - lib\screens\register_screen.dart:254:46 - curly_braces_in_flow_control_structures
+   info - Missing a newline at the end of the file - lib\screens\register_screen.dart:278:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:19:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:32:81 - lines_longer_than_80_chars
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\results_screen.dart:87:19 - cast_nullable_to_non_nullable
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\results_screen.dart:104:25 - cast_nullable_to_non_nullable
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\results_screen.dart:113:25 - cast_nullable_to_non_nullable
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\results_screen.dart:129:27 - cast_nullable_to_non_nullable
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:131:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:139:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\results_screen.dart:170:25 - inference_failure_on_instance_creation
+   info - Missing a newline at the end of the file - lib\screens\results_screen.dart:198:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\search_screen.dart:5:1 - directives_ordering
+   info - Sort directive sections alphabetically - lib\screens\search_screen.dart:6:1 - directives_ordering
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:24:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:28:16 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:31:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:40:24 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:47:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:54:33 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:56:31 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:59:33 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:62:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:68:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:88:13 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:92:24 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:96:19 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:98:28 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:100:19 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:104:32 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:105:34 - prefer_const_constructors
+   info - Missing a required trailing comma - lib\screens\search_screen.dart:108:63 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\search_screen.dart:122:52 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\search_screen.dart:180:45 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\search_screen.dart:191:78 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\search_screen.dart:198:37 - require_trailing_commas
+   info - Missing a newline at the end of the file - lib\screens\search_screen.dart:208:2 - eol_at_end_of_file
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:63:68 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:76:40 - require_trailing_commas
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\screens\smart_camera_screen.dart:127:9 - unawaited_futures
+   info - Closure should be a tearoff - lib\screens\smart_camera_screen.dart:203:3 - unnecessary_lambdas
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:223:64 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:223:65 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:260:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:306:55 - deprecated_member_use
+   info - The value of the argument is redundant because it matches the default value - lib\screens\smart_camera_screen.dart:313:31 - avoid_redundant_argument_values
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:317:48 - require_trailing_commas
+   info - The value of the argument is redundant because it matches the default value - lib\screens\smart_camera_screen.dart:334:45 - avoid_redundant_argument_values
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:337:45 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:337:76 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:338:19 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\smart_camera_screen.dart:342:49 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:346:54 - require_trailing_commas
+warning - Don't invoke 'print' in production code - lib\screens\storage_service.dart:23:7 - avoid_print
+   info - Missing a newline at the end of the file - lib\screens\storage_service.dart:27:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\translator_screen.dart:87:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\translator_screen.dart:88:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\translator_screen.dart:116:32 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\translator_screen.dart:201:76 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\translator_screen.dart:232:78 - require_trailing_commas
+   info - Missing a newline at the end of the file - lib\screens\translator_screen.dart:287:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\travel_diary_screen.dart:2:1 - directives_ordering
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\travel_diary_screen.dart:4:8 - always_use_package_imports
+   info - Sort directive sections alphabetically - lib\screens\travel_diary_screen.dart:5:1 - directives_ordering
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\travel_diary_screen.dart:5:8 - always_use_package_imports
+   info - Unnecessary use of a 'double' literal - lib\screens\travel_diary_screen.dart:83:45 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:83:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\travel_diary_screen.dart:96:23 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\travel_diary_screen.dart:98:23 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\travel_diary_screen.dart:99:23 - prefer_const_literals_to_create_immutables
+warning - The value of the local variable 'avgDepth' isn't used - lib\screens\travel_diary_screen.dart:161:11 - unused_local_variable
+   info - Unnecessary use of parentheses - lib\screens\travel_diary_screen.dart:161:22 - unnecessary_parenthesis
+warning - The value of the local variable 'uniqueEmotions' isn't used - lib\screens\travel_diary_screen.dart:162:11 - unused_local_variable
+   info - Unnecessary use of parentheses - lib\screens\travel_diary_screen.dart:162:28 - unnecessary_parenthesis
+warning - The value of the local variable 'overallImpact' isn't used - lib\screens\travel_diary_screen.dart:163:11 - unused_local_variable
+   info - Unnecessary use of parentheses - lib\screens\travel_diary_screen.dart:163:27 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\screens\travel_diary_screen.dart:164:33 - unnecessary_parenthesis
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:168:52 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:220:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\travel_diary_screen.dart:248:18 - prefer_const_constructors
+   info - Unnecessary use of a 'double' literal - lib\screens\travel_diary_screen.dart:286:41 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:313:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:320:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:327:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:328:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\travel_diary_screen.dart:328:83 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:331:24 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:336:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:403:13 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:427:22 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:454:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:470:75 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:476:76 - require_trailing_commas
+   info - Missing a newline at the end of the file - lib\screens\travel_diary_screen.dart:500:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\trip_detail_screen.dart:5:1 - directives_ordering
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\trip_detail_screen.dart:17:3 - sort_constructors_first
+   info - Required named parameters should be before optional named parameters - lib\screens\trip_detail_screen.dart:22:19 - always_put_required_named_parameters_first
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:28:81 - lines_longer_than_80_chars
+   info - Unnecessary type annotation on a local variable - lib\screens\trip_detail_screen.dart:41:3 - omit_local_variable_types
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:43:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\trip_detail_screen.dart:55:20 - avoid_redundant_argument_values
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\trip_detail_screen.dart:71:24 - cast_nullable_to_non_nullable
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\trip_detail_screen.dart:78:9 - sort_constructors_first
+   info - Required named parameters should be before optional named parameters - lib\screens\trip_detail_screen.dart:78:52 - always_put_required_named_parameters_first
+   info - Closure should be a tearoff - lib\screens\trip_detail_screen.dart:92:18 - unnecessary_lambdas
+   info - Missing a required trailing comma - lib\screens\trip_detail_screen.dart:110:74 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\trip_detail_screen.dart:110:75 - require_trailing_commas
+   info - Use a 'ColoredBox' rather than a 'Container' with only a 'Color' - lib\screens\trip_detail_screen.dart:112:19 - use_colored_box
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:115:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:124:45 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\trip_detail_screen.dart:136:53 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:159:43 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\trip_detail_screen.dart:173:71 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:221:43 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:242:57 - prefer_int_literals
+   info - The value of the argument is redundant because it matches the default value - lib\screens\trip_detail_screen.dart:246:53 - avoid_redundant_argument_values
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:270:39 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:288:45 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:313:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:340:51 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:353:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:363:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:367:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:373:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\vision_service.dart:7:81 - lines_longer_than_80_chars
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\vision_service.dart:27:3 - sort_constructors_first
+   info - Use of an async 'dart:io' method - lib\screens\vision_service.dart:38:16 - avoid_slow_async_io
+   info - Missing a required trailing comma - lib\screens\vision_service.dart:44:78 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\vision_service.dart:49:5 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:29:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:40:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:51:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:62:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:87:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:110:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:156:81 - lines_longer_than_80_chars
+   info - Unnecessary duplication of receiver - lib\services\admob_service.dart:16:5 - cascade_invocations
+   info - Unnecessary duplication of receiver - lib\services\admob_service.dart:26:5 - cascade_invocations
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\services\admob_service.dart:26:14 - unawaited_futures
+   info - Sort directive sections alphabetically - lib\services\affiliate_service.dart:3:1 - directives_ordering
+   info - Sort directive sections alphabetically - lib\services\affiliate_service.dart:4:1 - directives_ordering
+   info - Missing a required trailing comma - lib\services\affiliate_service.dart:57:50 - require_trailing_commas
+   info - Unnecessary type annotation on a local variable - lib\services\agency_service.dart:170:15 - omit_local_variable_types
+   info - Missing a newline at the end of the file - lib\services\agency_service.dart:223:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\services\auth_service.dart:7:1 - directives_ordering
+   info - Missing a newline at the end of the file - lib\services\auth_service.dart:112:2 - eol_at_end_of_file
+   info - Use 'package:' imports for files in the 'lib' directory - lib\services\cart_service.dart:2:8 - always_use_package_imports
+   info - The line length exceeds the 80-character limit - lib\services\cart_service.dart:21:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\cart_service.dart:25:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\cart_service.dart:37:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\country_service.dart:9:81 - lines_longer_than_80_chars
+   info - Unnecessary use of parentheses - lib\services\country_service.dart:24:11 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\services\country_service.dart:56:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:119:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:121:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:194:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:238:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\diary_service.dart:291:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\forgot_password_screen.dart:45:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\forgot_password_screen.dart:129:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\instagram_story_service.dart:47:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\instagram_story_service.dart:70:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\notification_service.dart:63:81 - lines_longer_than_80_chars
+   info - Invalid use of 'default' member in a switch - lib\services\revenuecat_service.dart:228:7 - no_default_cases
+   info - Missing a newline at the end of the file - lib\services\revenuecat_service.dart:248:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\sharing_service.dart:13:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\sharing_service.dart:33:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\sharing_service.dart:90:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\storage_service.dart:30:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\storage_service.dart:41:81 - lines_longer_than_80_chars
+   info - Don't cast a nullable value to a non-nullable type - lib\services\story_service.dart:104:20 - cast_nullable_to_non_nullable
+   info - Missing a required trailing comma - lib\services\story_service.dart:148:68 - require_trailing_commas
+   info - Missing a required trailing comma - lib\services\story_service.dart:159:68 - require_trailing_commas
+   info - To-do comment doesn't follow the Flutter style - lib\trip_detail_screen.dart:4:1 - flutter_style_todos
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:42:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:43:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:47:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:56:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\trip_detail_screen.dart:69:2 - eol_at_end_of_file
+   info - Unnecessary use of parentheses - lib\trip_model.dart:44:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\trip_model.dart:47:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\trip_model.dart:50:9 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\widgets\affiliate_widget.dart:40:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\widgets\affiliate_widget.dart:81:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - mercado_pago_service.dart:6:1 - directives_ordering
+   info - The line length exceeds the 80-character limit - premium_subscription_screen.dart:6:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - premium_subscription_screen.dart:54:81 - lines_longer_than_80_chars
+   info - Unnecessary duplication of receiver - premium_subscription_screen.dart:224:23 - cascade_invocations
+   info - Dependencies not sorted alphabetically - pubspec.yaml:13:3 - sort_pub_dependencies
+   info - Dependencies not sorted alphabetically - pubspec.yaml:64:3 - sort_pub_dependencies
+   info - Dependencies not sorted alphabetically - pubspec.yaml:80:3 - sort_pub_dependencies
+   info - Sort directive sections alphabetically - search_provider.dart:2:1 - directives_ordering
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - search_provider.dart:30:11 - inference_failure_on_instance_creation
+   info - The line length exceeds the 80-character limit - search_provider.dart:36:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - search_provider.dart:47:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - search_provider.dart:50:9 - inference_failure_on_instance_creation
+   info - Missing a newline at the end of the file - search_provider.dart:52:4 - eol_at_end_of_file
+warning - The type argument(s) of 'List' can't be inferred - test\models\experience_model_test.dart:16:20 - inference_failure_on_collection_literal
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:32:30 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:33:15 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:36:18 - prefer_const_literals_to_create_immutables
+warning - The type argument(s) of 'List' can't be inferred - test\models\experience_model_test.dart:54:19 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:44:19 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:45:23 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:53:21 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:54:22 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:56:32 - inference_failure_on_collection_literal
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\user_model_test.dart:13:24 - prefer_const_literals_to_create_immutables
+warning - The type argument(s) of 'List' can't be inferred - test\models\user_model_test.dart:29:26 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\user_model_test.dart:30:19 - inference_failure_on_collection_literal
+   info - Missing a required trailing comma - trip_repository.dart:28:56 - require_trailing_commas
+
+754 issues found. (ran in 14.5s)

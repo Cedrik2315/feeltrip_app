@@ -491,13 +491,27 @@ After each phase:
 
 ---
 
+## 📞 Team Hiring for Scale
+
+**PM/Growth:**
+- Growth experiments (A/B, viral loops)
+- Metrics dashboard ownership
+- $80k/year
+
+**Mid Flutter Dev:**
+- Phase 2 viral features
+- Tests/maintenance
+- $60k/year
+
+**Timeline:** Hire Week 1, onboard Week 2
+
 ## 📞 Next Steps
 
-1. **Complete Phase 1 testing** (this week)
-2. **Get user feedback** on current features
-3. **Prioritize Phase 2** with stakeholders
-4. **Start FCM infrastructure** setup
-5. **Plan Phase 2 sprint** with team
+1. **Phase 1 complete** ✅ (Growth engine ready)
+2. **Hiring** - Post jobs
+3. **Phase 2 viral** - Start notifications UI
+4. **Metrics monitoring** - LTV dashboard live
+
 
 ---
 

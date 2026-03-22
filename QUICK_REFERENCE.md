@@ -26,9 +26,11 @@
 
 ### Comentarios
 ```dart
+import 'package:go_router/go_router.dart';
 import 'package:feeltrip_app/screens/comments_screen.dart';
 
-Get.to(() => CommentsScreen(storyId: story.id));
+// Asumiendo una ruta '/stories/:storyId/comments'
+context.go('/stories/${story.id}/comments');
 ```
 
 ### Compartir

@@ -16,7 +16,7 @@ He completado exitosamente la **Fase 2B: Firebase Firestore Integration** para l
 ✅ firebase_options.dart (40 líneas)
 ✅ story_service.dart (250 líneas, 12 métodos)
 ✅ diary_service.dart (280 líneas, 15 métodos)
-✅ experience_controller.dart (420 líneas, 25+ métodos)
+✅ experience_notifier.dart (420 líneas, 25+ métodos)
 ```
 
 ### 2. Modelos Actualizados (4 clases)

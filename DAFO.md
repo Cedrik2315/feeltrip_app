@@ -31,7 +31,7 @@ He realizado una revisión completa del código de la aplicación FeelTrip. A co
 
 ### 6. **Posibles Memory Leaks**
 - En `database_service.dart`, los streams no siempre se cierran correctamente
-- En `home_controller.dart`, no hay limpieza de recursos en el dispose
+- En `home_controller.dart`, no hay limpieza de recursos en el dispose. **Nota:** La migración a Riverpod con providers `.autoDispose` soluciona este problema de forma automática.
 
 ---
 
@@ -65,7 +65,7 @@ He realizado una revisión completa del código de la aplicación FeelTrip. A co
 
 ### 1. **Arquitectura Escalable**
 - Separación clara: Screens → Controllers → Services → Models
-- Uso de Provider para gestión de estado
+- Uso de **Riverpod** para gestión de estado, proveyendo una solución robusta y compile-safe.
 - Patrón de servicios bien definido
 
 ### 2. **Modelo de Datos Rico**

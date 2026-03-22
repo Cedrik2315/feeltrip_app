@@ -7,14 +7,14 @@
 │                     FEELTRIP APP (FLUTTER)                      │
 │                                                                  │
 │  ┌───────────────┐  ┌──────────────┐  ┌────────────────────┐   │
-│  │  USER SCREENS │  │  CONTROLLERS │  │   SERVICES         │   │
+│  │  USER SCREENS │  │ STATE MGMT   │  │   SERVICES         │   │
 │  │               │  │              │  │                    │   │
 │  │ • Main        │  │ Experience   │  │ • StoryService     │   │
 │  │ • Stories     │  │ Controller   │  │ • DiaryService     │   │
 │  │ • Diary       │  │ (GetX)       │  │ • CommentService   │   │
 │  │ • Reels       │  │              │  │ • SharingService   │   │
 │  │ • Comments ✨ │  │ • GetX Put   │  │ • AgencyService    │   │
-│  │ • AgencyProfile│ │ • Reactive   │  │ • StorageService   │   │
+│  │ • AgencyProfile│ │ • Riverpod   │  │ • StorageService   │   │
 │  │   Screen ✨   │  │   State      │  │ • ApiService       │   │
 │  └───────────────┘  └──────────────┘  └────────────────────┘   │
 │         │                  │                    │                │
@@ -158,7 +158,8 @@ USER TAPS SHARE BUTTON
 USER WANTS TO VIEW AGENCY
         │
         ▼
-   Get.to(AgencyProfileScreen(agencyId))
+   context.go('/agencies/$agencyId')
+   (GoRouter Navigation)
         │
         ▼
    AgencyProfileScreen

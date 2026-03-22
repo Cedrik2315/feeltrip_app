@@ -29,19 +29,20 @@ La aplicación FeelTrip ahora está completamente integrada con Firebase Firesto
 - Streams para actualizaciones en tiempo real
 
 ### 5. **lib/controllers/experience_controller.dart**
-- GetX controller para gestión de estado
-- Integración de StoryService y DiaryService
-- 25+ métodos públicos
-- Manejo de carga, errores y éxito
+- **Riverpod Notifier** para gestión de estado (`AsyncNotifier`).
+- Integración de `StoryService` y `DiaryService` a través de `ref`.
+- 25+ métodos públicos para mutar el estado.
+- Manejo de estados asíncronos (loading, data, error) con `AsyncValue`.
 
 ## 📦 Dependencias
 
 Ya están en `pubspec.yaml`:
 ```yaml
-firebase_core: ^2.13.0
-cloud_firestore: ^4.8.0
-get: ^4.6.5
-uuid: ^3.0.7
+firebase_core: ^4.5.0
+cloud_firestore: ^6.1.3
+flutter_riverpod: ^3.1.0
+riverpod_annotation: ^4.0.0
+uuid: ^4.5.3
 ```
 
 Aún **necesitas agregar**:
