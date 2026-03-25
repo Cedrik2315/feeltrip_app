@@ -1,126 +1,171 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TravelerStory {
-
-  const TravelerStory({
+  TravelerStory({
     required this.id,
-    required this.userId,
-    required this.destination,
+    required this.author,
     required this.title,
     required this.story,
     required this.emotionalHighlights,
-    required this.tags,
-    required this.rating,
     required this.likes,
-    required this.likedBy,
-    required this.reaction,
+    required this.rating,
     required this.createdAt,
-    this.imageUrl,
+    this.imageUrl = '',
+    this.likedBy = const [],
+    this.reaction = '',
+    this.agencyId,
   });
 
   factory TravelerStory.fromJson(Map<String, dynamic> json) {
     return TravelerStory(
-      id: (json['id'] as String?) ?? '',
-      userId: (json['userId'] as String?) ?? '',
-      destination: (json['destination'] as String?) ?? '',
-      title: (json['title'] as String?) ?? '',
-      story: (json['story'] as String?) ?? '',
-      emotionalHighlights: List<String>.from((json['emotionalHighlights'] as List<dynamic>?) ?? []),
-      tags: List<String>.from((json['tags'] as List<dynamic>?) ?? []),
+      id: json['id'] as String? ?? '',
+      author: json['author'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      story: json['story'] as String? ?? '',
+      emotionalHighlights: List<String>.from(
+          json['emotionalHighlights'] as Iterable<dynamic>? ?? []),
+      likes: json['likes'] as int? ?? 0,
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      likes: (json['likes'] as int?) ?? 0,
-      likedBy: List<String>.from((json['likedBy'] as List<dynamic>?) ?? []),
-      reaction: (json['reaction'] as String?) ?? '',
+      imageUrl: json['imageUrl'] as String? ?? '',
+      likedBy: List<String>.from(json['likedBy'] as Iterable<dynamic>? ?? []),
+      reaction: json['reaction'] as String? ?? '',
+      agencyId: json['agencyId'] as String?,
       createdAt: json['createdAt'] is Timestamp
           ? (json['createdAt'] as Timestamp).toDate()
-          : DateTime.tryParse((json['createdAt'] as String?) ?? '') ?? DateTime.now(),
-      imageUrl: json['imageUrl'] as String?,
+          : DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+              DateTime.now(),
     );
   }
+
+  factory TravelerStory.fromFirestore(DocumentSnapshot doc) {
+    final data = Map<String, dynamic>.from(doc.data() as Map? ?? {});
+    data['id'] = doc.id;
+    return TravelerStory.fromJson(data);
+  }
+
   final String id;
-  final String userId;
-  final String destination;
+  final String author;
   final String title;
   final String story;
   final List<String> emotionalHighlights;
-  final List<String> tags;
-  final double rating;
   final int likes;
+  final double rating;
+  final String imageUrl;
   final List<String> likedBy;
   final String reaction;
+  final String? agencyId;
   final DateTime createdAt;
-  final String? imageUrl;
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'userId': userId,
-      'destination': destination,
+      'author': author,
       'title': title,
       'story': story,
       'emotionalHighlights': emotionalHighlights,
-      'tags': tags,
-      'rating': rating,
       'likes': likes,
+      'rating': rating,
+      'imageUrl': imageUrl,
       'likedBy': likedBy,
       'reaction': reaction,
-      'createdAt': createdAt.toIso8601String(),
-      'imageUrl': imageUrl,
+      'agencyId': agencyId,
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 }
 
 class DiaryEntry {
-
-  const DiaryEntry({
+  DiaryEntry({
     required this.id,
-    required this.tripId,
     required this.userId,
-    required this.location,
+    required this.title,
     required this.content,
     required this.emotions,
-    required this.photos,
-    required this.reflectionDepth,
     required this.createdAt,
+    this.photoUrls = const [],
+    this.reflectionDepth = 0,
+    this.tags = const [],
   });
+
+  factory DiaryEntry.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return DiaryEntry(
+      id: doc.id,
+      userId: data['userId'] as String? ?? '',
+      title: data['title'] as String? ?? '',
+      content: data['content'] as String? ?? '',
+      emotions: List<String>.from(data['emotions'] as Iterable<dynamic>? ?? []),
+      photoUrls:
+          List<String>.from(data['photoUrls'] as Iterable<dynamic>? ?? []),
+      reflectionDepth: data['reflectionDepth'] as int? ?? 0,
+      tags: List<String>.from(data['tags'] as Iterable<dynamic>? ?? []),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
 
   factory DiaryEntry.fromJson(Map<String, dynamic> json) {
     return DiaryEntry(
-      id: (json['id'] as String?) ?? '',
-      tripId: (json['tripId'] as String?) ?? '',
-      userId: (json['userId'] as String?) ?? '',
-      location: (json['location'] as String?) ?? '',
-      content: (json['content'] as String?) ?? '',
-      emotions: List<String>.from((json['emotions'] as List<dynamic>?) ?? []),
-      photos: List<String>.from((json['photos'] as List<dynamic>?) ?? []),
-      reflectionDepth: (json['reflectionDepth'] as int?) ?? 3,
+      id: json['id'] as String? ?? '',
+      userId: json['userId'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      content: json['content'] as String? ?? '',
+      emotions:
+          List<String>.from(json['emotions'] as Iterable<dynamic>? ?? []),
+      photoUrls:
+          List<String>.from(json['photoUrls'] as Iterable<dynamic>? ?? []),
+      reflectionDepth: json['reflectionDepth'] as int? ?? 0,
+      tags: List<String>.from(json['tags'] as Iterable<dynamic>? ?? []),
       createdAt: json['createdAt'] is Timestamp
           ? (json['createdAt'] as Timestamp).toDate()
-          : DateTime.tryParse((json['createdAt'] as String?) ?? '') ?? DateTime.now(),
+          : DateTime.now(),
     );
   }
+
   final String id;
-  final String tripId;
   final String userId;
-  final String location;
+  final String title;
   final String content;
   final List<String> emotions;
-  final List<String> photos;
+  final List<String> photoUrls;
   final int reflectionDepth;
+  final List<String> tags;
   final DateTime createdAt;
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'tripId': tripId,
       'userId': userId,
-      'location': location,
+      'title': title,
       'content': content,
       'emotions': emotions,
-      'photos': photos,
+      'photoUrls': photoUrls,
       'reflectionDepth': reflectionDepth,
-      'createdAt': createdAt.toIso8601String(),
+      'tags': tags,
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
-}
 
+  DiaryEntry copyWith({
+    String? id,
+    String? userId,
+    String? title,
+    String? content,
+    List<String>? emotions,
+    List<String>? photoUrls,
+    int? reflectionDepth,
+    List<String>? tags,
+    DateTime? createdAt,
+  }) {
+    return DiaryEntry(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      emotions: emotions ?? this.emotions,
+      photoUrls: photoUrls ?? this.photoUrls,
+      reflectionDepth: reflectionDepth ?? this.reflectionDepth,
+      tags: tags ?? this.tags,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+}

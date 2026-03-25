@@ -15,10 +15,7 @@ class AffiliateWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Reserva tu viaje',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold)),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           GridView.count(
             crossAxisCount: 2,
@@ -30,8 +27,7 @@ class AffiliateWidget extends StatelessWidget {
             children: options
                 .map((option) => GestureDetector(
                       onTap: () {
-                        AnalyticsService.logAffiliateClick(
-                            option.name, destination);
+                        AnalyticsService.logAffiliateClick(option.name, destination);
                         AffiliateOptionsService.openAffiliateLink(option.url);
                       },
                       child: Container(
@@ -42,8 +38,7 @@ class AffiliateWidget extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(option.emoji,
-                                style: const TextStyle(fontSize: 20)),
+                            Text(option.emoji, style: const TextStyle(fontSize: 20)),
                             const SizedBox(width: 6),
                             Text(option.name,
                                 style: const TextStyle(

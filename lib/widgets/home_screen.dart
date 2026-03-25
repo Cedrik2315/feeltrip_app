@@ -55,7 +55,7 @@ class HomeScreen extends ConsumerWidget {
                         title: trip.title,
                         destination: trip.destination,
                         imageUrl:
-                            trip.images.isNotEmpty ? trip.images.first : null,
+                            trip.imageUrl.isNotEmpty ? trip.imageUrl : null,
                         onTap: () =>
                             context.go('${RouteNames.tripDetail}/${trip.id}'),
                       );

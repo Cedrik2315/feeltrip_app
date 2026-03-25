@@ -1,5 +1,7 @@
 import 'package:share_plus/share_plus.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
+import '../models/travel_agency_model.dart';
+import '../models/experience_model.dart';
 
 class SharingService {
   /// Share to WhatsApp with viral CTA
@@ -67,6 +69,46 @@ class SharingService {
     } catch (e) {
       AppLogger.e('Share error: $e');
       rethrow;
+    }
+  }
+
+  static String generateAgencyDeepLink(String agencyId) {
+    return 'https://feeltrip.app/agency/$agencyId';
+  }
+
+  /// Share an agency highlighting if verified
+  static Future<void> shareAgency(TravelAgency agency) async {
+    final deepLink = generateAgencyDeepLink(agency.id);
+    final verifiedBadge = agency.verified ? ' ✅ Verificada' : '';
+    final message =
+        '${agency.name}${verifiedBadge} en ${agency.city}, ${agency.country}\n\n'
+        '${agency.description}\n\n'
+        'Descubre experiencias únicas en FeelTrip 🌍✨\n'
+        '$deepLink';
+    try {
+      await Share.share(message, subject: '${agency.name} - FeelTrip');
+      AppLogger.i('Shared agency: ${agency.id}');
+    } catch (e) {
+      AppLogger.e('Share agency error: $e');
+    }
+  }
+
+  static String generateStoryDeepLink(String storyId) {
+    return 'https://feeltrip.app/story/$storyId';
+  }
+
+  /// Share a story with travel emojis 🌍 and CTA
+  static Future<void> shareStory(TravelerStory story) async {
+    final deepLink = generateStoryDeepLink(story.id);
+    final message =
+        '🌍 ¡Historia increíble de ${story.author} en ${story.title}! '
+        'Únete a FeelTrip y vive tu propia aventura transformacional 🌟✨\n\n'
+        '$deepLink';
+    try {
+      await Share.share(message, subject: 'Historia en FeelTrip');
+      AppLogger.i('Shared story: ${story.id}');
+    } catch (e) {
+      AppLogger.e('Share story error: $e');
     }
   }
 

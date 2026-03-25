@@ -6,8 +6,7 @@ import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MercadoPagoService {
-  static const String _baseUrl =
-      'https://api.mercadopago.com/checkout/preferences';
+  static const String _baseUrl = 'https://api.mercadopago.com/checkout/preferences';
 
   static Future<Either<Failure, String>> createPreference({
     required double amount,
@@ -56,8 +55,7 @@ class MercadoPagoService {
     }
   }
 
-  static Future<Either<Failure, Map<String, dynamic>>> getPaymentStatus(
-      String externalRef) async {
+  static Future<Either<Failure, Map<String, dynamic>>> getPaymentStatus(String externalRef) async {
     try {
       final token = dotenv.env['MERCADO_PAGO_ACCESS_TOKEN'] ?? '';
       final response = await http.get(

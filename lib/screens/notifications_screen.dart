@@ -9,8 +9,7 @@ class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  ConsumerState<NotificationsScreen> createState() =>
-      _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
@@ -72,8 +71,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   children: [
                     Icon(Icons.notifications_off, size: 64, color: Colors.grey),
                     SizedBox(height: 16),
-                    Text('No hay notificaciones',
-                        style: TextStyle(fontSize: 18)),
+                    Text('No hay notificaciones', style: TextStyle(fontSize: 18)),
                   ],
                 ),
               );
@@ -81,8 +79,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             return ListView.builder(
               itemCount: notifications.length,
               itemBuilder: (context, index) {
-                final data =
-                    notifications[index].data() as Map<String, dynamic>;
+                final data = notifications[index].data() as Map<String, dynamic>;
                 final notification = NotificationModel.fromJson({
                   ...data,
                   'id': notifications[index].id,
@@ -90,18 +87,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 final bool isRead = data['isRead'] == true;
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: notification.imageUrl != null
-                        ? NetworkImage(notification.imageUrl!)
-                        : null,
-                    child: notification.imageUrl == null
-                        ? const Icon(Icons.notifications)
-                        : null,
+                    backgroundImage:
+                        notification.imageUrl != null ? NetworkImage(notification.imageUrl!) : null,
+                    child: notification.imageUrl == null ? const Icon(Icons.notifications) : null,
                   ),
                   title: Text(notification.title),
                   subtitle: Text(notification.body),
-                  trailing: isRead
-                      ? null
-                      : const Icon(Icons.circle, color: Colors.blue, size: 12),
+                  trailing: isRead ? null : const Icon(Icons.circle, color: Colors.blue, size: 12),
                   onTap: () {
                     _firestore
                         .collection('users')

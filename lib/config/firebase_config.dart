@@ -26,8 +26,7 @@ class FirebaseConfig {
       // log eliminado: ✅ Firebase inicializado exitosamente
     } catch (e) {
       // Si Firebase ya está inicializado, esto es esperado
-      if (e.toString().contains('duplicate-app') ||
-          e.toString().contains('already exists')) {
+      if (e.toString().contains('duplicate-app') || e.toString().contains('already exists')) {
         // log eliminado: ✅ Firebase ya estaba inicializado
         return;
       }

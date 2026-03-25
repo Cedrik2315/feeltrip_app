@@ -61,9 +61,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               onSubmitted: (query) {
                 if (query.trim().isNotEmpty) {
-                  ref
-                      .read(searchNotifierProvider.notifier)
-                      .searchExperiences(query);
+                  ref.read(searchNotifierProvider.notifier).searchExperiences(query);
                 }
               },
             ),
@@ -80,8 +78,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           title: result.title,
                           destination: result.destination,
                           imageUrl: result.imageUrl,
-                          onTap: () => context
-                              .go('${RouteNames.tripDetail}/${result.id}'),
+                          onTap: () => context.go('${RouteNames.tripDetail}/${result.id}'),
                         );
                       },
                     ),

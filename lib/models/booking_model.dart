@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'booking_model.freezed.dart';
 part 'booking_model.g.dart';
 
@@ -17,6 +18,5 @@ class BookingModel with _$BookingModel {
     @Default(false) bool isSynced,
   }) = _BookingModel;
 
-  factory BookingModel.fromJson(Map<String, dynamic> json) =>
-      _$BookingModelFromJson(json);
+  factory BookingModel.fromJson(Map<String, dynamic> json) => _$BookingModelFromJson(json);
 }

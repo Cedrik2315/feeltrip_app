@@ -19,8 +19,7 @@ class Momento {
         photoUrl: json['photoUrl'] as String?,
         latitude: (json['latitude'] as num?)?.toDouble(),
         longitude: (json['longitude'] as num?)?.toDouble(),
-        createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
-            DateTime.now(),
+        createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ?? DateTime.now(),
         isSynced: json['isSynced'] as bool? ?? false,
       );
   final String id;

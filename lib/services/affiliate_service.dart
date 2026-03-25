@@ -5,8 +5,7 @@ import 'dart:convert';
 
 class AffiliateService {
   static String get baseUrl =>
-      dotenv.env['AFFILIATE_API_URL'] ??
-      'https://api.feeltrip.app/v1/affiliate';
+      dotenv.env['AFFILIATE_API_URL'] ?? 'https://api.feeltrip.app/v1/affiliate';
 
   /// Genera un enlace de afiliado para una agencia/experiencia
   static Future<String> generateAffiliateLink({

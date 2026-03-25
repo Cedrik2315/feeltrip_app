@@ -3,10 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class AffiliateOption {
   const AffiliateOption(
-      {required this.name,
-      required this.url,
-      required this.emoji,
-      required this.color});
+      {required this.name, required this.url, required this.emoji, required this.color});
   final String name;
   final String url;
   final String emoji;
@@ -23,14 +20,12 @@ class AffiliateOptionsService {
           color: const Color(0xFF003580)),
       AffiliateOption(
           name: 'Viator',
-          url:
-              'https://www.viator.com/search/$destination?pid=P00288924&mcid=42383&medium=link',
+          url: 'https://www.viator.com/search/$destination?pid=P00288924&mcid=42383&medium=link',
           emoji: '🗺️',
           color: const Color(0xFFFF6600)),
       AffiliateOption(
           name: 'GetYourGuide',
-          url:
-              'https://www.getyourguide.es/s/?q=$destination&partner_id=ASL9O0I&cmp=share_to_earn',
+          url: 'https://www.getyourguide.es/s/?q=$destination&partner_id=ASL9O0I&cmp=share_to_earn',
           emoji: '🎯',
           color: const Color(0xFF00B545)),
       AffiliateOption(

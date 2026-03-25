@@ -2,8 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../diario/domain/models/momento_model.dart';
 import '../../../../core/local_storage/isar_service.dart';
 
-final momentoProvider =
-    StateNotifierProvider<MomentoNotifier, List<Momento>>((ref) {
+final momentoProvider = StateNotifierProvider<MomentoNotifier, List<Momento>>((ref) {
   return MomentoNotifier(IsarService());
 });
 

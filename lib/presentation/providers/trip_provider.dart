@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../shared/models/trip_model.dart';
+import 'package:feeltrip_app/models/trip_model.dart';  
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final featuredTripsProvider = FutureProvider<List<Trip>>((ref) async {

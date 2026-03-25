@@ -35,10 +35,7 @@ class IsarService {
   }
 
   Future<void> markAsSynced(String id) async {
-    await FirebaseFirestore.instance
-        .collection('bookings')
-        .doc(id)
-        .update({'isSynced': true});
+    await FirebaseFirestore.instance.collection('bookings').doc(id).update({'isSynced': true});
   }
 
   Future<void> saveBooking(Map<String, dynamic> booking) async {

@@ -14,14 +14,12 @@ class CountryService {
     try {
       Uri uri;
       if (name != null) {
-        uri = Uri.parse(
-            '$restCountriesApi/name/$name?fields=name,cca2,capital,flags,region');
+        uri = Uri.parse('$restCountriesApi/name/$name?fields=name,cca2,capital,flags,region');
       } else if (continent != null) {
-        uri = Uri.parse(
-            '$restCountriesApi/region/$continent?fields=name,cca2,capital,flags,region');
+        uri =
+            Uri.parse('$restCountriesApi/region/$continent?fields=name,cca2,capital,flags,region');
       } else {
-        uri = Uri.parse(
-            '$restCountriesApi/all?fields=name,cca2,capital,flags,region&limit=$limit');
+        uri = Uri.parse('$restCountriesApi/all?fields=name,cca2,capital,flags,region&limit=$limit');
       }
 
       final response = await http.get(uri);
@@ -61,10 +59,9 @@ class CountryService {
   }
 
   /// Get country details
-  static Future<Map<String, dynamic>> getCountry(String code) async {
+  static Future<Map<String, dynamic>> getCountryInfo(String code) async {
     try {
-      final response =
-          await http.get(Uri.parse('$restCountriesApi/alpha/$code'));
+      final response = await http.get(Uri.parse('$restCountriesApi/alpha/$code'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as List<dynamic>;
         return data[0] as Map<String, dynamic>;
@@ -80,8 +77,7 @@ class CountryService {
   }
 
   /// Search countries
-  static Future<List<Map<String, dynamic>>> searchCountries(
-      String query) async {
+  static Future<List<Map<String, dynamic>>> searchCountries(String query) async {
     return getCountries(name: query);
   }
 }

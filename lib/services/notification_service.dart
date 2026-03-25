@@ -3,26 +3,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:feeltrip_app/core/logger/app_logger.dart';
-import 'package:feeltrip_app/models/notification_model.dart';
-import 'package:uuid/uuid.dart';
+import '../core/logger/app_logger.dart';
+import '../models/notification_model.dart';
 
 class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   static final NotificationService _instance = NotificationService._internal();
-  // ignore: unused_field
-  final _uuid = const Uuid();
 
   // Stream controller for navigation events
-  final _navigationController =
-      StreamController<Map<String, dynamic>>.broadcast();
-  Stream<Map<String, dynamic>> get navigationStream =>
-      _navigationController.stream;
+  final _navigationController = StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get navigationStream => _navigationController.stream;
 
   /// Initialize FCM (enhanced for startup)
   Future<void> initialize() async {
@@ -32,21 +26,17 @@ class NotificationService {
       AppLogger.i('FCM Permission: ${settings.authorizationStatus}');
 
       // Initialize local notifications
-      const androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
       const iosSettings = DarwinInitializationSettings();
-      const initSettings =
-          InitializationSettings(android: androidSettings, iOS: iosSettings);
+      const initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
       await _localNotifications.initialize(initSettings);
 
       await _localNotifications
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(const AndroidNotificationChannel(
             'high_importance_channel', // id
             'High Importance Notifications', // title
-            description:
-                'This channel is used for important notifications.', // description
+            description: 'This channel is used for important notifications.', // description
             importance: Importance.max,
           ));
 
@@ -57,6 +47,14 @@ class NotificationService {
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({'fcmToken': token}, SetOptions(merge: true));
+        final uid = FirebaseAuth.instance.currentUser!.uid;
+        final agencySnapshot = await _firestore
+            .collection('agencies')
+            .where('ownerUid', isEqualTo: uid)
+            .get();
+        for (final doc in agencySnapshot.docs) {
+          await doc.reference.set({'fcmToken': token}, SetOptions(merge: true));
+        }
       }
 
       // Foreground messages - show snackbar/local notif
@@ -100,8 +98,7 @@ class NotificationService {
     }
   }
 
-  Future<void> _showLocalNotification(RemoteMessage message,
-      {Map<String, dynamic>? data}) async {
+  Future<void> _showLocalNotification(RemoteMessage message, {Map<String, dynamic>? data}) async {
     final notification = message.notification;
     final android = message.notification?.android;
 
@@ -114,8 +111,7 @@ class NotificationService {
           android: AndroidNotificationDetails(
             'high_importance_channel',
             'High Importance Notifications',
-            channelDescription:
-                'This channel is used for important notifications.',
+            channelDescription: 'This channel is used for important notifications.',
             icon: '@mipmap/ic_launcher',
           ),
           iOS: DarwinNotificationDetails(),
@@ -150,6 +146,36 @@ class NotificationService {
       // Demo: Log
     } catch (e) {
       AppLogger.e('Send notif error: $e');
+    }
+  }
+
+  /// Send comment notification
+  Future<void> sendCommentNotification(
+    String targetUserId,
+    String storyTitle,
+    String storyId,
+  ) async {
+    try {
+      final doc = await _firestore.collection('users').doc(targetUserId).get();
+      final token = doc.data()?['fcmToken'] as String?;
+
+      if (token == null) return;
+
+      AppLogger.i('Sending comment notif to $targetUserId for story $storyId');
+
+      // Production: Cloud Function
+      // Demo: Add local notif doc
+      await _firestore.collection('users').doc(targetUserId).collection('notifications').add({
+        'title': '¡Nuevo comentario!',
+        'body': 'Alguien está interesado en tus experiencias.',
+        'type': 'story_comments',
+        'storyId': storyId,
+        'storyTitle': storyTitle,
+        'isRead': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      AppLogger.e('Send comment notif error: $e');
     }
   }
 

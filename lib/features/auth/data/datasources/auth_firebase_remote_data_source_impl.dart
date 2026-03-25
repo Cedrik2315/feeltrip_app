@@ -7,8 +7,7 @@ class AuthFirebaseRemoteDataSourceImpl implements AuthRemoteDataSource {
   final firebase.FirebaseAuth _auth;
 
   @override
-  Future<AuthUser?> signInWithEmailAndPassword(
-      String email, String password) async {
+  Future<AuthUser?> signInWithEmailAndPassword(String email, String password) async {
     try {
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -23,8 +22,7 @@ class AuthFirebaseRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthUser?> registerWithEmailAndPassword(
-      String email, String password) async {
+  Future<AuthUser?> registerWithEmailAndPassword(String email, String password) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -100,14 +98,12 @@ class AuthFirebaseRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  
   Future<AuthUser?> getCurrentUser() async {
     return _mapFirebaseUser(_auth.currentUser);
   }
 
   @override
-  Stream<AuthUser?> authStateChanges() =>
-      _auth.authStateChanges().map(_mapFirebaseUser);
+  Stream<AuthUser?> authStateChanges() => _auth.authStateChanges().map(_mapFirebaseUser);
 
   AuthUser? _mapFirebaseUser(firebase.User? user) {
     if (user == null) return null;

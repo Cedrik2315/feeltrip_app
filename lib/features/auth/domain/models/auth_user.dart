@@ -12,6 +12,5 @@ class AuthUser with _$AuthUser {
     String? photoUrl,
   }) = _AuthUser;
 
-  factory AuthUser.fromJson(Map<String, dynamic> json) =>
-      _$AuthUserFromJson(json);
+  factory AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
 }

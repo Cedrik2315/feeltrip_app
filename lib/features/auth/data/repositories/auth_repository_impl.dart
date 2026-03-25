@@ -22,8 +22,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthUser?> signInWithEmailAndPassword(
-      String email, String password) async {
+  Future<AuthUser?> signInWithEmailAndPassword(String email, String password) async {
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
@@ -43,8 +42,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthUser?> registerWithEmailAndPassword(
-      String email, String password) async {
+  Future<AuthUser?> registerWithEmailAndPassword(String email, String password) async {
     try {
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,

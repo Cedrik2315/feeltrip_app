@@ -13,8 +13,7 @@ class SearchRepositoryImpl implements SearchRepository {
   final FirebaseFirestore firestore;
 
   @override
-  Future<Either<Failure, List<SearchResult>>> searchExperiences(
-      String query) async {
+  Future<Either<Failure, List<SearchResult>>> searchExperiences(String query) async {
     try {
       final snapshot = await firestore
           .collection('experiences')

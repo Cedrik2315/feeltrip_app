@@ -35,8 +35,7 @@ void main() {
     });
 
     test('purchasePackage success', () async {
-      when(() => mockService.purchasePackage(any()))
-          .thenAnswer((_) async => MockCustomerInfo());
+      when(() => mockService.purchasePackage(any())).thenAnswer((_) async => MockCustomerInfo());
 
       final result = await repository.purchasePackage(MockPackage());
 

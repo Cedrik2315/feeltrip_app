@@ -28,4 +28,7 @@ class RouteNames {
   static const String previewEntry = '/preview-entry';
   static const String diario = '/diario';
   static const String notifications = '/notifications';
+  static const String agencyDetail = '/agency/:agencyId';
+  static const String storyDetail = '/story/:storyId';
+  static const String commentsDetail = '/comments/:storyId';
 }

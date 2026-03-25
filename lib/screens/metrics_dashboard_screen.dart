@@ -36,20 +36,15 @@ class MetricsDashboardScreen extends ConsumerWidget {
             ),
             Card(
               child: ListTile(
-                title: Text(
-                    'LTV > CAC: ${MetricsService.ltvGreaterCAC ? "✅ YES" : "❌ NO"}'),
+                title: Text('LTV > CAC: ${MetricsService.ltvGreaterCAC ? "✅ YES" : "❌ NO"}'),
                 subtitle: const Text('Scalable growth confirmed'),
-                tileColor:
-                    MetricsService.ltvGreaterCAC ? Colors.green : Colors.red,
+                tileColor: MetricsService.ltvGreaterCAC ? Colors.green : Colors.red,
               ),
             ),
             const Card(
-                child: ListTile(
-                    title: Text('Crashlytics: Ready'),
-                    subtitle: Text('0 crashes 24h'))),
-            const Card(
-                child: ListTile(
-                    title: Text('Tests: 95%'), subtitle: Text('CI enforced'))),
+                child:
+                    ListTile(title: Text('Crashlytics: Ready'), subtitle: Text('0 crashes 24h'))),
+            const Card(child: ListTile(title: Text('Tests: 95%'), subtitle: Text('CI enforced'))),
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),

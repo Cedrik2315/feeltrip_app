@@ -109,9 +109,8 @@ class TestDataGenerator {
       },
       {
         'name': 'Serenity Retreat',
-        'description':
-            'Retiros de bienestar y transformación. Yoga, meditación y '
-                'conexión con la naturaleza en destinos paradisíacos.',
+        'description': 'Retiros de bienestar y transformación. Yoga, meditación y '
+            'conexión con la naturaleza en destinos paradisíacos.',
         'logo': 'https://via.placeholder.com/200?text=Serenity+Retreat',
         'city': 'Bali',
         'country': 'Indonesia',
@@ -133,9 +132,8 @@ class TestDataGenerator {
       },
       {
         'name': 'Kiwi Extreme Sports',
-        'description':
-            'Experiencias de adrenalina y deportes extremos en Nueva '
-                'Zelanda. Para los que buscan emociones fuertes.',
+        'description': 'Experiencias de adrenalina y deportes extremos en Nueva '
+            'Zelanda. Para los que buscan emociones fuertes.',
         'logo': 'https://via.placeholder.com/200?text=Kiwi+Extreme',
         'city': 'Queenstown',
         'country': 'New Zealand',
@@ -157,9 +155,8 @@ class TestDataGenerator {
       },
       {
         'name': 'Dolce Vita Tours',
-        'description':
-            'Tours gastronÃ³micos y culturales en Italia. Descubre la '
-                'autenticidad italiana comiendo como un local.',
+        'description': 'Tours gastronÃ³micos y culturales en Italia. Descubre la '
+            'autenticidad italiana comiendo como un local.',
         'logo': 'https://via.placeholder.com/200?text=Dolce+Vita',
         'city': 'Roma',
         'country': 'Italy',

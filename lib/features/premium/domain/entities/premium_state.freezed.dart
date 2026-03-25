@@ -20,6 +20,7 @@ PremiumState _$PremiumStateFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PremiumState {
+  bool get isLoading => throw _privateConstructorUsedError;
   bool get isPremium => throw _privateConstructorUsedError;
   List<Offering> get offerings => throw _privateConstructorUsedError;
   Package? get activePackage => throw _privateConstructorUsedError;
@@ -38,7 +39,8 @@ abstract class $PremiumStateCopyWith<$Res> {
       _$PremiumStateCopyWithImpl<$Res, PremiumState>;
   @useResult
   $Res call(
-      {bool isPremium,
+      {bool isLoading,
+      bool isPremium,
       List<Offering> offerings,
       Package? activePackage,
       String? errorMessage});
@@ -59,12 +61,17 @@ class _$PremiumStateCopyWithImpl<$Res, $Val extends PremiumState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? isLoading = null,
     Object? isPremium = null,
     Object? offerings = null,
     Object? activePackage = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(_value.copyWith(
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
       isPremium: null == isPremium
           ? _value.isPremium
           : isPremium // ignore: cast_nullable_to_non_nullable
@@ -106,7 +113,8 @@ abstract class _$$PremiumStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool isPremium,
+      {bool isLoading,
+      bool isPremium,
       List<Offering> offerings,
       Package? activePackage,
       String? errorMessage});
@@ -126,12 +134,17 @@ class __$$PremiumStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? isLoading = null,
     Object? isPremium = null,
     Object? offerings = null,
     Object? activePackage = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(_$PremiumStateImpl(
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
       isPremium: null == isPremium
           ? _value.isPremium
           : isPremium // ignore: cast_nullable_to_non_nullable
@@ -156,7 +169,8 @@ class __$$PremiumStateImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PremiumStateImpl implements _PremiumState {
   const _$PremiumStateImpl(
-      {this.isPremium = false,
+      {this.isLoading = false,
+      this.isPremium = false,
       final List<Offering> offerings = const [],
       this.activePackage = null,
       this.errorMessage})
@@ -165,6 +179,9 @@ class _$PremiumStateImpl implements _PremiumState {
   factory _$PremiumStateImpl.fromJson(Map<String, dynamic> json) =>
       _$$PremiumStateImplFromJson(json);
 
+  @override
+  @JsonKey()
+  final bool isLoading;
   @override
   @JsonKey()
   final bool isPremium;
@@ -185,7 +202,7 @@ class _$PremiumStateImpl implements _PremiumState {
 
   @override
   String toString() {
-    return 'PremiumState(isPremium: $isPremium, offerings: $offerings, activePackage: $activePackage, errorMessage: $errorMessage)';
+    return 'PremiumState(isLoading: $isLoading, isPremium: $isPremium, offerings: $offerings, activePackage: $activePackage, errorMessage: $errorMessage)';
   }
 
   @override
@@ -193,6 +210,8 @@ class _$PremiumStateImpl implements _PremiumState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PremiumStateImpl &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
             (identical(other.isPremium, isPremium) ||
                 other.isPremium == isPremium) &&
             const DeepCollectionEquality()
@@ -207,6 +226,7 @@ class _$PremiumStateImpl implements _PremiumState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      isLoading,
       isPremium,
       const DeepCollectionEquality().hash(_offerings),
       activePackage,
@@ -228,7 +248,8 @@ class _$PremiumStateImpl implements _PremiumState {
 
 abstract class _PremiumState implements PremiumState {
   const factory _PremiumState(
-      {final bool isPremium,
+      {final bool isLoading,
+      final bool isPremium,
       final List<Offering> offerings,
       final Package? activePackage,
       final String? errorMessage}) = _$PremiumStateImpl;
@@ -236,6 +257,8 @@ abstract class _PremiumState implements PremiumState {
   factory _PremiumState.fromJson(Map<String, dynamic> json) =
       _$PremiumStateImpl.fromJson;
 
+  @override
+  bool get isLoading;
   @override
   bool get isPremium;
   @override

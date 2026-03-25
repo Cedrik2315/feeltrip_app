@@ -1,41 +1,22 @@
-# Lint Cleanup TODO
+# TODO: Flutter Analyze Cleanup - 0 Errors, Clean All Warnings/Infos (754 total)
 
-## Status: In Progress ✅
+## Progress
+- [ ] Phase 1: Remove unused imports (lib/main.dart: 22, app_router.dart, auth_gate.dart, profile_screen.dart, premium_subscription_screen.dart, etc.)
+✅ Phase 2: emotional_preferences_quiz_screen.dart const constructors fixed (inference warning remains for MaterialPageRoute)
+- [ ] Phase 3: Fix inference failures (showDialog<Widget>, MaterialPageRoute<Page>, Future.delayed<void>, List<String>)
+- [ ] Phase 4: Fix deprecated (withOpacity → withValues(alpha:), logger levels v→trace/wtf→fatal)
+- [ ] Phase 5: Formatting (trailing commas, EOL newlines, reflow >80 chars lines in mock_data.dart etc.)
+- [ ] Phase 6: prefer_final_locals/omit_local_types (var→final)
+- [ ] Phase 7: Remove unused elements (methods like _buildPackageCard, _buildFollowerStats)
+- [ ] Phase 8: avoid_print → AppLogger
+- [ ] Phase 9: Task-specific dead code/nulability in notifications_screen.dart:101 (simplify ternary/??)
+- [ ] Phase 10: Run `dart format lib/ test/ --line-length=100`
+- [ ] Phase 11: `flutter analyze` → verify 0 issues
+- [ ] Phase 12: `flutter test`
 
-## 1. use_key_in_widget_constructors (9 files) [9/9]
-- [✅] lib/screens/bookings_screen.dart
-- [✅] lib/screens/cart_screen.dart
-- [✅] lib/screens/emotional_preferences_quiz_screen.dart
-- [✅] lib/screens/experience_impact_dashboard_screen.dart
-- [✅] lib/screens/login_screen.dart
-- [✅] lib/screens/onboarding_screen.dart
-- [✅] lib/screens/quiz_screen.dart
-- [✅] lib/screens/register_screen.dart
-- [✅] lib/screens/search_screen.dart
-
-### 2. use_super_parameters (3 files) [3/3]
-- [✅] lib/screens/comments_screen.dart
-- [✅] lib/screens/trip_detail_screen.dart
-- [✅] lib/widgets/affiliate_widget.dart
-
-### 3. withOpacity deprecated (3 files) [3/3]
-- [✅] lib/screens/experience_impact_dashboard_screen.dart (2 instances)
-- [✅] lib/screens/instagram_stories_screen.dart (2 instances)
-- [✅] lib/screens/onboarding_screen.dart (1 instance)
-
-### 4. use_build_context_synchronously (4 files) [0/4]
-- [✅] lib/screens/login_screen.dart
-- [✅] lib/screens/ocr_screen.dart
-- [ ] lib/screens/profile_screen.dart (3 instances)
-- [✅] lib/screens/register_screen.dart
-
-### 5. diary_screen.dart library_private_types [1/1]
-- [✅] lib/screens/diary_screen.dart (@visibleForTesting)
-
-## Follow-up [1/3]
-- [✅] Run `flutter analyze`
-- [ ] Test screens
-- [ ] attempt_completion
-
-**Next step: Start with step 1.1 bookings_screen.dart**
-
+✅ Phase 1: Remove unused imports  
+✅ Phase 1: Remove unused imports  
+✅ main.dart cleaned (22 unused imports removed)  
+✅ Phase 1: Remove unused imports (main.dart cleaned)
+✅ Phase 2 Started: Fixing emotional_preferences_quiz_screen.dart const constructors (30+)
+**Current: Phase 2**

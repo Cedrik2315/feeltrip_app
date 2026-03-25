@@ -28,7 +28,7 @@ Future<void> main() async {
       try {
         await dotenv.load();
       } catch (e) {
-        // log eliminado: Ã¢Å¡Â Ã¯Â¸Â Warning: Could not load .env file: $e
+        // log eliminado: â\u201aÂ¡ï¸Â\u008f Warning: Could not load .env file: $e
       }
 
       await SystemChrome.setPreferredOrientations([
@@ -64,7 +64,19 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Inicializar Deep Links
+
+    // Listen for notification deep links
+    final notificationService = ref.read(notificationServiceProvider);
+    notificationService.navigationStream.listen((data) {
+      final type = data['type'] as String?;
+      final id = data['id'] as String?;
+      if (type == 'story_comments' && id != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final router = ref.read(routerProvider);
+          router.go('/comments/$id');
+        });
+      }
+    });
   }
 
   @override

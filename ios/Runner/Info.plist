@@ -43,7 +43,18 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
+<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:feeltrip.app</string>
+	</array>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Mantente conectado con las mejores agencias verificadas incluso en segundo plano.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Usamos tu ubicación para mostrarte las experiencias vivenciales más cercanas.</string>
+
 </dict>
 </plist>

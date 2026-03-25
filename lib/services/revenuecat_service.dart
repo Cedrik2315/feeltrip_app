@@ -11,11 +11,11 @@ class RevenueCatService {
     late PurchasesConfiguration configuration;
 
     if (Platform.isAndroid) {
-      configuration = PurchasesConfiguration(
-          dotenv.env['REVENUECAT_ANDROID_KEY'] ?? 'goog_android_api_key');
+      configuration =
+          PurchasesConfiguration(dotenv.env['REVENUECAT_ANDROID_KEY'] ?? 'goog_android_api_key');
     } else if (Platform.isIOS) {
-      configuration = PurchasesConfiguration(
-          dotenv.env['REVENUECAT_IOS_KEY'] ?? 'appl_ios_api_key');
+      configuration =
+          PurchasesConfiguration(dotenv.env['REVENUECAT_IOS_KEY'] ?? 'appl_ios_api_key');
     } else {
       AppLogger.e('RevenueCat: Plataforma no soportada');
       return;

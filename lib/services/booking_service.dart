@@ -25,19 +25,20 @@ class BookingService {
   }) async {
     try {
       // 1. Lógica de Clima y Descuento
-      await DestinationService.getDestinationDetails(
-          destinationId: destinationId);
+      // Assuming getDestinationDetails is replaced by getCountryInfo or similar logic
+      final countryInfo = await DestinationService.getCountryInfo(destinationId);
+      AppLogger.i('Country Info for $destinationId: $countryInfo');
       const discount = 0.1;
       final finalPrice = priceUsd * (1 - discount);
 
       // 2. Conversión de moneda segura
-      final convertedPrice = await CurrencyService.convert(
+      final convertedPrice = await CurrencyService.convertCurrency(
         from: 'USD',
         to: currency,
         amount: finalPrice,
       );
 
-      // 3. Preparar items para Mercado Pago (Evitando dynamic calls erróneos)
+      // 3. Preparar items para Mercado Pago
       final List<Map<String, dynamic>> items = [
         {
           'title': 'FeelTrip: $destinationId',
@@ -47,7 +48,7 @@ class BookingService {
         }
       ];
 
-      // 4. Llamada al servicio de pago (Asegúrate que coincida con la firma del método)
+      // 4. Llamada al servicio de pago
       final prefIdEither = await MercadoPagoService.createPreference(
         amount: convertedPrice,
         title: 'FeelTrip Booking',
@@ -89,8 +90,7 @@ class BookingService {
       final pendingBookingsData = await _isar.getPendingBookings();
 
       for (final bookingData in pendingBookingsData) {
-        final booking =
-            BookingModel.fromJson(bookingData as Map<String, dynamic>);
+        final booking = BookingModel.fromJson(bookingData as Map<String, dynamic>);
         try {
           await _firestore
               .collection('users')

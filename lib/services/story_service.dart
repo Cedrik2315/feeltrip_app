@@ -21,8 +21,7 @@ class StoryService {
     final ref = _firestore.collection('stories').doc(storyId);
     final doc = await ref.get();
     if (!doc.exists) return;
-    final likedBy =
-        List<String>.from((doc.data()?['likedBy'] as List<dynamic>?) ?? []);
+    final likedBy = List<String>.from((doc.data()?['likedBy'] as List<dynamic>?) ?? []);
     if (likedBy.contains(userId)) {
       likedBy.remove(userId);
     } else {

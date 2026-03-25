@@ -7,7 +7,7 @@ class CurrencyService {
   static const String baseUrl = 'https://api.exchangerate-api.com/v4/latest';
 
   /// Convert amount from base to target currency
-  static Future<double> convert({
+  static Future<double> convertCurrency({
     required String from,
     required String to,
     required double amount,
@@ -18,13 +18,12 @@ class CurrencyService {
         // CORRECCIÓN: Casteo a Map para evitar 'dynamic calls'
         final data = json.decode(response.body) as Map<String, dynamic>;
         final rates = data['rates'] as Map<String, dynamic>;
-        
+
         // CORRECCIÓN: Usar .toDouble() porque la API puede devolver int o double
         final rate = (rates[to] as num).toDouble();
         final converted = amount * rate;
-        
-        AppLogger.i(
-            'Converted $amount $from to ${converted.toStringAsFixed(2)} $to');
+
+        AppLogger.i('Converted $amount $from to ${converted.toStringAsFixed(2)} $to');
         return converted;
       }
       throw Exception('Conversion failed');
@@ -35,7 +34,7 @@ class CurrencyService {
         'USD': {'EUR': 0.92, 'ARS': 950.0, 'MXN': 18.0},
         'EUR': {'USD': 1.09, 'ARS': 1030.0, 'MXN': 19.5},
       };
-      
+
       final rate = fallbackRates[from]?[to] ?? 1.0;
       return amount * rate;
     }
