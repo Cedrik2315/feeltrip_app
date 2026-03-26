@@ -1,18 +1,25 @@
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:feeltrip_app/core/logger/app_logger.dart';
-import 'package:feeltrip_app/services/destination_service.dart';
-import 'package:feeltrip_app/models/travel_proposal.dart';
-import 'package:feeltrip_app/services/auth_service.dart';
 import 'package:uuid/uuid.dart';
-import 'package:feeltrip_app/services/agency_service.dart';
-import 'package:feeltrip_app/models/travel_agency_model.dart';
+
 import 'package:feeltrip_app/core/di/providers.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
+import 'package:feeltrip_app/models/travel_agency_model.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:feeltrip_app/models/travel_proposal.dart';
+import 'package:feeltrip_app/models/vision_models.dart';
+import 'package:feeltrip_app/services/agency_service.dart';
+import 'package:feeltrip_app/services/auth_service.dart';
+import 'package:feeltrip_app/services/destination_service.dart';
+import 'package:feeltrip_app/services/voice_service.dart';
+import 'package:feeltrip_app/services/translation_service.dart';
+import 'package:feeltrip_app/services/speech_service.dart';
 
 part 'osint_ai_service.freezed.dart';
 
@@ -29,10 +36,13 @@ class OsintAiService extends StateNotifier<OsintState> {
 
   final Ref _ref;
 
+  void reset() {
+    state = const OsintState.initial();
+  }
+
   Future<void> generateViventialProposal() async {
     state = const OsintState.loading();
     try {
-      // Step 1: Emotional profile from user + Vision data
       final userId = AuthService.currentUser?.uid;
       if (userId == null) {
         state = const OsintState.error('Usuario no autenticado');
@@ -40,29 +50,14 @@ class OsintAiService extends StateNotifier<OsintState> {
       }
 
       final profileData = await _getUserEmotionalProfile(userId);
-      final emotionalProfile = (profileData['archetype'] as String? ?? '') != ''
-          ? (profileData['archetype'] as String)
-          : ((profileData['travelerType'] as String? ?? '') != ''
-              ? (profileData['travelerType'] as String)
-              : 'aventurero');
-
-      // Vision integration
-      final visionState = _ref.read(visionServiceProvider.notifier).state;
-      String visionInsight = '';
-      visionState.maybeWhen(
-        success: (result) {
-          final sentiment =
-              (result.sentimentScore ?? 0.5) > 0.5 ? 'feliz' : 'reflexivo';
-          final labels = (result.imageLabels as Iterable<dynamic>?)?.take(3).join(', ') ?? '';
-          visionInsight = 'Sentimiento actual: $sentiment. Visto: $labels.';
-        },
-        orElse: () {},
-      );
+      final emotionalProfile = _resolveEmotionalProfile(profileData);
+      final visionInsight =
+          _buildVisionInsight(_ref.read(visionServiceProvider));
 
       AppLogger.i(
-          'Perfil emocional: $emotionalProfile. Vision: $visionInsight');
+        'Perfil emocional: $emotionalProfile. Vision: $visionInsight',
+      );
 
-      // Step 2: Filter destinations
       final destinations = await DestinationService.getDestinationsByArchetype(
         archetype: emotionalProfile.toLowerCase(),
       );
@@ -72,16 +67,14 @@ class OsintAiService extends StateNotifier<OsintState> {
         return;
       }
 
-      // Step 3: OSINT verification
       final safeCandidates = <String>[];
-      for (final dest in destinations) {
-        final destName = dest['name'] as String? ?? 'Unknown';
-        final osintResult = await _performOsintScan(destName);
+      for (final destination in destinations) {
+        final destinationName = destination['name'] as String? ?? 'Unknown';
+        final osintResult = await _performOsintScan(destinationName);
         if (((osintResult['risk_score'] as num?)?.toDouble() ?? 100.0) < 30) {
-          safeCandidates.add(destName);
+          safeCandidates.add(destinationName);
         }
-        await Future<void>.delayed(
-            const Duration(milliseconds: 200)); // Rate limit sim
+        await Future<void>.delayed(const Duration(milliseconds: 200));
       }
 
       if (safeCandidates.isEmpty) {
@@ -89,32 +82,35 @@ class OsintAiService extends StateNotifier<OsintState> {
         return;
       }
 
-      // Step 4: GenAI proposal
-      final proposal =
-          await _generateAiProposal(emotionalProfile, safeCandidates);
+      final proposal = await _generateAiProposal(
+        emotionalProfile,
+        safeCandidates,
+        visionInsight: visionInsight,
+      );
       state = OsintState.success(proposal);
-    } catch (e) {
-      AppLogger.e('Error generando propuesta: $e');
-      state = OsintState.error('Error: $e');
+    } catch (error) {
+      AppLogger.e('Error generando propuesta: $error');
+      state = OsintState.error('Error: $error');
     }
   }
 
   Future<Map<String, dynamic>> _getUserEmotionalProfile(String userId) async {
     final doc =
         await FirebaseFirestore.instance.collection('users').doc(userId).get();
-    if (!doc.exists) throw Exception('Perfil no encontrado');
-    return doc.data() ?? {};
+    if (!doc.exists) {
+      throw Exception('Perfil no encontrado');
+    }
+    return doc.data() ?? <String, dynamic>{};
   }
 
   Future<Map<String, dynamic>> _performOsintScan(String target) async {
-    // Enhance existing mock with more realism
     await Future<void>.delayed(const Duration(milliseconds: 800));
-    final risk = 10 + Random().nextInt(40); // 10-50
-    return {
+    final risk = 10 + Random().nextInt(40);
+    return <String, dynamic>{
       'target': target,
       'risk_score': risk.toDouble(),
       'safety': risk < 30,
-      'sources': ['OSINT API', 'Local News', 'Weather'],
+      'sources': <String>['OSINT API', 'Local News', 'Weather'],
     };
   }
 
@@ -123,98 +119,157 @@ class OsintAiService extends StateNotifier<OsintState> {
     return agencyService.getAgenciesByMood(mood);
   }
 
+  /// Generates a contextual travel buddy alert using AI
+  Future<void> generateSmartAlert({
+    required String weatherContext,
+    required Position position,
+    String? extraContext, // For currency or specific events
+  }) async {
+    final apiKey = dotenv.env['GEMINI_API_KEY'];
+    if (apiKey == null || apiKey.isEmpty) return;
+
+    try {
+      final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
+      final prompt = '''
+        Contexto Geográfico: Lat ${position.latitude}, Lng ${position.longitude}. 
+        Contexto Climático: $weatherContext.
+        Info Adicional: ${extraContext ?? 'Ninguna'}.
+        
+        Eres un compañero de viaje experto. Genera un consejo o alerta de MÁXIMO 10 PALABRAS. 
+        Sé útil, breve y usa un tono amigable.
+      ''';
+
+      final response = await model.generateContent([Content.text(prompt)]);
+      final alertText =
+          response.text?.trim() ?? '¡Disfruta tu día en el camino!';
+
+      await _ref.read(notificationServiceProvider).showInstantNotification(
+            'Compañero FeelTrip',
+            alertText,
+            prefs: _ref.read(userPreferencesProvider),
+          );
+      AppLogger.i('Smart Alert generated: $alertText');
+    } catch (e) {
+      AppLogger.e('Error generating AI smart alert: $e');
+    }
+  }
+
+  /// Local test for Cedrik's specific requirement
+  Future<void> triggerTestNotification() async {
+    const name = 'Cedrik';
+    const location = 'Quillota';
+
+    await _ref.read(notificationServiceProvider).showInstantNotification(
+          'FeelTrip IA',
+          '¡Hola $name! El clima en $location está ideal para una foto con la Smart Camera',
+          prefs: _ref.read(userPreferencesProvider),
+        );
+
+    // Integración de la respuesta de voz
+    await _ref.read(voiceServiceProvider).sayStatus(name, location);
+  }
+
+  /// Traduce y emite por voz una alerta inteligente
+  Future<void> translateAndSpeakAlert(
+      String text, String targetLanguage) async {
+    final translated = await _ref.read(translationServiceProvider).translate(
+          text,
+          targetLanguage: targetLanguage,
+        );
+
+    // El VoiceService ahora soporta mensajes directos
+    await _ref.read(voiceServiceProvider).speak(
+          translated,
+          language:
+              targetLanguage.toLowerCase().contains('en') ? 'en-US' : 'es-MX',
+        );
+  }
+
+  /// Realiza una traducción completa de voz a voz.
+  /// 1. Escucha la entrada de voz.
+  /// 2. Traduce el texto vía Gemini.
+  /// 3. Reproduce el resultado por los altavoces.
+  Future<void> performVoiceToVoiceTranslation(String targetLanguage) async {
+    AppLogger.i('Iniciando traducción de voz a voz...');
+    
+    // 1. Capturar la voz
+    final originalText = await _ref.read(speechServiceProvider).listenOnce();
+    if (originalText.isEmpty) {
+      AppLogger.w('No se detectó voz para traducir.');
+      return;
+    }
+
+    // 2. Traducir y hablar (reutilizamos nuestra lógica existente)
+    // Si el turista está en Alemania, el targetLanguage sería 'Español'
+    await translateAndSpeakAlert(
+      'El interlocutor dijo: $originalText', 
+      targetLanguage,
+    );
+  }
+
   Future<TravelAgency?> getPersonalizedProposal(String userId) async {
     try {
       final profileData = await _getUserEmotionalProfile(userId);
-      final primaryTrait = (profileData['archetype'] as String?) ??
-          (profileData['travelerType'] as String?) ??
-          'aventurero';
-
-      // Map trait to badge
-      // Eliminar moodEmoji y moodBadge ya que no se utilizan
-      // String moodEmoji = '🌊';
-      // String moodBadge = 'Buscando Calma';
-      // switch (primaryTrait.toLowerCase()) {
-      //   case 'calma':
-      //   case 'reflexion':
-      //     moodEmoji = '🌊';
-      //     moodBadge = 'Buscando Calma';
-      //     break;
-      //   case 'aventurero':
-      //   case 'aventura':
-      //     moodEmoji = '⚡';
-      //     moodBadge = 'Aventura Pura';
-      //     break;
-      //   case 'conexion':
-      //     moodEmoji = '💕';
-      //     moodBadge = 'Conexiones';
-      //     break;
-      //   case 'transformacion':
-      //     moodEmoji = '🦋';
-      //     moodBadge = 'Transformación';
-      //     break;
-      //   case 'aprendizaje':
-      //     moodEmoji = '📚';
-      //     moodBadge = 'Aprendizaje';
-      //     break;
-      //   default:
-      //     moodEmoji = '✨';
-      //     moodBadge = 'Vivencial';
-      // }
+      final primaryTrait = _resolveEmotionalProfile(profileData);
 
       final agencyService = AgencyService();
       final agencies = await agencyService.getAgenciesByMood(primaryTrait);
-
-      // Filter verified only, pick first
-      final verifiedAgencies = agencies.where((a) => a.verified).toList();
-      if (verifiedAgencies.isEmpty) return null;
+      final verifiedAgencies =
+          agencies.where((agency) => agency.verified).toList();
+      if (verifiedAgencies.isEmpty) {
+        return null;
+      }
 
       return verifiedAgencies.first.copyWith();
-    } catch (e) {
-      AppLogger.e('Error getting personalized proposal: $e');
+    } catch (error) {
+      AppLogger.e('Error getting personalized proposal: $error');
       return null;
     }
   }
 
   Future<TravelProposal> _generateAiProposal(
-      String profile, List<String> dests) async {
+    String profile,
+    List<String> dests, {
+    String? visionInsight,
+  }) async {
     final apiKey = dotenv.env['GEMINI_API_KEY'];
     if (apiKey == null || apiKey.isEmpty) {
-      // Fallback mock
-      return _mockProposal(profile, dests);
+      return _mockProposal(profile, dests, visionInsight: visionInsight);
     }
 
     try {
       final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
-      // Get recommended agencies
       final agencies = await getRecommendedAgencies(profile);
       final topAgencies = agencies.take(2).toList();
-      final agencyInfo = topAgencies
-          .map((a) =>
-              'Agencia: ${a.name} (verificada: ${a.verified}, especialidades: ${a.specialties.join(', ')})')
-          .join('\\n');
+      final agencyInfo = topAgencies.isEmpty
+          ? 'No hay agencias verificadas disponibles para este perfil.'
+          : topAgencies
+              .map(
+                (agency) =>
+                    'Agencia: ${agency.name} (verificada: ${agency.verified}, especialidades: ${agency.specialties.join(', ')})',
+              )
+              .join('\n');
 
       final prompt = '''
-Perfil emocional del usuario: $profile (ej: aventurero, busca calma)
+Perfil emocional del usuario: $profile
 Destinos seguros verificados: ${dests.join(', ')}
+Contexto de vision computacional: ${visionInsight ?? 'Sin contexto visual adicional.'}
 
 AGENCIA RECOMENDADA:
 $agencyInfo
 
-Basado en tu perfil de $profile, te recomiendo la agencia [AgencyName]. Son expertos en [Specialty] y están verificados por nuestro sistema de seguridad.
-
-Redacta una propuesta de "Viaje Vivencial" personalizada y atractiva INCLUYENDO la agencia recomendada. 
+Redacta una propuesta de Viaje Vivencial personalizada y atractiva.
 Incluye:
-- Título impactante
-- 3-5 experiencias ÚNICAS coordinadas con la agencia
-- Por qué coincide emocionalmente
-- Cómo contactar la agencia
-- Duración sugerida (5-10 días)
+- Titulo impactante
+- 3-5 experiencias unicas coordinadas con la agencia
+- Por que coincide emocionalmente
+- Como contactar la agencia
+- Duracion sugerida (5-10 dias)
 
-Formato JSON:
+Responde SOLO en JSON con este formato:
 {
   "title": "...",
-  "subtitle": "...", 
+  "subtitle": "...",
   "experiences": ["...", "..."],
   "agencyRecommendation": "Texto completo sobre la agencia...",
   "generatedText": "texto completo..."
@@ -228,42 +283,172 @@ Formato JSON:
       return TravelProposal(
         id: const Uuid().v4(),
         title: jsonData['title'] as String? ?? 'Tu Viaje Vivencial Perfecto',
-        subtitle: jsonData['subtitle'] as String? ?? 'Personalizado para tu esencia',
+        subtitle:
+            jsonData['subtitle'] as String? ?? 'Personalizado para tu esencia',
         destinations: dests,
-        experiences: List<String>.from(jsonData['experiences'] as Iterable<dynamic>? ?? []),
+        experiences: List<String>.from(
+          jsonData['experiences'] as Iterable<dynamic>? ?? const <dynamic>[],
+        ),
         emotionalProfile: profile,
         safetyScore: 85.0,
         osintReport:
-            'Todos destinos verificados seguros + agencias recomendadas',
+            'Destinos verificados y sugerencias alineadas con el analisis visual.',
         aiPrompt: prompt,
-        generatedText: jsonData['generatedText'] as String? ?? response.text ?? '',
+        generatedText:
+            jsonData['generatedText'] as String? ?? response.text ?? '',
+        agencyRecommendation: jsonData['agencyRecommendation'] as String?,
         generatedAt: DateTime.now(),
       );
-    } catch (e) {
-      AppLogger.w('GenAI error, using mock: $e');
-      return _mockProposal(profile, dests);
+    } catch (error) {
+      AppLogger.w('GenAI error, using mock: $error');
+      return _mockProposal(profile, dests, visionInsight: visionInsight);
     }
   }
 
-  TravelProposal _mockProposal(String profile, List<String> dests) {
+  TravelProposal _mockProposal(
+    String profile,
+    List<String> dests, {
+    String? visionInsight,
+  }) {
     return TravelProposal(
       id: const Uuid().v4(),
       title: 'Viaje $profile a ${dests.first}',
-      subtitle: 'Experiencias auténticas que transformarán tu alma',
+      subtitle: 'Experiencias autenticas que transformaran tu alma',
       destinations: dests,
-      experiences: [
+      experiences: const <String>[
         'Taller privado de yoga al amanecer con maestro local',
         'Cena secreta en casa de familia tradicional',
         'Trekking guiado a cascada sagrada con chaman',
-        'Taller de cerámica ancestral con artesanos',
+        'Taller de ceramica ancestral con artesanos',
       ],
       emotionalProfile: profile,
       safetyScore: 92.0,
-      osintReport: 'Verificación OSINT completada: 100% seguro',
+      osintReport: 'Verificacion OSINT completada: destino de bajo riesgo',
       aiPrompt: 'Mock generation for $profile',
       generatedText:
-          'Tu propuesta personalizada con destinos ${dests.join(', ')} y experiencias únicas para tu perfil $profile.',
+          'Tu propuesta personalizada combina ${dests.join(', ')} con experiencias unicas para tu perfil $profile. ${visionInsight ?? ''}'
+              .trim(),
+      agencyRecommendation:
+          'Se priorizaron agencias verificadas para este perfil.',
       generatedAt: DateTime.now(),
     );
+  }
+
+  Future<void> analyzeScene() async {
+    AppLogger.i('AI: analizando la escena en vivo...');
+    state = const OsintState.loading();
+    try {
+      final visionState = _ref.read(visionServiceProvider);
+      final visionResult = visionState.maybeWhen(
+        success: (result) => result,
+        orElse: () => null,
+      );
+
+      if (visionResult == null) {
+        state = const OsintState.error(
+          'Primero toma una foto para analizar la escena.',
+        );
+        return;
+      }
+
+      final userId = AuthService.currentUser?.uid;
+      final emotionalProfile = userId == null
+          ? 'aventurero'
+          : _resolveEmotionalProfile(await _getUserEmotionalProfile(userId));
+      final destinations = await _inferDestinationsFromVision(visionResult);
+      final proposal = await _generateAiProposal(
+        emotionalProfile,
+        destinations,
+        visionInsight: _describeVisionResult(visionResult),
+      );
+      state = OsintState.success(proposal);
+      AppLogger.i('AI: analisis completado - Propuesta generada');
+    } catch (error) {
+      state = OsintState.error('Error en analisis de escena: $error');
+    }
+  }
+
+  String _resolveEmotionalProfile(Map<String, dynamic> profileData) {
+    final archetype = profileData['archetype'] as String?;
+    final travelerType = profileData['travelerType'] as String?;
+    if (archetype != null && archetype.trim().isNotEmpty) {
+      return archetype;
+    }
+    if (travelerType != null && travelerType.trim().isNotEmpty) {
+      return travelerType;
+    }
+    return 'aventurero';
+  }
+
+  String _buildVisionInsight(VisionState visionState) {
+    return visionState.maybeWhen(
+      success: _describeVisionResult,
+      orElse: () => 'Sin contexto visual adicional.',
+    );
+  }
+
+  String _describeVisionResult(VisionResult result) {
+    final sentiment = (result.sentimentScore ?? 0.5) >= 0.6
+        ? 'positivo'
+        : (result.sentimentScore ?? 0.5) <= 0.4
+            ? 'sereno'
+            : 'equilibrado';
+    final labels = (result.topLabels ?? result.imageLabels ?? <String>[])
+        .take(3)
+        .join(', ');
+    final recognizedText = result.recognizedText;
+    final textFragment = recognizedText == null || recognizedText.trim().isEmpty
+        ? ''
+        : ' Texto detectado: ${recognizedText.trim()}.';
+
+    var insight =
+        'Estado emocional estimado: $sentiment. Elementos visibles: $labels.$textFragment';
+    final location = result.location;
+    if (location != null) {
+      insight =
+          '$insight Coordenadas aproximadas: ${location.latitude}, ${location.longitude}.';
+    }
+    return insight;
+  }
+
+  Future<List<String>> _inferDestinationsFromVision(VisionResult result) async {
+    final labels = (result.imageLabels ?? result.topLabels ?? <String>[])
+        .map((label) => label.toLowerCase())
+        .toList();
+    final suggestions = <String>{};
+
+    if (labels.any((label) =>
+        label.contains('beach') ||
+        label.contains('sea') ||
+        label.contains('playa') ||
+        label.contains('ocean'))) {
+      suggestions.addAll(<String>['Tulum', 'Bali']);
+    }
+    if (labels.any((label) =>
+        label.contains('mountain') ||
+        label.contains('montana') ||
+        label.contains('snow'))) {
+      suggestions.addAll(<String>['Patagonia', 'Banff']);
+    }
+    if (labels.any((label) =>
+        label.contains('temple') ||
+        label.contains('city') ||
+        label.contains('building') ||
+        label.contains('street'))) {
+      suggestions.addAll(<String>['Kyoto', 'Lisboa']);
+    }
+
+    if (suggestions.isEmpty) {
+      final fallback = await DestinationService.getDestinationsByArchetype(
+        archetype: 'aventurero',
+      );
+      suggestions.addAll(
+        fallback
+            .map((destination) => destination['name'] as String?)
+            .whereType<String>(),
+      );
+    }
+
+    return suggestions.take(3).toList();
   }
 }

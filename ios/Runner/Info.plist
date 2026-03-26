@@ -55,6 +55,11 @@
 	<string>Mantente conectado con las mejores agencias verificadas incluso en segundo plano.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Usamos tu ubicación para mostrarte las experiencias vivenciales más cercanas.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>FeelTrip necesita acceso a la cámara para identificar destinos y experiencias.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>FeelTrip necesita acceso al micrófono para grabar videos de tus viajes.</string>
 
 </dict>
+
 </plist>

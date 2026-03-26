@@ -14,8 +14,8 @@ import 'package:feeltrip_app/screens/comments_screen.dart';
 import 'package:feeltrip_app/screens/premium_subscription_screen.dart';
 import 'package:feeltrip_app/screens/travel_diary_screen.dart';
 import 'package:feeltrip_app/screens/notifications_screen.dart';
+import 'package:feeltrip_app/screens/smart_camera_screen.dart';
 
-/// Global redirect logic for auth protection
 String? _globalRedirect(Ref ref, GoRouterState state) {
   final authState = ref.read(authNotifierProvider);
   final bool isLoggedIn = authState.valueOrNull != null;
@@ -58,6 +58,10 @@ GoRouter createAppRouter(Ref ref) {
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
+        path: RouteNames.smartCamera,
+        builder: (context, state) => const SmartCameraScreen(),
+      ),
+      GoRoute(
         path: RouteNames.agencyDetail,
         builder: (context, state) {
           final agencyId = state.pathParameters['agencyId']!;
@@ -90,11 +94,10 @@ GoRouter createAppRouter(Ref ref) {
         path: RouteNames.notifications,
         builder: (context, state) => const NotificationsScreen(),
       ),
-      // Additional existing routes from route_names can be added as needed
     ],
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('Error')),
-      body: const Center(child: Text('Ruta no encontrada: \${state.uri}')),
+      body: Center(child: Text('Ruta no encontrada: ${state.uri}')),
     ),
   );
 }

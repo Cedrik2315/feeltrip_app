@@ -1,17 +1,13 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:feeltrip_app/config/firebase_config.dart';
-
-import 'package:feeltrip_app/core/providers/connectivity_provider.dart';
-
 import 'package:feeltrip_app/core/di/providers.dart';
+import 'package:feeltrip_app/core/providers/connectivity_provider.dart';
+import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:feeltrip_app/services/notification_service.dart';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
-
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 Future<void> main() async {
@@ -27,8 +23,8 @@ Future<void> main() async {
       WidgetsFlutterBinding.ensureInitialized();
       try {
         await dotenv.load();
-      } catch (e) {
-        // log eliminado: â\u201aÂ¡ï¸Â\u008f Warning: Could not load .env file: $e
+      } catch (_) {
+        // Optional .env file.
       }
 
       await SystemChrome.setPreferredOrientations([
@@ -38,7 +34,6 @@ Future<void> main() async {
 
       await FirebaseConfig.initialize();
 
-      // Initialize Growth Engine (FCM)
       final notificationService = NotificationService();
       await notificationService.initialize();
 
@@ -65,11 +60,10 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    // Listen for notification deep links
     final notificationService = ref.read(notificationServiceProvider);
-    notificationService.navigationStream.listen((data) {
-      final type = data['type'] as String?;
-      final id = data['id'] as String?;
+    notificationService.navigationStream.listen((payload) {
+      final type = payload['type'] as String?;
+      final id = payload['id'] as String?;
       if (type == 'story_comments' && id != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final router = ref.read(routerProvider);
@@ -89,11 +83,10 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp>
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
 
-    // Listener de conectividad para sincronización automática
     ref.listen(connectivityProvider, (previous, next) {
-      next.whenData((results) {
-        if (results == ConnectivityResult.mobile ||
-            results == ConnectivityResult.wifi) {
+      next.whenData((result) {
+        if (result == ConnectivityResult.mobile ||
+            result == ConnectivityResult.wifi) {
           ref.read(authNotifierProvider).whenOrNull(data: (user) {
             if (user != null) {
               // ref.read(syncServiceProvider).syncPendingMomentos(user.id);

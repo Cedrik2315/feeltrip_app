@@ -1,16 +1,16 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Cámara -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <!-- CÃ¡mara -->
     <uses-permission android:name="android.permission.CAMERA" />
     
     <!-- Almacenamiento (Android < 13) -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" tools:replace="android:maxSdkVersion" />
     
     <!-- Almacenamiento (Android 13+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     
-    <!-- Micrófono (para voz en traductor) -->
+    <!-- MicrÃ³fono (para voz en traductor) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     
     <!-- Internet -->
@@ -19,9 +19,10 @@
     <!-- Notificaciones (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     
-    <!-- Ubicación (para clima y mapa) -->
+    <!-- UbicaciÃ³n (para clima y mapa) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <!-- Features de hardware -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -85,7 +86,7 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9067451109299541~8356542986"/>
 
-        <!-- FIX: Añadir la API Key de Google Maps para Android -->
+        <!-- FIX: AÃ±adir la API Key de Google Maps para Android -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC7t5MPjy1ZJ8-gOwZqJR88KidbXqaIhIg"/>
@@ -103,3 +104,4 @@
         </intent>
     </queries>
 </manifest>
+

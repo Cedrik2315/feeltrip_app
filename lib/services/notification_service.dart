@@ -1,52 +1,64 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+
 import '../core/logger/app_logger.dart';
+import '../core/models/user_preferences.dart';
 import '../models/notification_model.dart';
 
 class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+
   static final NotificationService _instance = NotificationService._internal();
 
-  // Stream controller for navigation events
-  final _navigationController = StreamController<Map<String, dynamic>>.broadcast();
-  Stream<Map<String, dynamic>> get navigationStream => _navigationController.stream;
+  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
+  final Set<String> _notifiedGeofences = {};
+  final _navigationController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
-  /// Initialize FCM (enhanced for startup)
+  Stream<Map<String, dynamic>> get navigationStream =>
+      _navigationController.stream;
+
   Future<void> initialize() async {
     try {
-      // Request permission
+      tz.initializeTimeZones();
+
       final settings = await _messaging.requestPermission();
       AppLogger.i('FCM Permission: ${settings.authorizationStatus}');
 
-      // Initialize local notifications
-      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
       const iosSettings = DarwinInitializationSettings();
-      const initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
+      const initSettings =
+          InitializationSettings(android: androidSettings, iOS: iosSettings);
       await _localNotifications.initialize(initSettings);
 
       await _localNotifications
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(const AndroidNotificationChannel(
-            'high_importance_channel', // id
-            'High Importance Notifications', // title
-            description: 'This channel is used for important notifications.', // description
+            'high_importance_channel',
+            'High Importance Notifications',
+            description: 'This channel is used for important notifications.',
             importance: Importance.max,
           ));
 
-      // Get FCM token
       final token = await _messaging.getToken();
       if (token != null && FirebaseAuth.instance.currentUser != null) {
         await _firestore
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({'fcmToken': token}, SetOptions(merge: true));
+
         final uid = FirebaseAuth.instance.currentUser!.uid;
         final agencySnapshot = await _firestore
             .collection('agencies')
@@ -57,16 +69,13 @@ class NotificationService {
         }
       }
 
-      // Foreground messages - show snackbar/local notif
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      FirebaseMessaging.onMessage.listen((message) {
         AppLogger.i('Foreground message: ${message.notification?.title}');
         _showLocalNotification(message, data: message.data);
       });
 
-      // Background message tap
       FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
 
-      // Terminated state - handle deep link
       final initialMessage = await _messaging.getInitialMessage();
       if (initialMessage != null) {
         AppLogger.i('Initial message: ${initialMessage.messageId}');
@@ -76,17 +85,94 @@ class NotificationService {
         }
       }
 
-      // Background/quit state
       FirebaseMessaging.onBackgroundMessage(
-        _firebaseMessagingBackgroundHandler,
-      );
-
-      // Subscribe to viral/growth topics
+          _firebaseMessagingBackgroundHandler);
       await subscribeToTopics();
 
-      AppLogger.i('✅ Growth FCM initialized + topics');
-    } catch (e) {
-      AppLogger.e('❌ FCM init error: $e');
+      AppLogger.i('Growth FCM initialized + topics');
+    } catch (error) {
+      AppLogger.e('FCM init error: $error');
+    }
+  }
+
+  Future<void> scheduleLocationNotification() async {
+    AppLogger.i('Location scheduling logic ready for geofencing');
+  }
+
+  Future<void> showInstantNotification(
+    String title,
+    String body, {
+    bool isPriority = false,
+    UserPreferences? prefs,
+  }) async {
+    if (prefs != null && isInsideQuietHours(prefs) && !isPriority) {
+      AppLogger.i('Notification suppressed by quiet hours');
+      return;
+    }
+
+    const androidDetails = AndroidNotificationDetails(
+      'high_importance_channel',
+      'High Importance Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+    const notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: DarwinNotificationDetails(),
+    );
+
+    await _localNotifications.show(
+      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      title,
+      body,
+      notificationDetails,
+    );
+  }
+
+  static bool isInsideQuietHours(UserPreferences prefs) {
+    if (!prefs.isQuietModeEnabled) {
+      return false;
+    }
+
+    final now = DateTime.now();
+    final currentHour = now.hour;
+    final startHour = prefs.startHour;
+    final endHour = prefs.endHour;
+
+    if (startHour == endHour) {
+      return true;
+    }
+    if (startHour < endHour) {
+      return currentHour >= startHour && currentHour < endHour;
+    }
+    return currentHour >= startHour || currentHour < endHour;
+  }
+
+  Future<void> checkProximityAndNotify({
+    required Position userPosition,
+    required String targetId,
+    required String targetName,
+    required double targetLat,
+    required double targetLng,
+    double radiusInMeters = 500,
+  }) async {
+    final distance = Geolocator.distanceBetween(
+      userPosition.latitude,
+      userPosition.longitude,
+      targetLat,
+      targetLng,
+    );
+
+    if (distance <= radiusInMeters && !_notifiedGeofences.contains(targetId)) {
+      _notifiedGeofences.add(targetId);
+      AppLogger.i('Geofence entry: $targetName ($distance m)');
+      await showInstantNotification(
+        'Destino cercano',
+        'Estas muy cerca de $targetName. Abre FeelTrip para ver que hay aqui.',
+      );
+    } else if (distance > radiusInMeters * 2) {
+      _notifiedGeofences.remove(targetId);
     }
   }
 
@@ -98,7 +184,10 @@ class NotificationService {
     }
   }
 
-  Future<void> _showLocalNotification(RemoteMessage message, {Map<String, dynamic>? data}) async {
+  Future<void> _showLocalNotification(
+    RemoteMessage message, {
+    Map<String, dynamic>? data,
+  }) async {
     final notification = message.notification;
     final android = message.notification?.android;
 
@@ -111,7 +200,8 @@ class NotificationService {
           android: AndroidNotificationDetails(
             'high_importance_channel',
             'High Importance Notifications',
-            channelDescription: 'This channel is used for important notifications.',
+            channelDescription:
+                'This channel is used for important notifications.',
             icon: '@mipmap/ic_launcher',
           ),
           iOS: DarwinNotificationDetails(),
@@ -121,7 +211,6 @@ class NotificationService {
     }
   }
 
-  /// Subscribe to growth topics
   Future<void> subscribeToTopics() async {
     await _messaging.subscribeToTopic('daily_reminders');
     await _messaging.subscribeToTopic('feeltrip_growth');
@@ -129,7 +218,6 @@ class NotificationService {
     AppLogger.i('Subscribed to growth topics');
   }
 
-  /// Send like notification (Cloud Function ready)
   Future<void> sendLikeNotification(
     String targetUserId,
     String storyTitle,
@@ -137,19 +225,14 @@ class NotificationService {
     try {
       final doc = await _firestore.collection('users').doc(targetUserId).get();
       final token = doc.data()?['fcmToken'] as String?;
-
       if (token == null) return;
 
       AppLogger.i('Sending like notif to $targetUserId for "$storyTitle"');
-
-      // Production: Call Cloud Function https://firebase.google.com/docs/cloud-messaging/send-message
-      // Demo: Log
-    } catch (e) {
-      AppLogger.e('Send notif error: $e');
+    } catch (error) {
+      AppLogger.e('Send notif error: $error');
     }
   }
 
-  /// Send comment notification
   Future<void> sendCommentNotification(
     String targetUserId,
     String storyTitle,
@@ -158,28 +241,28 @@ class NotificationService {
     try {
       final doc = await _firestore.collection('users').doc(targetUserId).get();
       final token = doc.data()?['fcmToken'] as String?;
-
       if (token == null) return;
 
       AppLogger.i('Sending comment notif to $targetUserId for story $storyId');
 
-      // Production: Cloud Function
-      // Demo: Add local notif doc
-      await _firestore.collection('users').doc(targetUserId).collection('notifications').add({
-        'title': '¡Nuevo comentario!',
-        'body': 'Alguien está interesado en tus experiencias.',
+      await _firestore
+          .collection('users')
+          .doc(targetUserId)
+          .collection('notifications')
+          .add({
+        'title': 'Nuevo comentario',
+        'body': 'Alguien esta interesado en tus experiencias.',
         'type': 'story_comments',
         'storyId': storyId,
         'storyTitle': storyTitle,
         'isRead': false,
         'createdAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      AppLogger.e('Send comment notif error: $e');
+    } catch (error) {
+      AppLogger.e('Send comment notif error: $error');
     }
   }
 
-  /// Get unread count
   Future<int> getUnreadCount(String userId) async {
     final snapshot = await _firestore
         .collection('users')
@@ -191,14 +274,11 @@ class NotificationService {
     return snapshot.count ?? 0;
   }
 
-  /// Get notifications list (placeholder for provider usage)
   Future<List<NotificationModel>> getNotifications(String userId) async {
-    // Implementation would go here, usually handled by Stream in UI
     return [];
   }
 }
 
-// Background message handler (top-level required)
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   AppLogger.i('Background message: ${message.messageId}');
 }

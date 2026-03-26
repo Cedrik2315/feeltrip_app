@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'vision_service.dart';
+part of 'vision_models.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -616,11 +616,11 @@ abstract class _Error implements VisionState {
 
 /// @nodoc
 mixin _$VisionResult {
-  double? get sentimentScore =>
-      throw _privateConstructorUsedError; // 0.0 sad - 1.0 happy
+  double? get sentimentScore => throw _privateConstructorUsedError;
   List<String>? get imageLabels => throw _privateConstructorUsedError;
   String? get recognizedText => throw _privateConstructorUsedError;
   List<String>? get topLabels => throw _privateConstructorUsedError;
+  Position? get location => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $VisionResultCopyWith<VisionResult> get copyWith =>
@@ -637,7 +637,8 @@ abstract class $VisionResultCopyWith<$Res> {
       {double? sentimentScore,
       List<String>? imageLabels,
       String? recognizedText,
-      List<String>? topLabels});
+      List<String>? topLabels,
+      Position? location});
 }
 
 /// @nodoc
@@ -657,6 +658,7 @@ class _$VisionResultCopyWithImpl<$Res, $Val extends VisionResult>
     Object? imageLabels = freezed,
     Object? recognizedText = freezed,
     Object? topLabels = freezed,
+    Object? location = freezed,
   }) {
     return _then(_value.copyWith(
       sentimentScore: freezed == sentimentScore
@@ -675,6 +677,10 @@ class _$VisionResultCopyWithImpl<$Res, $Val extends VisionResult>
           ? _value.topLabels
           : topLabels // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as Position?,
     ) as $Val);
   }
 }
@@ -691,7 +697,8 @@ abstract class _$$VisionResultImplCopyWith<$Res>
       {double? sentimentScore,
       List<String>? imageLabels,
       String? recognizedText,
-      List<String>? topLabels});
+      List<String>? topLabels,
+      Position? location});
 }
 
 /// @nodoc
@@ -709,6 +716,7 @@ class __$$VisionResultImplCopyWithImpl<$Res>
     Object? imageLabels = freezed,
     Object? recognizedText = freezed,
     Object? topLabels = freezed,
+    Object? location = freezed,
   }) {
     return _then(_$VisionResultImpl(
       sentimentScore: freezed == sentimentScore
@@ -727,6 +735,10 @@ class __$$VisionResultImplCopyWithImpl<$Res>
           ? _value._topLabels
           : topLabels // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as Position?,
     ));
   }
 }
@@ -738,15 +750,14 @@ class _$VisionResultImpl implements _VisionResult {
       {this.sentimentScore,
       final List<String>? imageLabels,
       this.recognizedText,
-      final List<String>? topLabels})
+      final List<String>? topLabels,
+      this.location})
       : _imageLabels = imageLabels,
         _topLabels = topLabels;
 
   @override
   final double? sentimentScore;
-// 0.0 sad - 1.0 happy
   final List<String>? _imageLabels;
-// 0.0 sad - 1.0 happy
   @override
   List<String>? get imageLabels {
     final value = _imageLabels;
@@ -769,8 +780,11 @@ class _$VisionResultImpl implements _VisionResult {
   }
 
   @override
+  final Position? location;
+
+  @override
   String toString() {
-    return 'VisionResult(sentimentScore: $sentimentScore, imageLabels: $imageLabels, recognizedText: $recognizedText, topLabels: $topLabels)';
+    return 'VisionResult(sentimentScore: $sentimentScore, imageLabels: $imageLabels, recognizedText: $recognizedText, topLabels: $topLabels, location: $location)';
   }
 
   @override
@@ -785,7 +799,9 @@ class _$VisionResultImpl implements _VisionResult {
             (identical(other.recognizedText, recognizedText) ||
                 other.recognizedText == recognizedText) &&
             const DeepCollectionEquality()
-                .equals(other._topLabels, _topLabels));
+                .equals(other._topLabels, _topLabels) &&
+            (identical(other.location, location) ||
+                other.location == location));
   }
 
   @override
@@ -794,7 +810,8 @@ class _$VisionResultImpl implements _VisionResult {
       sentimentScore,
       const DeepCollectionEquality().hash(_imageLabels),
       recognizedText,
-      const DeepCollectionEquality().hash(_topLabels));
+      const DeepCollectionEquality().hash(_topLabels),
+      location);
 
   @JsonKey(ignore: true)
   @override
@@ -808,16 +825,19 @@ abstract class _VisionResult implements VisionResult {
       {final double? sentimentScore,
       final List<String>? imageLabels,
       final String? recognizedText,
-      final List<String>? topLabels}) = _$VisionResultImpl;
+      final List<String>? topLabels,
+      final Position? location}) = _$VisionResultImpl;
 
   @override
   double? get sentimentScore;
-  @override // 0.0 sad - 1.0 happy
+  @override
   List<String>? get imageLabels;
   @override
   String? get recognizedText;
   @override
   List<String>? get topLabels;
+  @override
+  Position? get location;
   @override
   @JsonKey(ignore: true)
   _$$VisionResultImplCopyWith<_$VisionResultImpl> get copyWith =>

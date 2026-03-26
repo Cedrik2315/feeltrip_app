@@ -11,9 +11,6 @@ import '../models/experience_model.dart';
 import '../widgets/ai_proposal_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/travel_agency_model.dart';
-
-// import '../services/admob_service.dart';
-// import '../controllers/premium_controller.dart';
 import 'translator_screen.dart';
 import 'ocr_screen.dart';
 
@@ -39,7 +36,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final notifier = ref.read(osintAiServiceProvider.notifier);
       _proposalFuture = notifier.getPersonalizedProposal(userId);
     } else {
-      _proposalFuture = Future.value();
+      _proposalFuture = Future<TravelAgency?>(() async => null);
     }
 
     FirebaseFirestore.instance
@@ -60,32 +57,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     });
     _loadStories();
-
-    // AdMobService.initialize();\n    // AdMobService.loadBannerAd();
   }
 
   void _loadStories() {
-    // Mock stories data
     setState(() {
       _stories = [
         TravelerStory(
           id: '1',
-          author: 'María García',
+          author: 'Maria Garcia',
           title: 'Bajo la aurora boreal',
           story:
-              'En Tromsø, vimos las luces del norte y algo cambió dentro de mí. Lloré de alegría viendo la naturaleza en su máxima expresión.',
-          emotionalHighlights: ['Asombro', 'Gratitud', 'Transformación'],
+              'En Tromso, vimos las luces del norte y algo cambio dentro de mi. Llore de alegria viendo la naturaleza en su maxima expresion.',
+          emotionalHighlights: ['Asombro', 'Gratitud', 'Transformacion'],
           likes: 347,
           rating: 5.0,
           createdAt: DateTime.now().subtract(const Duration(days: 7)),
         ),
         TravelerStory(
           id: '2',
-          author: 'Juan López',
-          title: 'Conexión en Perú',
+          author: 'Juan Lopez',
+          title: 'Conexion en Peru',
           story:
-              'Conocí a una familia quechua en el valle sagrado. Compartimos comida, risas y historias. Aprendí que la verdadera riqueza está en las conexiones humanas.',
-          emotionalHighlights: ['Conexión', 'Paz', 'Esperanza'],
+              'Conoci a una familia quechua en el valle sagrado. Compartimos comida, risas y historias. Aprendi que la verdadera riqueza esta en las conexiones humanas.',
+          emotionalHighlights: ['Conexion', 'Paz', 'Esperanza'],
           likes: 512,
           rating: 5.0,
           createdAt: DateTime.now().subtract(const Duration(days: 14)),
@@ -95,8 +89,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           author: 'Isabella Romano',
           title: 'El legado de mi nonna',
           story:
-              'Volvimos a Italia después de 40 años. Encontramos la casa de mis abuelos y conocimos primos que no sabía que existían. Mi identidad cobró nuevo sentido.',
-          emotionalHighlights: ['Nostalgia', 'Reflexión', 'Pertenencia'],
+              'Volvimos a Italia despues de 40 anos. Encontramos la casa de mis abuelos y conocimos primos que no sabia que existian. Mi identidad cobro nuevo sentido.',
+          emotionalHighlights: ['Nostalgia', 'Reflexion', 'Pertenencia'],
           likes: 289,
           rating: 4.8,
           createdAt: DateTime.now().subtract(const Duration(days: 21)),
@@ -112,11 +106,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: const Text('FeelTrip - Viajes Transformadores'),
         elevation: 0,
         backgroundColor: Colors.deepPurple,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(4.0),
+          child: Consumer(
+            builder: (context, ref, child) {
+              return ref.watch(userLocationProvider).when(
+                    data: (position) {
+                      if (position == null) return const SizedBox.shrink();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 4.0,
+                        ),
+                        child: Text(
+                          'Explorando cerca de: ${position.latitude.toStringAsFixed(2)}, ${position.longitude.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (error, stack) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Habilita GPS y permisos para ubicaciÃƒÆ’Ã‚Â³n'),
+                            backgroundColor: Colors.orange,
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      });
+                      return const SizedBox.shrink();
+                    },
+                  );
+            },
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Hero Banner - Experiencias Vivenciales
             Container(
               color: Colors.deepPurple,
               padding: const EdgeInsets.all(20),
@@ -124,7 +156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    '✨ Viajes que Transforman',
+                    'Viajes que Transforman',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
@@ -211,7 +243,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     AiProposalCard(
                       agency: agency,
-                      moodEmoji: '🌊', // From service trait map
+                      moodEmoji: 'ÃƒÂ°Ã…Â¸Ã…â€™Ã…Â ',
                       moodBadge: 'Buscando Calma',
                       onAdditionalTap: () => context.go('/agency/${agency.id}'),
                     ),
@@ -221,8 +253,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               },
             ),
             const SizedBox(height: 8),
-
-            // CTA: Descubre tu tipo de viajero
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
@@ -236,7 +266,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Column(
                   children: [
                     const Text(
-                      '🎯 Descubre Tu Tipo de Viajero',
+                      'Descubre Tu Tipo de Viajero',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -271,8 +301,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Traveler Archetypes
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -291,31 +319,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Row(
                       children: [
                         _buildArchetypeCard(
-                          '💕',
+                          'ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã¢â‚¬Â¢',
                           'Conector',
                           'Conexiones humanas\ny culturales',
                           Colors.red,
                         ),
                         _buildArchetypeCard(
-                          '🦋',
+                          'ÃƒÂ°Ã…Â¸Ã‚Â¦Ã¢â‚¬Â¹',
                           'Transformado',
-                          'Crecimiento personal\ny reflexión',
+                          'Crecimiento personal\ny reflexion',
                           Colors.deepPurple,
                         ),
                         _buildArchetypeCard(
-                          '⚡',
+                          'ÃƒÂ¢Ã…Â¡Ã‚Â¡',
                           'Aventurero',
                           'Adrenalina y\nnuevas emociones',
                           Colors.orange,
                         ),
                         _buildArchetypeCard(
-                          '🌅',
+                          'ÃƒÂ°Ã…Â¸Ã…â€™Ã¢â‚¬Å¾',
                           'Contemplativo',
-                          'Paz interior y\nconexión con la naturaleza',
+                          'Paz interior y\nconexion con la naturaleza',
                           Colors.cyan,
                         ),
                         _buildArchetypeCard(
-                          '📚',
+                          'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â¡',
                           'Aprendiz',
                           'Conocimiento y\ndescubrimiento',
                           Colors.green,
@@ -327,8 +355,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Featured Transformative Trips
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -374,8 +400,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Historias de Viajeros Transformados
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -385,7 +409,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Historias de Transformación',
+                        'Historias de Transformacion',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -414,8 +438,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-// Quick Access Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -433,7 +455,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       Expanded(
                         child: _buildQuickAccessCard(
-                          '📔',
+                          'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â',
                           'Mi Diario',
                           'Registra tus emociones',
                           () {
@@ -444,9 +466,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildQuickAccessCard(
-                          '📊',
+                          'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â ',
                           'Mi Impacto',
-                          'Mide tu transformación',
+                          'Mide tu transformacion',
                           () {
                             Navigator.of(context)
                                 .pushNamed('/impact-dashboard');
@@ -459,7 +481,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Herramientas UGC
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -485,7 +506,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
-                          builder: (context) => const TranslatorScreen()),
+                        builder: (context) => const TranslatorScreen(),
+                      ),
                     ),
                   ),
                   ListTile(
@@ -494,14 +516,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
-                          builder: (context) => const OCRScreen()),
+                        builder: (context) => const OCRScreen(),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-
-            // if (!Get.find<PremiumController>().isPremium.value)\n              // Padding(\n                // padding: const EdgeInsets.all(16),\n                // child: AdMobService.buildBannerAd(),\n              // ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'ConfiguraciÃƒÆ’Ã‚Â³n',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Card(
+                    child: Consumer(
+                      builder: (context, ref, child) {
+                        final prefs = ref.watch(userPreferencesProvider);
+                        return SwitchListTile(
+                          title: const Text('Modo Descanso'),
+                          subtitle:
+                              const Text('Silencia alertas de 22:00 a 08:00'),
+                          secondary: const Icon(Icons.nightlight_round),
+                          value: prefs.isQuietModeEnabled,
+                          onChanged: (value) {
+                            ref.read(userPreferencesProvider.notifier).update(
+                                  (state) => state.copyWith(
+                                    isQuietModeEnabled: value,
+                                  ),
+                                );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 32),
           ],
         ),
@@ -510,7 +569,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildArchetypeCard(
-      String emoji, String title, String description, Color color) {
+    String emoji,
+    String title,
+    String description,
+    Color color,
+  ) {
     return Container(
       width: 140,
       margin: const EdgeInsets.only(right: 12),
@@ -627,7 +690,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildQuickAccessCard(
-      String emoji, String title, String subtitle, VoidCallback onTap) {
+    String emoji,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -664,6 +731,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 class TripCard extends StatelessWidget {
   const TripCard({super.key, required this.trip});
+
   final Trip trip;
 
   @override
@@ -701,7 +769,9 @@ class TripCard extends StatelessWidget {
                   if (trip.isTransformative)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.purple[100],
                         borderRadius: BorderRadius.circular(4),
