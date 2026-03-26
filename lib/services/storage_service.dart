@@ -1,9 +1,33 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
 
 class StorageService {
   static final FirebaseStorage _storage = FirebaseStorage.instance;
+  static const String _boxName = 'user_prefs';
+
+  /// Inicializa Hive para almacenamiento local rápido.
+  static Future<void> initHive() async {
+    try {
+      await Hive.initFlutter();
+      await Hive.openBox(_boxName);
+      AppLogger.i('Hive inicializado correctamente');
+    } catch (e) {
+      AppLogger.e('Error inicializando Hive: $e');
+    }
+  }
+
+  /// Guarda datos del usuario localmente para el radar y sesión.
+  static void saveUserData(String name, String city) {
+    final box = Hive.box(_boxName);
+    box.put('userName', name);
+    box.put('lastCity', city);
+  }
+
+  /// Obtiene el nombre del usuario guardado localmente.
+  static String? getUserName() => Hive.box(_boxName).get('userName');
 
   // Subir foto de perfil
   static Future<String?> uploadProfilePhoto(File file) async {

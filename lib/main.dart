@@ -2,7 +2,9 @@ import 'package:feeltrip_app/config/firebase_config.dart';
 import 'package:feeltrip_app/core/di/providers.dart';
 import 'package:feeltrip_app/core/providers/connectivity_provider.dart';
 import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:feeltrip_app/services/connectivity_service.dart';
 import 'package:feeltrip_app/services/notification_service.dart';
+import 'package:feeltrip_app/services/storage_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +15,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 Future<void> main() async {
   await SentryFlutter.init(
     (options) => options
-      ..dsn = const String.fromEnvironment('SENTRY_DSN')
+      ..dsn = 'TU_DSN_DE_SENTRY_AQUÍ' // Reemplazar con el DSN real
       ..tracesSampleRate = 1.0
       ..environment = const String.fromEnvironment(
         'FLUTTER_ENV',
@@ -33,6 +35,9 @@ Future<void> main() async {
       ]);
 
       await FirebaseConfig.initialize();
+
+      // Inicialización de Local Storage (Hive)
+      await StorageService.initHive();
 
       final notificationService = NotificationService();
       await notificationService.initialize();
@@ -59,6 +64,9 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Iniciar monitoreo de conectividad con voz
+    ref.read(connectivityServiceProvider).monitorConnection();
 
     final notificationService = ref.read(notificationServiceProvider);
     notificationService.navigationStream.listen((payload) {
