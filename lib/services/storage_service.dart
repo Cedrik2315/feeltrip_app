@@ -12,7 +12,7 @@ class StorageService {
   static Future<void> initHive() async {
     try {
       await Hive.initFlutter();
-      await Hive.openBox(_boxName);
+      await Hive.openBox<dynamic>(_boxName);
       AppLogger.i('Hive inicializado correctamente');
     } catch (e) {
       AppLogger.e('Error inicializando Hive: $e');
@@ -21,13 +21,14 @@ class StorageService {
 
   /// Guarda datos del usuario localmente para el radar y sesión.
   static void saveUserData(String name, String city) {
-    final box = Hive.box(_boxName);
+    final box = Hive.box<dynamic>(_boxName);
     box.put('userName', name);
     box.put('lastCity', city);
   }
 
   /// Obtiene el nombre del usuario guardado localmente.
-  static String? getUserName() => Hive.box(_boxName).get('userName');
+  static String? getUserName() =>
+      Hive.box<dynamic>(_boxName).get('userName') as String?;
 
   // Subir foto de perfil
   static Future<String?> uploadProfilePhoto(File file) async {
