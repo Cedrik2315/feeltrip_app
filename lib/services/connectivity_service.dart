@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:feeltrip_app/services/voice_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,16 +14,19 @@ class ConnectivityService {
 
   /// Inicia el monitoreo del estado de red.
   void monitorConnection() {
+    // CORRECCIÓN: En la versión 5.0.2 se recibe un solo ConnectivityResult, no una lista.
     _connectivity.onConnectivityChanged
-        .listen((List<ConnectivityResult> results) {
+        .listen((ConnectivityResult result) {
       final voice = _ref.read(voiceServiceProvider);
 
-      if (results.contains(ConnectivityResult.none)) {
+      // Verificamos si el resultado es 'none'
+      if (result == ConnectivityResult.none) {
         AppLogger.w('Conexión perdida');
         voice.speak(
             'Atención Cedrik, se ha perdido la conexión a internet. Activando modo local.');
         _wasOffline = true;
       } else if (_wasOffline) {
+        // Si antes estábamos offline y ahora el resultado no es 'none', hemos vuelto.
         AppLogger.i('Conexión restablecida');
         voice.speak('Conexión restablecida. Sincronizando datos de FeelTrip.');
         _wasOffline = false;

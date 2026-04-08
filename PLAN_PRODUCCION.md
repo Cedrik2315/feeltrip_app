@@ -1,117 +1,63 @@
-# PLAN DE TRABAJO FeelTrip - Producción (7 Días)
+# PLAN DE PRODUCCION FEELTRIP
 
-## 📅 **DÍA 1-2: Tests Completos (95% Coverage)**
+## Objetivo
+Transformar FeelTrip de un "RC técnico" a un "producto lanzable con riesgo controlado" en un ciclo de 90 días. Foco: confiabilidad transaccional, coherencia arquitectónica y métricas reales.
 
-### Día 1: Unit Tests (Repos + Services)
-```
-✅ [ ] test/features/auth/data/auth_repository_test.dart (mocktail FirebaseAuth)
-✅ [ ] test/features/premium/data/revenuecat_repository_test.dart
-✅ [ ] test/services/sync_service_test.dart (Isar mock)
-✅ [ ] test/services/vision_service_test.dart (mock Gemini)
-flutter test --coverage
-```
+## Estado base actual
+- `flutter analyze`: limpio.
+- Fase 2B (Firestore Integration) finalizada: Historias y Diarios operativos en tiempo real.
+- Auth, router y notificaciones base funcionales.
+- **Brecha Crítica:** Pagos en client-side (Mercado Pago), persistencia híbrida (Hive/Firestore) y métricas en stub.
 
-### Día 2: Widget Tests (Screens)
-```
-✅ [ ] test/widget/smart_camera_test.dart (Golden + pumpWidget)
-✅ [ ] test/widget/diary_screen_test.dart (ListView scroll)
-✅ [ ] test/widget/search_screen_test.dart (ChoiceChips interaction)
-flutter test test/widget/
-coverage:collect_lcov -i -a lib/ -o coverage/lcov.info
-```
+## Hoja de Ruta: Ciclo de 90 Días
 
-## ⚡ **DÍA 3: Performance Tuning**
+### Fase 1: 0–30 días (Estabilización Crítica)
+**Criterio rector:** Eliminar vulnerabilidades transaccionales y duplicidad.
+- **Pagos Server-Authoritative:** [COMPLETADO] Repositorio, Cloud Function y Webhook con notificaciones operativos.
+- **Unificación de Persistencia:** [COMPLETADO] SyncService con soporte para momentos, propuestas e itinerarios + Backoff exponencial.
+- **Contrato de Booking:** [COMPLETADO] Modelo robusto con trazabilidad implementado.
+- **Métricas de Funnel:** [COMPLETADO] MetricsService implementado con Firebase Analytics.
+- **Seguridad:** [COMPLETADO] Reglas de Firestore endurecidas para bookings.
 
-```
-✅ [ ] firestore.indexes.json → firebase deploy --only firestore:indexes
-  indexes:
-    - collectionGroup momentos
-      queryScope: COLLECTION
-      fields:
-        - createdAt: ASCENDING
-        - isSynced: ASCENDING
-✅ [ ] Pagination: InfiniteScroll + startAfter(lastDoc) en providers
-✅ [ ] Image caching: cached_network_image + flutter_cache_manager
-✅ [ ] Bundle analyzer → tree shaking deps unused
-```
+### Fase 2: 31–60 días (Producto Confiable)
+**Criterio rector:** Journey honesto y fin de los mocks.
+- **Search Real:** [COMPLETADO] SearchNotifier e interfaz SearchScreen integrados con Firestore.
+- **Eliminación de Mocks:** [COMPLETADO] HomeRepository y AgencyService conectados a datos reales de Firestore.
+- **Refuerzo Offline:** [COMPLETADO] ConnectivityProvider y NoConnectionWidget integrados; SyncService proactivo.
+- **Deep Links:** [COMPLETADO] NotificationService habilitado con Stream de navegación para flujos directos.
+- **Monetización:** [COMPLETADO] PremiumNotifier (RevenueCat) y PaymentRepository (Mercado Pago) unificados y reactivos.
 
-## 🔑 **DÍA 4: Prod Keys**
+### Fase 3: 61–90 días (Base de Escala)
+**Criterio rector:** Preparación para crecimiento (10K+ usuarios).
+- **Search Dedicado:** [COMPLETADO] AlgoliaSearchService integrado en SearchNotifier.
+- **Analytics BI:** [COMPLETADO] Cloud Function exportBookingToBI para pipeline de datos.
+- **Control de Costos IA:** [COMPLETADO] Implementado AiCacheService con hashing de prompts.
+- **Optimización Media:** [COMPLETADO] MediaService para transformación de URLs y optimización de carga.
+- **Panel de Agencias:** [COMPLETADO] AgencyDashboardScreen y reglas de seguridad para leads implementadas.
 
-```
-✅ [ ] RevenueCat: sandbox → prod key (dashboard.revenuecat.com)
-✅ [ ] Firebase: rotate API keys (console.firebase.google.com)
-✅ [ ] .env.prod → git rm --cached + .gitignore
-✅ [ ] Sentry: DSN prod (sentry.io)
-✅ [ ] TestFlight/Stripe test → prod
-```
+## Priorización Ejecutiva (Orden de ejecución)
+1. **Pagos y Bookings:** Seguridad financiera primero.
+2. **Unificación Sync:** Limpieza de deuda técnica Hive vs Firestore.
+3. **Reglas de Seguridad:** Cerrar accesos de escritura no autorizados.
+4. **Analytics Real:** Medir para decidir.
+5. **Search y Home:** Experiencia de usuario real, no mock.
 
-## 🔄 **DÍA 5: CI/CD GitHub Actions**
+## No prometer todavia
+- 95% de coverage.
+- readiness para 1M usuarios.
+- Búsqueda semántica instantánea (v3).
+- Offline-first total para media pesada.
 
-```
-✅ .github/workflows/flutter.yml
-name: CI/CD FeelTrip
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with: sdk-version: '3.24.0'
-      - run: flutter pub get
-      - run: flutter analyze
-      - run: flutter test --coverage
-      - uses: VeryGoodOpenSource/very_good_coverage@v2
-  build-apk:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: flutter build apk --release
-      - uses: actions/upload-artifact@v4
-        with: name: app.apk
-```
+## Gate de Lanzamiento (Checklist)
+- [x] Los pagos pasan por Cloud Functions y webhooks.
+- [x] Ningún `booking` se confirma sin correlación exacta de pago.
+- [x] `SyncService` unificado maneja momentos, propuestas e itinerarios.
+- [x] `firestore.rules` prohíbe acceso a datos de otros usuarios.
+- [x] Search UI muestra resultados de Firestore, no estáticos.
+- [x] Métricas emiten eventos verificables en Firebase Analytics.
 
-## 📱 **DÍA 6: QA Dispositivos Reales**
-
-```
-✅ iOS: iPhone 14 Pro + iPad Pro (TestFlight)
-✅ Android: Pixel 8 + Samsung S24 (Firebase TestLab)
-✅ Flows:
-  - Auth (Google/FB/Email)
-  - Smart Camera → Diario sync offline/online
-  - Premium purchase → restore
-  - Search → Map integration
-```
-
-## 🚀 **DÍA 7: StoreKit Review + Release**
-
-```
-✅ App Store Connect: Screenshots, keywords "viajes emocionales AI"
-✅ Google Play Console: Internal testing → Production
-✅ Post-launch:
-  - Crashlytics monitor 24h
-  - A/B test onboarding
-  - Push notifications campaign
-```
-
-**Checkpoints diarios:**
-```
-flutter doctor
-flutter analyze (0 errors)
-flutter test (95% coverage)
-flutter run -d chrome (E2E)
-```
-
-**Herramientas:**
-- Fastlane (automático StoreKit)
-- Codemagic (CI/CD alternativo)
-- Firebase Perf Monitoring
-
-**Team:** PM/Growth + Mid Flutter hired. Contact: hr@feeltrip.app
-
-**Startup Strong Complete** ✅
-- Growth: FCM + sharing viral ready
-- Tests: 95% CI enforced
-- Metrics: LTV $127 > CAC $5 proof dashboard
-- Infra: Multi-tenant Firestore rules
-**Estado final: 1M users ready!** 🔥
+## Supuestos y Defaults
+- Equipo pequeño (1-2 devs): Se prioriza estabilización sobre nuevas features sociales.
+- RevenueCat es el canal premium principal.
+- Cualquier pantalla en estado "beta" se reduce o se endurece; no se maquilla.
+- Si una iniciativa nueva compite con la estabilidad, gana la estabilidad.

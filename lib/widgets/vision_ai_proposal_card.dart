@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:feeltrip_app/core/di/providers.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:feeltrip_app/services/vision_service.dart';
 
 class VisionAiProposalCard extends ConsumerWidget {
   const VisionAiProposalCard({
@@ -13,116 +14,106 @@ class VisionAiProposalCard extends ConsumerWidget {
   final List<String> labels;
   final String? proposalText;
 
-  String get _mockText => proposalText ?? _generateMockText(labels);
-
-  String _generateMockText(List<String> lbls) {
-    final top3 = lbls.take(3).join(', ');
-    if (lbls.any(
-      (label) =>
-          label.toLowerCase().contains('montana') ||
-          label.toLowerCase().contains('nieve'),
-    )) {
-      return 'Parece que estas en un lugar natural. Quieres que busque experiencias de trekking cerca?';
-    }
-    if (lbls.any(
-      (label) =>
-          label.toLowerCase().contains('playa') ||
-          label.toLowerCase().contains('lago'),
-    )) {
-      return 'Vistas increibles cerca del agua. Explorar actividades acuaticas?';
-    }
-    return 'Escena interesante detectada: $top3. Quieres experiencias similares cerca?';
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final topLabels = labels.take(3).toList();
+    final text = proposalText ?? 'ANÁLISIS COMPLETADO. IDENTIFICANDO RUTAS COMPATIBLES...';
 
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.black87,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
         border: Border(
-          top: BorderSide(color: Colors.white24),
+          top: BorderSide(color: const Color(0xFFFF8F00).withValues(alpha: 0.5), width: 2),
         ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: topLabels
-                .map(
-                  (label) => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurpleAccent,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      label,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
+          // Header de Procesamiento
+          Row(
+            children: [
+              const Icon(Icons.lens_blur_rounded, color: Color(0xFFFF8F00), size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'VISION_ENGINE_V3: TAGS DETECTADOS',
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFFF8F00),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          
+          // Etiquetas de Visión
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: topLabels.map((label) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black12),
+              ),
+              child: Text(
+                label.toUpperCase(),
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+              ),
+            )).toList(),
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Texto de la Propuesta (Estilo Playfair para el contraste "Travel")
           Text(
-            _mockText,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              height: 1.4,
+            text,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              fontStyle: FontStyle.italic,
+              height: 1.3,
+              color: isDark ? Colors.white : Colors.black87,
             ),
           ),
-          const SizedBox(height: 20),
+          
+          const SizedBox(height: 24),
+          
+          // Botones de Acción
           Row(
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.explore, size: 20),
-                  label: const Text('Explorar experiencias'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                child: OutlinedButton(
                   onPressed: () {
                     final query = labels.take(3).join(' ');
-                    if (context.mounted) {
-                      context.go('/search_screen?q=$query');
-                    }
+                    context.go('/search?q=$query');
                   },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFFF8F00)),
+                    foregroundColor: const Color(0xFFFF8F00),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  ),
+                  child: Text(
+                    'EXPLORAR DESTINOS',
+                    style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: TextButton.icon(
-                  icon: const Icon(Icons.camera_alt_outlined, size: 20),
-                  label: const Text('Tomar otra foto'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white70,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    ref.read(visionServiceProvider.notifier).reset();
-                  },
+              IconButton(
+                icon: const Icon(Icons.camera_alt_outlined),
+                onPressed: () => ref.read(visionServiceProvider.notifier).reset(),
+                style: IconButton.styleFrom(
+                  backgroundColor: isDark ? Colors.white10 : Colors.black12,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  padding: const EdgeInsets.all(16),
                 ),
               ),
             ],

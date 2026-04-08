@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import '../../core/di/providers.dart';
-import '../../models/comment_model.dart';
-import '../../models/travel_agency_model.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+// Importaciones corregidas de relativo a package
+import 'package:feeltrip_app/core/di/providers.dart';
+import 'package:feeltrip_app/models/comment_model.dart';
+import 'package:feeltrip_app/models/travel_agency_model.dart';
 
 class CommentsScreen extends ConsumerStatefulWidget {
-  const CommentsScreen({
-    super.key,
-    required this.storyId,
-  });
+  const CommentsScreen({super.key, required this.storyId});
   final String storyId;
 
   @override
@@ -19,6 +20,18 @@ class CommentsScreen extends ConsumerStatefulWidget {
 
 class _CommentsScreenState extends ConsumerState<CommentsScreen> {
   bool _permissionsRequested = false;
+  final TextEditingController _commentController = TextEditingController();
+
+  // Paleta FeelTrip Comunitaria
+  static const Color boneWhite = Color(0xFFF5F5DC);
+  static const Color mossGreen = Color(0xFF4B5320);
+  static const Color charcoal = Color(0xFF1A1A1A);
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -33,42 +46,41 @@ class _CommentsScreenState extends ConsumerState<CommentsScreen> {
     final messaging = FirebaseMessaging.instance;
     final settings = await messaging.getNotificationSettings();
     if (settings.authorizationStatus == AuthorizationStatus.denied) {
-      final newSettings = await messaging.requestPermission();
-      if (newSettings.authorizationStatus == AuthorizationStatus.authorized) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Notificaciones habilitadas ✅')),
-          );
-        }
-      }
+      await messaging.requestPermission();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final commentsAsync = ref.watch(commentProvider(widget.storyId));
-    final commentController = TextEditingController();
     final userId = FirebaseAuth.instance.currentUser?.uid ?? 'anonymous';
-    final reactions = ['❤️', '😂', '😍', '🔥', '👍', '😢'];
+    const reactions = ['❤️', '😂', '😍', '🔥', '👍', '😢'];
 
     return Scaffold(
+      backgroundColor: boneWhite,
       appBar: AppBar(
-        title: const Text('Comentarios'),
+        backgroundColor: charcoal,
         elevation: 0,
+        centerTitle: false,
+        title: Text('BITÁCORA_COMUNIDAD', 
+          style: GoogleFonts.jetBrainsMono(fontSize: 13, color: boneWhite, letterSpacing: 1)),
+        iconTheme: const IconThemeData(color: boneWhite, size: 20),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
       body: Column(
         children: [
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () {
-                ref.invalidate(commentProvider(widget.storyId));
-                return Future.value();
-              },
+              color: mossGreen,
+              backgroundColor: boneWhite,
+              onRefresh: () async => ref.invalidate(commentProvider(widget.storyId)),
               child: commentsAsync.when(
                 data: (comments) => comments.isEmpty 
                   ? const CenterEmptyComments()
-                  : ListView.builder(
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
                       itemCount: comments.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0x0D000000)),
                       itemBuilder: (context, index) => CommentCard(
                         comment: comments[index],
                         storyId: widget.storyId,
@@ -77,35 +89,18 @@ class _CommentsScreenState extends ConsumerState<CommentsScreen> {
                         ref: ref,
                       ),
                     ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Center(child: Text('Error: $err')),
+                loading: () => const Center(child: CircularProgressIndicator(color: mossGreen, strokeWidth: 2)),
+                error: (err, _) => Center(
+                  child: Text('// ERROR_DE_LOG: $err', 
+                    style: GoogleFonts.jetBrainsMono(color: Colors.red.shade800, fontSize: 12))
+                ),
               ),
             ),
           ),
           CommentInput(
             storyId: widget.storyId,
-            controller: commentController,
+            controller: _commentController,
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class CenterEmptyComments extends StatelessWidget {
-  const CenterEmptyComments({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.comment_bank_outlined, size: 80, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('Sin comentarios aún', style: TextStyle(fontSize: 16, color: Colors.grey)),
-          SizedBox(height: 8),
-          Text('Sé el primero en comentar', style: TextStyle(fontSize: 14, color: Colors.grey)),
         ],
       ),
     );
@@ -123,206 +118,276 @@ class CommentCard extends StatelessWidget {
   });
 
   final Comment comment;
-  final String storyId;
-  final String userId;
+  final String storyId, userId;
   final List<String> reactions;
   final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: comment.userAvatar.isNotEmpty
-                    ? NetworkImage(comment.userAvatar)
-                    : null,
-                child: comment.userAvatar.isEmpty 
-                  ? const Icon(Icons.person, size: 20) 
-                  : null,
-              ),
+              _UserAvatar(avatarUrl: comment.userAvatar),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FutureBuilder<TravelAgency?>(
-                      future: ref.read(agencyServiceProvider).getAgencyById(comment.userId),
-                      builder: (context, snapshot) {
-                        final isVerified = snapshot.data?.verified ?? false;
-                        return Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                comment.userName,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (isVerified)
-                              const Padding(
-                                padding: EdgeInsets.only(left: 4),
-                                child: Icon(Icons.verified, color: Colors.blue, size: 16),
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-                    Text(
-                      _timeAgo(comment.createdAt),
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
+                    _UserHeader(userId: comment.userId, userName: comment.userName, ref: ref),
+                    const SizedBox(height: 2),
+                    Text(_timeAgo(comment.createdAt), 
+                        style: GoogleFonts.jetBrainsMono(fontSize: 9, color: Colors.grey.shade500)),
                   ],
                 ),
               ),
               if (comment.userId == userId)
-                GestureDetector(
-                  onTap: () => ref.read(commentServiceProvider).deleteComment(storyId, comment.id),
-                  child: const Icon(Icons.close, size: 20, color: Colors.grey),
+                IconButton(
+                  icon: const Icon(Icons.more_vert, size: 16, color: Colors.grey),
+                  onPressed: () => _showDeleteConfirm(context),
                 ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(comment.content, style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => ref.read(commentServiceProvider).likeComment(storyId, comment.id),
-                child: Row(
-                  children: [
-                    const Icon(Icons.favorite_border, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text('${comment.likes}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              GestureDetector(
-                onTap: () => _showReactionPicker(context, ref, storyId, comment.id, reactions),
-                child: Row(
-                  children: [
-                    const Icon(Icons.emoji_emotions_outlined, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text('${comment.reactions.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          if (comment.reactions.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Wrap(
-                spacing: 4,
-                children: comment.reactions.map((r) => Text(r, style: const TextStyle(fontSize: 16))).toList(),
-              ),
-            ),
           const SizedBox(height: 12),
-          Divider(color: Colors.grey.shade300),
+          Text(
+            comment.content, 
+            style: GoogleFonts.ebGaramond(fontSize: 17, height: 1.4, color: const Color(0xFF2A2A2A))
+          ),
+          const SizedBox(height: 16),
+          _ReactionToolbar(comment: comment, storyId: storyId, reactions: reactions, ref: ref),
+          if (comment.reactions.isNotEmpty) _ReactionSummary(reactions: comment.reactions),
         ],
       ),
     );
   }
 
-  void _showReactionPicker(BuildContext context, WidgetRef ref, String storyId, String commentId, List<String> reactions) {
-    showModalBottomSheet<void>(
+  void _showDeleteConfirm(BuildContext context) {
+    showDialog(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Agrega una reacción', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: reactions.map((reaction) => GestureDetector(
-                onTap: () {
-                  ref.read(commentServiceProvider).addReaction(storyId, commentId, reaction);
-                  Navigator.pop(context);
-                },
-                child: Text(reaction, style: const TextStyle(fontSize: 32)),
-              )).toList(),
-            ),
-          ],
-        ),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFFF5F5DC),
+        title: Text('¿ELIMINAR_REGISTRO?', style: GoogleFonts.jetBrainsMono(fontSize: 14)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCELAR')),
+          TextButton(
+            onPressed: () {
+              ref.read(commentServiceProvider).deleteComment(storyId, comment.id);
+              Navigator.pop(ctx);
+            }, 
+            child: const Text('CONFIRMAR', style: TextStyle(color: Colors.red))
+          ),
+        ],
       ),
     );
   }
 
   String _timeAgo(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-    if (difference.inSeconds < 60) return 'ahora';
-    if (difference.inMinutes < 60) return 'hace ${difference.inMinutes}m';
-    if (difference.inHours < 24) return 'hace ${difference.inHours}h';
-    if (difference.inDays < 7) return 'hace ${difference.inDays}d';
-    return 'hace ${difference.inDays ~/ 7}s';
+    final diff = DateTime.now().difference(dateTime);
+    if (diff.inMinutes < 1) return 'JUST_NOW';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}M_AGO';
+    if (diff.inHours < 24) return '${diff.inHours}H_AGO';
+    return '${diff.inDays}D_AGO';
+  }
+}
+
+class _UserHeader extends StatelessWidget {
+  const _UserHeader({required this.userId, required this.userName, required this.ref});
+  final String userId, userName;
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<TravelAgency?>(
+      future: ref.read(agencyServiceProvider).getAgencyById(userId),
+      builder: (context, snapshot) {
+        final isVerified = snapshot.data?.verified ?? false;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(userName.toUpperCase(), 
+                style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 11, letterSpacing: 0.5))
+            ),
+            if (isVerified) const Padding(
+              padding: EdgeInsets.only(left: 6),
+              child: Icon(Icons.verified_rounded, color: Color(0xFF4B5320), size: 14),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ReactionToolbar extends StatelessWidget {
+  const _ReactionToolbar({required this.comment, required this.storyId, required this.reactions, required this.ref});
+  final Comment comment;
+  final String storyId;
+  final List<String> reactions;
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _ActionButton(
+          icon: Icons.favorite_border_rounded, 
+          label: '${comment.likes}',
+          onTap: () => ref.read(commentServiceProvider).likeComment(storyId, comment.id),
+        ),
+        const SizedBox(width: 20),
+        _ActionButton(
+          icon: Icons.add_reaction_outlined,
+          label: 'REACCIONAR',
+          onTap: () => _showPicker(context),
+        ),
+      ],
+    );
+  }
+
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A1A),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Wrap(
+          spacing: 24, runSpacing: 24,
+          children: reactions.map((r) => InkWell(
+            onTap: () {
+              ref.read(commentServiceProvider).addReaction(storyId, comment.id, r);
+              Navigator.pop(context);
+            },
+            child: Text(r, style: const TextStyle(fontSize: 28)),
+          )).toList(),
+        ),
+      ),
+    );
   }
 }
 
 class CommentInput extends ConsumerWidget {
-  const CommentInput({
-    super.key,
-    required this.storyId,
-    required this.controller,
-  });
-
+  const CommentInput({super.key, required this.storyId, required this.controller});
   final String storyId;
   final TextEditingController controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    void submitComment() {
-      if (controller.text.trim().isEmpty) return;
-      ref.read(commentServiceProvider).addComment(storyId, controller.text.trim());
-      controller.clear();
-    }
-
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+      padding: EdgeInsets.fromLTRB(16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
+      decoration: const BoxDecoration(
+        color: Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: Colors.blue.shade100,
-            child: const Icon(Icons.person, size: 16, color: Colors.blue),
-          ),
-          const SizedBox(width: 8),
           Expanded(
             child: TextField(
               controller: controller,
-              onSubmitted: (_) => submitComment(),
+              style: GoogleFonts.jetBrainsMono(color: Colors.white, fontSize: 13),
               decoration: InputDecoration(
-                hintText: 'Agrega un comentario...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                hintText: 'ESCRIBIR_COMENTARIO...',
+                hintStyle: GoogleFonts.jetBrainsMono(color: Colors.white.withValues(alpha: 0.3), fontSize: 12),
+                border: InputBorder.none,
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: submitComment,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(20)),
-              child: const Icon(Icons.send, color: Colors.white, size: 18),
-            ),
+          IconButton(
+            icon: const Icon(Icons.send_rounded, color: Color(0xFFF5F5DC), size: 20),
+            onPressed: () {
+              if (controller.text.trim().isEmpty) return;
+              ref.read(commentServiceProvider).addComment(storyId, controller.text.trim());
+              controller.clear();
+              FocusScope.of(context).unfocus();
+            },
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UserAvatar extends StatelessWidget {
+  const _UserAvatar({required this.avatarUrl});
+  final String avatarUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor: const Color(0xFF4B5320).withValues(alpha: 0.1),
+      backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+      child: avatarUrl.isEmpty 
+        ? const Icon(Icons.person_outline, size: 14, color: Color(0xFF4B5320)) 
+        : null,
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({required this.icon, required this.label, required this.onTap});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: Colors.grey.shade600),
+          const SizedBox(width: 6),
+          Text(label, style: GoogleFonts.jetBrainsMono(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReactionSummary extends StatelessWidget {
+  const _ReactionSummary({required this.reactions});
+  final List<String> reactions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Wrap(
+        spacing: 6,
+        children: reactions.toSet().map((r) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.04), 
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.black.withValues(alpha: 0.05))
+          ),
+          child: Text(r, style: const TextStyle(fontSize: 12)),
+        )).toList(),
+      ),
+    );
+  }
+}
+
+class CenterEmptyComments extends StatelessWidget {
+  const CenterEmptyComments({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.auto_stories_rounded, size: 40, color: Colors.grey.shade400),
+          const SizedBox(height: 20),
+          Text('HISTORIAL_VACÍO', 
+            style: GoogleFonts.jetBrainsMono(color: Colors.grey.shade400, letterSpacing: 2, fontSize: 12)),
         ],
       ),
     );

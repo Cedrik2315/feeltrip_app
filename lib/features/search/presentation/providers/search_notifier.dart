@@ -1,34 +1,49 @@
-import 'dart:async';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:feeltrip_app/features/search/data/repositories/search_repository_impl.dart';
-import 'package:feeltrip_app/features/search/domain/entities/search_result.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:feeltrip_app/services/algolia_search_service.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
 
-part 'search_notifier.g.dart';
+/// Estado de la búsqueda
+class SearchState {
 
-@riverpod
-class SearchNotifier extends _$SearchNotifier {
-  @override
-  FutureOr<List<SearchResult>> build() => [];
+  SearchState({this.results = const [], this.isLoading = false, this.error});
+  final List<Map<String, dynamic>> results;
+  final bool isLoading;
+  final String? error;
+}
 
-  Future<void> searchExperiences(String query) async {
+final searchNotifierProvider = StateNotifierProvider<SearchNotifier, SearchState>((ref) {
+  return SearchNotifier();
+});
+
+class SearchNotifier extends StateNotifier<SearchState> {
+  SearchNotifier() : super(SearchState());
+
+  final _algoliaService = AlgoliaSearchService();
+
+  /// Realiza una búsqueda avanzada usando Algolia (Fase 3).
+  Future<void> search(String query, {String? collection}) async {
     if (query.isEmpty) {
-      state = const AsyncData([]);
+      state = SearchState(results: []);
       return;
     }
 
-    state = const AsyncLoading();
+    state = SearchState(isLoading: true);
 
-    // Usamos guard para capturar errores automáticamente
-    state = await AsyncValue.guard(() async {
-      final repository = ref.read(searchRepositoryProvider);
+    try {
+      // Ahora usamos Algolia para búsqueda semántica y escala
+      final results = await _algoliaService.searchExperiences(query);
 
-      // Si tu repositorio devuelve Either<Failure, List<SearchResult>>:
-      final result = await repository.searchExperiences(query);
-
-      return result.fold(
-        (failure) => throw Exception(failure.toString()),
-        (results) => results,
+      state = SearchState(results: results);
+    } catch (e) {
+      AppLogger.e('Error en la búsqueda de Firestore: $e');
+      state = SearchState(
+        results: [],
+        error: 'No se pudo completar la búsqueda. Inténtalo de nuevo.',
       );
-    });
+    }
+  }
+
+  void clearSearch() {
+    state = SearchState();
   }
 }

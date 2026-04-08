@@ -1,223 +1,268 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/cart_item_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class CartScreen extends StatefulWidget {
+import 'package:feeltrip_app/models/cart_item_model.dart';
+import 'package:feeltrip_app/presentation/providers/cart_provider.dart';
+
+class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
-  @override
-  State<CartScreen> createState() => _CartScreenState();
-}
 
-class _CartScreenState extends State<CartScreen> {
+  // Paleta FeelTrip
+  static const Color boneWhite = Color(0xFFF5F5DC);
+  static const Color carbonBlack = Color(0xFF1A1A1A);
+  static const Color mossGreen = Color(0xFF4B5320);
+  static const Color rustyEarth = Color(0xFFA52A2A);
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final user = FirebaseAuth.instance.currentUser;
+    
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Debes iniciar sesión')),
+      return Scaffold(
+        backgroundColor: boneWhite,
+        body: Center(
+          child: Text('> ERROR: AUTH_SESSION_REQUIRED', 
+            style: GoogleFonts.jetBrainsMono(color: rustyEarth, fontWeight: FontWeight.bold)),
+        ),
       );
     }
 
-    final cartRef =
-        FirebaseFirestore.instance.collection('carts').doc(user.uid).collection('items');
+    final cartAsync = ref.watch(cartItemsProvider(user.uid));
 
     return Scaffold(
+      backgroundColor: boneWhite,
       appBar: AppBar(
-        title: const Text('Carrito de Compras'),
-        backgroundColor: Colors.deepPurple,
+        elevation: 0,
+        backgroundColor: carbonBlack,
+        title: Text('CARRITO_COMPRAS.sys', 
+          style: GoogleFonts.jetBrainsMono(color: boneWhite, fontSize: 16)),
+        iconTheme: const IconThemeData(color: boneWhite),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: cartRef.snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+      body: cartAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: mossGreen)),
+        error: (error, _) => Center(
+          child: Text('// SYS_ERROR: $error', style: GoogleFonts.jetBrainsMono(color: rustyEarth))
+        ),
+        data: (cartItems) {
+          if (cartItems.isEmpty) {
+            return _EmptyCartView(onAction: () => context.pop());
           }
-          if (snapshot.hasError) {
-            return const Center(child: Text('Error: \${snapshot.error}'));
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
-                  const SizedBox(height: 16),
-                  const Text('Tu carrito está vacío',
-                      style: TextStyle(fontSize: 18, color: Colors.grey)),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
-                    child: const Text('Continuar Comprando'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final cartItems = snapshot.data!.docs.map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            data['id'] = doc.id;
-            return CartItem.fromJson(data);
-          }).toList();
 
           final subtotal = cartItems.fold<double>(0, (total, item) => total + item.total);
-          final tax = subtotal * 0.1;
+          final tax = subtotal * 0.19; // IVA Chile
           final total = subtotal + tax;
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                // Items
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
                   itemCount: cartItems.length,
                   itemBuilder: (context, index) {
-                    CartItem item = cartItems[index];
-
-                    final docRef =
-                        cartRef.doc(item.tripId); // Use tripId as doc id or item.id if set
-
+                    final item = cartItems[index];
                     return Dismissible(
-                      key: Key(item.tripId),
+                      key: Key(item.id.isNotEmpty ? item.id : item.tripId),
+                      direction: DismissDirection.endToStart,
                       onDismissed: (_) async {
-                        await docRef.delete();
+                        await ref.read(cartServiceProvider).removeItem(
+                          userId: user.uid,
+                          itemId: item.id.isNotEmpty ? item.id : item.tripId,
+                        );
                       },
                       background: Container(
-                        color: Colors.red,
                         alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 16),
-                        child: const Icon(Icons.delete, color: Colors.white),
+                        padding: const EdgeInsets.only(right: 20),
+                        color: rustyEarth,
+                        child: const Icon(Icons.delete_forever, color: boneWhite),
                       ),
-                      child: Card(
-                        margin: const EdgeInsets.all(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.purple[100],
-                                ),
-                                child: Center(
-                                    child: Text(item.image, style: const TextStyle(fontSize: 32))),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(item.tripTitle,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold, fontSize: 14)),
-                                    Text(item.destination,
-                                        style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                                    Text('\$${item.price}',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold, color: Colors.deepPurple)),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.add),
-                                    onPressed: () async {
-                                      item = item.copyWith(quantity: item.quantity + 1);
-                                      await docRef.update({'quantity': item.quantity});
-                                      setState(() {}); // Refresh UI
-                                    },
-                                    iconSize: 18,
-                                  ),
-                                  const Text('\${item.quantity}'),
-                                  IconButton(
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: item.quantity > 1
-                                        ? () async {
-                                            item = item.copyWith(quantity: item.quantity - 1);
-                                            await docRef.update({'quantity': item.quantity});
-                                            setState(() {}); // Refresh UI
-                                          }
-                                        : null,
-                                    iconSize: 18,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                      child: _CartItemCard(
+                        item: item,
+                        onIncrement: () => ref.read(cartServiceProvider).updateQuantity(
+                          userId: user.uid,
+                          item: item,
+                          quantity: item.quantity + 1,
                         ),
+                        onDecrement: item.quantity > 1
+                            ? () => ref.read(cartServiceProvider).updateQuantity(
+                                  userId: user.uid,
+                                  item: item,
+                                  quantity: item.quantity - 1,
+                                )
+                            : null,
                       ),
                     );
                   },
                 ),
-                // Summary
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16))),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Resumen de Pago',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 16),
-                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text('Subtotal:'),
-                        Text('\$${subtotal.toStringAsFixed(2)}')
-                      ]),
-                      const SizedBox(height: 8),
-                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text('Impuestos (10%):'),
-                        Text('\$${tax.toStringAsFixed(2)}')
-                      ]),
-                      const SizedBox(height: 8),
-                      const Divider(),
-                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text('Total:',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text('\$${total.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.deepPurple)),
-                      ]),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pushNamed(context, '/bookings'),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
-                              padding: const EdgeInsets.symmetric(vertical: 16)),
-                          child: const Text('Proceder al Pago',
-                              style: TextStyle(fontSize: 16, color: Colors.white)),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colors.deepPurple),
-                              padding: const EdgeInsets.symmetric(vertical: 16)),
-                          child: const Text('Continuar Comprando',
-                              style: TextStyle(fontSize: 16, color: Colors.deepPurple)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+              _CheckoutSummary(subtotal: subtotal, tax: tax, total: total),
+            ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _CheckoutSummary extends StatelessWidget {
+  final double subtotal, tax, total;
+  const _CheckoutSummary({required this.subtotal, required this.tax, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        border: Border.all(color: const Color(0xFF4B5320).withValues(alpha: 0.5)),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            _SummaryRow(label: 'SUBTOTAL', value: subtotal),
+            _SummaryRow(label: 'TAX_IVA (19%)', value: tax),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Divider(color: Color(0xFFF5F5DC), thickness: 0.5),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('TOTAL_FINAL', 
+                  style: GoogleFonts.jetBrainsMono(color: const Color(0xFFF5F5DC), fontWeight: FontWeight.bold)),
+                Text('\$${total.toStringAsFixed(0)}', 
+                  style: GoogleFonts.jetBrainsMono(color: const Color(0xFFA52A2A), fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () => context.push('/bookings'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFF5F5DC),
+                  shape: const RoundedRectangleBorder(),
+                ),
+                child: Text('>> PROCEDER_AL_PAGO', 
+                  style: GoogleFonts.jetBrainsMono(color: const Color(0xFF1A1A1A), fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  final String label;
+  final double value;
+  const _SummaryRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: GoogleFonts.jetBrainsMono(color: const Color(0xFFF5F5DC).withValues(alpha: 0.6), fontSize: 11)),
+          Text('\$${value.toStringAsFixed(0)}', style: GoogleFonts.jetBrainsMono(color: const Color(0xFFF5F5DC), fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
+class _CartItemCard extends StatelessWidget {
+  const _CartItemCard({required this.item, required this.onIncrement, required this.onDecrement});
+  final CartItem item;
+  final VoidCallback onIncrement;
+  final VoidCallback? onDecrement;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5DC),
+        border: Border.all(color: const Color(0xFF1A1A1A).withValues(alpha: 0.15)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Container(
+              width: 60, height: 60,
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xFF1A1A1A)),
+              ),
+              child: Center(child: Text(item.image, style: const TextStyle(fontSize: 24))),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(item.tripTitle.toUpperCase(), 
+                    style: GoogleFonts.ebGaramond(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text('LOC: ${item.destination}', 
+                    style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF4B5320))),
+                ],
+              ),
+            ),
+            _QuantityController(quantity: item.quantity, onAdd: onIncrement, onRemove: onDecrement),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuantityController extends StatelessWidget {
+  final int quantity;
+  final VoidCallback onAdd;
+  final VoidCallback? onRemove;
+  const _QuantityController({required this.quantity, required this.onAdd, this.onRemove});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(onPressed: onRemove, icon: const Icon(Icons.remove, size: 16), color: const Color(0xFFA52A2A)),
+        Text('$quantity', style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.bold)),
+        IconButton(onPressed: onAdd, icon: const Icon(Icons.add, size: 16), color: const Color(0xFF4B5320)),
+      ],
+    );
+  }
+}
+
+class _EmptyCartView extends StatelessWidget {
+  const _EmptyCartView({required this.onAction});
+  final VoidCallback onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.shopping_bag_outlined, size: 48, color: Color(0xFF4B5320)),
+          const SizedBox(height: 16),
+          Text('CARRITO_VACIO', style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 24),
+          OutlinedButton(
+            onPressed: onAction,
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Color(0xFF1A1A1A)),
+              shape: const RoundedRectangleBorder(),
+            ),
+            child: Text('VOLVER_A_EXPLORACION', style: GoogleFonts.jetBrainsMono(color: const Color(0xFF1A1A1A))),
+          ),
+        ],
       ),
     );
   }

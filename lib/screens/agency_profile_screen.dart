@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/travel_agency_model.dart';
 import '../services/agency_service.dart';
@@ -19,6 +20,12 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
   final AgencyService _agencyService = AgencyService();
   late Future<TravelAgency?> _agencyFuture;
 
+  // Paleta de Colores Oficial FeelTrip
+  static const Color boneWhite = Color(0xFFF5F2ED); // Tono papel más natural
+  static const Color carbonBlack = Color(0xFF1A1A1A);
+  static const Color mossGreen = Color(0xFF4A5D4E);
+  static const Color oxidizedEarth = Color(0xFFB35A38);
+
   @override
   void initState() {
     super.initState();
@@ -32,351 +39,313 @@ class _AgencyProfileScreenState extends State<AgencyProfileScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-              body: Center(child: CircularProgressIndicator()));
+            backgroundColor: boneWhite,
+            body: Center(child: CircularProgressIndicator(color: mossGreen)),
+          );
         }
 
         if (!snapshot.hasData || snapshot.data == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Agencia no encontrada')),
-            body: const Center(
-                child: Text('No se pudo cargar la información de la agencia.')),
+            backgroundColor: boneWhite,
+            appBar: AppBar(
+              backgroundColor: carbonBlack,
+              elevation: 0,
+              title: Text('ERR: NULL_PTR_AGENCY', style: GoogleFonts.jetBrainsMono(fontSize: 14)),
+            ),
+            body: Center(
+              child: Text(
+                'No se pudo localizar el registro de la agencia.',
+                style: GoogleFonts.ebGaramond(fontSize: 18),
+              ),
+            ),
           );
         }
 
         final agency = snapshot.data!;
 
-        return CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 200,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.blue[400]!,
-                        Colors.blue[800]!,
-                      ],
-                    ),
-                  ),
-                  child: Center(
-                    child: Image.network(
-                      agency.logo,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        Icons.business,
-                        size: 80,
-                        color: Colors.white,
+        return Scaffold(
+          backgroundColor: boneWhite,
+          body: CustomScrollView(
+            slivers: [
+              // Header Híbrido: Imagen + Terminal UI
+              SliverAppBar(
+                expandedHeight: 220,
+                pinned: true,
+                backgroundColor: carbonBlack,
+                iconTheme: const IconThemeData(color: boneWhite),
+                flexibleSpace: FlexibleSpaceBar(
+                  centerTitle: false,
+                  titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
+                  title: Row(
+                    children: [
+                      Text(
+                        '> AGENCY_PROFILE',
+                        style: GoogleFonts.jetBrainsMono(
+                          color: boneWhite,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.1,
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 4),
+                      _BlinkingCursor(),
+                    ],
                   ),
-                ),
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.share),
-                  onPressed: () => _shareAgency(agency),
-                ),
-              ],
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                agency.name,
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_on,
-                                    size: 16,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${agency.city}, ${agency.country}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600]!,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(
+                        agency.logo,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.landscape, color: mossGreen, size: 60),
+                      ),
+                      // Overlay para asegurar legibilidad del texto de terminal
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              carbonBlack.withValues(alpha: 0.3),
+                              carbonBlack.withValues(alpha: 0.8),
                             ],
                           ),
                         ),
-                        if (agency.verified)
-                          const Tooltip(
-                            message: 'Verificado',
-                            child: Icon(
-                              Icons.verified,
-                              color: Colors.blue,
-                              size: 24,
-                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.share_outlined),
+                    onPressed: () => _shareAgency(agency),
+                  ),
+                ],
+              ),
+
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Metadata Técnica
+                      Text(
+                        'ID: ${agency.id.toUpperCase()} // REG_LOC: ${agency.city.toUpperCase()}',
+                        style: GoogleFonts.jetBrainsMono(
+                          color: oxidizedEarth,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      
+                      // Nombre Editorial
+                      Text(
+                        agency.name,
+                        style: GoogleFonts.ebGaramond(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: carbonBlack,
+                          height: 0.9,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      Divider(color: mossGreen.withValues(alpha: 0.2), thickness: 1),
+                      
+                      // Bloque de Estadísticas de Instrumentación
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildStat(label: 'RATING', value: agency.rating.toStringAsFixed(1)),
+                            _buildStat(label: 'FOLLOWERS', value: agency.followers.toString()),
+                            _buildStat(label: 'EXPERIENCES', value: agency.experiences.length.toString()),
+                          ],
+                        ),
+                      ),
+                      
+                      Divider(color: mossGreen.withValues(alpha: 0.2), thickness: 1),
+                      const SizedBox(height: 32),
+
+                      // Sección Narrativa con Capitular
+                      Text(
+                        'CRÓNICA DE LA AGENCIA',
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 11,
+                          color: mossGreen,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      _buildEditorialDescription(agency.description),
+
+                      const SizedBox(height: 40),
+
+                      // Interfaz de Comandos de Contacto
+                      _buildTechnicalAction(
+                        label: 'CALL_STREAM',
+                        value: agency.phoneNumber,
+                        onTap: () => _launchPhone(agency.phoneNumber),
+                      ),
+                      _buildTechnicalAction(
+                        label: 'MAIL_PROTOCOL',
+                        value: agency.email,
+                        onTap: () => _launchEmail(agency.email),
+                      ),
+
+                      const SizedBox(height: 48),
+
+                      // Botón de Acción Principal (Terminal Style)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 60,
+                        child: OutlinedButton(
+                          onPressed: () => _agencyService.followAgency(agency.id),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: carbonBlack,
+                            side: const BorderSide(color: carbonBlack),
+                            shape: const RoundedRectangleBorder(), // Rectangular para estética técnica
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        _buildStat(
-                          icon: Icons.star,
-                          value: agency.rating.toStringAsFixed(1),
-                          label: 'Rating',
-                        ),
-                        const SizedBox(width: 24),
-                        _buildStat(
-                          icon: Icons.people,
-                          value: agency.followers.toString(),
-                          label: 'Followers',
-                        ),
-                        const SizedBox(width: 24),
-                        _buildStat(
-                          icon: Icons.tour,
-                          value: agency.experiences.length.toString(),
-                          label: 'Experiencias',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Sobre nosotros',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      agency.description,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    if (agency.specialties.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Especialidades',
-                            style: TextStyle(
-                              fontSize: 18,
+                          child: Text(
+                            '>> EJECUTAR: SEGUIR_AGENCIA',
+                            style: GoogleFonts.jetBrainsMono(
+                              color: boneWhite,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey[800],
+                              fontSize: 13,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: agency.specialties
-                                .map((specialty) => Chip(
-                                      label: Text(specialty),
-                                      backgroundColor: Colors.blue[100],
-                                    ))
-                                .toList(),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
-                    Text(
-                      'Contacto',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildContactButton(
-                      icon: Icons.phone,
-                      label: agency.phoneNumber,
-                      onTap: () => _launchPhone(agency.phoneNumber),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildContactButton(
-                      icon: Icons.email,
-                      label: agency.email,
-                      onTap: () => _launchEmail(agency.email),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildContactButton(
-                      icon: Icons.language,
-                      label: agency.website,
-                      onTap: () => _launchWebsite(agency.website),
-                    ),
-                    const SizedBox(height: 24),
-                    if (agency.socialMedia.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Redes Sociales',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 12,
-                            children: agency.socialMedia
-                                .map((social) => _buildSocialIcon(social))
-                                .toList(),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.person_add, color: Colors.white),
-                        label: const Text('Seguir'),
-                        onPressed: () {
-                          _agencyService.followAgency(agency.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('¡Ahora sigues a esta agencia!'),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue[700],
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildStat({
-    required IconData icon,
-    required String value,
-    required String label,
-  }) {
+  // Widget para la descripción con capitular editorial
+  Widget _buildEditorialDescription(String text) {
+    if (text.isEmpty) return const SizedBox.shrink();
+    
+    return RichText(
+      text: TextSpan(
+        style: GoogleFonts.ebGaramond(
+          fontSize: 19,
+          color: carbonBlack,
+          height: 1.5,
+        ),
+        children: [
+          TextSpan(
+            text: text.substring(0, 1),
+            style: GoogleFonts.ebGaramond(
+              fontSize: 52,
+              fontWeight: FontWeight.bold,
+              color: oxidizedEarth,
+              height: 0.8,
+            ),
+          ),
+          TextSpan(text: text.substring(1)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStat({required String label, required String value}) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: Colors.blue, size: 24),
-        const SizedBox(height: 4),
         Text(
-          value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+          value.padLeft(2, '0'),
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+            color: carbonBlack,
           ),
         ),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600]!,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 9,
+            color: mossGreen,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildContactButton({
-    required IconData icon,
+  Widget _buildTechnicalAction({
     required String label,
+    required String value,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(8),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            Icon(icon, color: Colors.blue),
-            const SizedBox(width: 12),
+            Text('$label > ', 
+              style: GoogleFonts.jetBrainsMono(color: mossGreen, fontSize: 11, fontWeight: FontWeight.bold)
+            ),
             Expanded(
               child: Text(
-                label,
-                style: const TextStyle(fontSize: 14),
+                value,
+                style: GoogleFonts.jetBrainsMono(
+                  color: carbonBlack,
+                  fontSize: 12,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
-            const Icon(Icons.arrow_forward, size: 16, color: Colors.blue),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSocialIcon(String social) {
-    IconData icon;
-    if (social.toLowerCase().contains('instagram')) {
-      icon = Icons.camera_alt;
-    } else if (social.toLowerCase().contains('facebook')) {
-      icon = Icons.group;
-    } else if (social.toLowerCase().contains('whatsapp')) {
-      icon = Icons.chat;
-    } else {
-      icon = Icons.link;
-    }
+  void _shareAgency(TravelAgency agency) => SharingService.shareAgency(agency);
+  Future<void> _launchPhone(String n) async => await launchUrl(Uri.parse('tel:$n'));
+  Future<void> _launchEmail(String e) async => await launchUrl(Uri.parse('mailto:$e'));
+}
 
-    return CircleAvatar(
-      backgroundColor: Colors.blue[100],
-      child: Icon(icon, color: Colors.blue),
+// Pequeño componente para el cursor parpadeante
+class _BlinkingCursor extends StatefulWidget {
+  @override
+  _BlinkingCursorState createState() => _BlinkingCursorState();
+}
+
+class _BlinkingCursorState extends State<_BlinkingCursor> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(duration: const Duration(milliseconds: 600), vsync: this)..repeat(reverse: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _controller,
+      child: Container(width: 8, height: 14, color: const Color(0xFFF5F2ED)),
     );
   }
 
-  void _shareAgency(TravelAgency agency) {
-    SharingService.shareAgency(agency);
-  }
-
-  Future<void> _launchPhone(String phoneNumber) async {
-    final url = 'tel:$phoneNumber';
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    }
-  }
-
-  Future<void> _launchEmail(String email) async {
-    final uri = Uri.parse('mailto:$email');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
-  }
-
-  Future<void> _launchWebsite(String website) async {
-    final uri =
-        Uri.parse(website.startsWith('http') ? website : 'https://$website');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

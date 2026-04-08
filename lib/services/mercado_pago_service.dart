@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:fpdart/fpdart.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:feeltrip_app/core/error/failures.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MercadoPagoService {
   static const String _baseUrl = 'https://api.mercadopago.com/checkout/preferences';
@@ -16,7 +18,10 @@ class MercadoPagoService {
   }) async {
     try {
       final token = dotenv.env['MERCADO_PAGO_ACCESS_TOKEN'] ?? '';
-      if (token.isEmpty) return Left(ServerFailure());
+      if (token.isEmpty) {
+        AppLogger.w('MercadoPago token missing. Booking payment stays in beta mode.');
+        return const Left(ServerFailure('MercadoPago token missing'));
+      }
 
       final body = json.encode({
         'items': items,
@@ -28,6 +33,10 @@ class MercadoPagoService {
         },
         'auto_return': 'approved',
         'external_reference': DateTime.now().millisecondsSinceEpoch.toString(),
+        'metadata': {
+          'source': 'feeltrip_mobile_beta',
+          'warning': 'client_side_preference_only',
+        },
       });
 
       final response = await http.post(
@@ -43,21 +52,27 @@ class MercadoPagoService {
         final data = json.decode(response.body) as Map<String, dynamic>;
         final prefId = data['id'] as String?;
         if (prefId != null) {
-          AppLogger.i('Preference created: $prefId');
+          AppLogger.i('Preference created in beta mode: $prefId');
           return Right(prefId);
         }
-        return Left(ServerFailure());
       }
-      return Left(ServerFailure());
+
+      AppLogger.e('MercadoPago preference error: ${response.statusCode} ${response.body}');
+      return const Left(ServerFailure('Preference creation failed'));
     } catch (e) {
       AppLogger.e('MercadoPago error: $e');
-      return Left(ServerFailure());
+      return const Left(ServerFailure('MercadoPago error'));
     }
   }
 
   static Future<Either<Failure, Map<String, dynamic>>> getPaymentStatus(String externalRef) async {
     try {
       final token = dotenv.env['MERCADO_PAGO_ACCESS_TOKEN'] ?? '';
+      if (token.isEmpty) {
+        AppLogger.w('MercadoPago token missing. Payment status is unavailable in beta mode.');
+        return const Left(ServerFailure('Payment status unavailable'));
+      }
+
       final response = await http.get(
         Uri.parse('$_baseUrl?external_reference=$externalRef'),
         headers: {'Authorization': 'Bearer $token'},
@@ -65,10 +80,13 @@ class MercadoPagoService {
       if (response.statusCode == 200) {
         return Right(json.decode(response.body) as Map<String, dynamic>);
       }
-      return Left(ServerFailure());
+
+      AppLogger.e('MercadoPago status error: ${response.statusCode} ${response.body}');
+      return const Left(ServerFailure('Status lookup failed'));
     } catch (e) {
       AppLogger.e('Status error: $e');
-      return Left(ServerFailure());
+      return const Left(ServerFailure('Status error'));
     }
   }
 }
+

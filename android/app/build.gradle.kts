@@ -2,8 +2,8 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")
 }
+
 
 android {
     namespace = "com.example.feeltrip_app"
@@ -11,32 +11,40 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // ACTIVADO: Necesario para flutter_local_notifications
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
+        @Suppress("DEPRECATION")
         jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId = "com.example.feeltrip_app"
-        minSdk = 21 // Recomendado para Stripe y MLKit
+        minSdk = flutter.minSdkVersion 
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
     }
+    signingConfigs {
+        create("release") {
+            keyAlias = "upload"
+            keyPassword = "231504"
+            storeFile = file("C:/Users/monch/upload-keystore.jks")
+            storePassword = "231504"
+    }
+}
 
     buildTypes {
         release {
-            // Usamos la firma de debug por ahora para que puedas probarlo en tu Moto g35
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
             
-            // ACTIVAMOS LA PROTECCIÓN CONTRA EL ERROR DE R8
-            minifyEnabled = true
-            shrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -45,17 +53,20 @@ android {
     }
 }
 
-// Eliminamos la estrategia de resolución que excluía firebase-iid 
-// porque MLKit la necesita para funcionar en modo Release.
+configurations.configureEach {
+    exclude(group = "com.google.firebase", module = "firebase-iid")
+}
+dependencies {
+    // Librería esencial para el soporte de notificaciones y GPS en Android
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    
+
+}
 
 flutter {
     source = "../.."
 }
 
-dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    
-    // Aseguramos que las librerías de MLKit y Stripe tengan lo necesario
-    implementation("com.google.firebase:firebase-iid") 
-}
+
+
+

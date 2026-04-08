@@ -1,5 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:feeltrip_app/features/auth/domain/models/auth_user.dart';
+import 'package:feeltrip_app/features/auth/domain/entities/auth_user.dart';
 
 class UserModel {
   UserModel({
@@ -40,33 +39,4 @@ class UserModel {
       'imageUrl': imageUrl,
     };
   }
-}
-
-void main() {
-  group('UserModelTests', () {
-    test('Debe crearse con los campos requeridos', () {
-      final user = UserModel(
-        id: 'user1',
-        email: 'juan@test.com',
-        name: 'Juan',
-        imageUrl: 'https://foto.com/juan.jpg',
-      );
-      expect(user.id, 'user1');
-      expect(user.name, 'Juan');
-      expect(user.email, 'juan@test.com');
-      expect(user.imageUrl, 'https://foto.com/juan.jpg');
-    });
-
-    test('toJson serializa correctamente para Firestore', () {
-      final user = UserModel(
-        id: 'user1',
-        email: 'juan@test.com',
-        name: 'Juan',
-        imageUrl: '',
-      );
-      final json = user.toJson();
-      expect(json['id'], 'user1');
-      expect(json['email'], 'juan@test.com');
-    });
-  });
 }

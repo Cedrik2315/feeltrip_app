@@ -1,34 +1,74 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-part 'notification_model.freezed.dart';
-part 'notification_model.g.dart';
+class NotificationModel {
+  const NotificationModel({
+    required this.id,
+    required this.userId,
+    required this.type,
+    required this.title,
+    required this.body,
+    this.actionId,
+    this.actionType,
+    this.isRead = false,
+    this.createdAt,
+    this.imageUrl,
+    this.badgeCount,
+  });
 
-@freezed
-class NotificationModel with _$NotificationModel {
-  const factory NotificationModel({
-    required String id,
-    required String userId,
-    required String
-        type, // 'streak', 'like', 'comment', 'booking_confirm', 'agency_update', 'share'
-    required String title,
-    required String body,
-    String? actionId, // storyId, bookingId, agencyId
-    String? actionType, // 'story', 'booking', 'profile'
-    @Default(false) bool isRead,
-    @ServerTimestampConverter() FieldValue? createdAt,
-    String? imageUrl, // para notifs visuales
-    int? badgeCount, // para streaks
-  }) = _NotificationModel;
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
+      id: json['id'] as String? ?? '',
+      userId: json['userId'] as String? ?? '',
+      type: json['type'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      body: json['body'] as String? ?? '',
+      actionId: (json['actionId'] ?? json['storyId']) as String?,
+      actionType: json['actionType'] as String?,
+      isRead: json['isRead'] as bool? ?? false,
+      createdAt: json['createdAt'] is Timestamp
+          ? (json['createdAt'] as Timestamp).toDate()
+          : DateTime.tryParse(json['createdAt']?.toString() ?? ''),
+      imageUrl: json['imageUrl'] as String?,
+      badgeCount: json['badgeCount'] as int?,
+    );
+  }
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) =>
-      _$NotificationModelFromJson(json);
-}
+  factory NotificationModel.fromFirestore(
+    String id,
+    Map<String, dynamic> data,
+  ) {
+    return NotificationModel.fromJson({
+      ...data,
+      'id': id,
+    });
+  }
 
-class ServerTimestampConverter implements JsonConverter<FieldValue, Object?> {
-  const ServerTimestampConverter();
-  @override
-  FieldValue fromJson(Object? json) => FieldValue.serverTimestamp();
-  @override
-  Object? toJson(FieldValue object) => null;
+  final String id;
+  final String userId;
+  final String type;
+  final String title;
+  final String body;
+  final String? actionId;
+  final String? actionType;
+  final bool isRead;
+  final DateTime? createdAt;
+  final String? imageUrl;
+  final int? badgeCount;
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'type': type,
+      'title': title,
+      'body': body,
+      'actionId': actionId,
+      'actionType': actionType,
+      'isRead': isRead,
+      'createdAt': createdAt != null
+          ? Timestamp.fromDate(createdAt!)
+          : FieldValue.serverTimestamp(),
+      'imageUrl': imageUrl,
+      'badgeCount': badgeCount,
+    };
+  }
 }

@@ -1,38 +1,97 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:feeltrip_app/core/logger/app_logger.dart';
+﻿import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/logger/app_logger.dart';
+
+final metricsServiceProvider = Provider((ref) => MetricsService());
 
 class MetricsService {
-  static final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
+  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
 
-  /// Simulate ARPU: total revenue / total users (hardcoded demo for LTV>CAC proof)
-  static double getSimulatedARPU() {
-    // Demo: $12.5 ARPU (premium subs)
-    const totalRevenue = 12500.0;
-    const totalUsers = 1000;
-    return totalRevenue / totalUsers;
+  // Eventos de Autenticación
+  Future<void> logSignUp(String method) async {
+    await _analytics.logSignUp(signUpMethod: method);
   }
 
-  /// LTV = ARPU * lifetime months * retention rate
-  static double getSimulatedLTV() {
-    const arpu = 12.5;
-    const lifetime = 12; // 1 year
-    const retention = 0.85;
-    return arpu * lifetime * retention; // $127.5 > CAC $5
+  Future<void> logLogin(String method) async {
+    await _analytics.logLogin(loginMethod: method);
   }
 
-  static double getCAC() => 5.0; // Marketing cost per user
+  // Eventos de Búsqueda y Discovery
+  Future<void> logSearch(String query) async {
+    await _analytics.logSearch(searchTerm: query);
+  }
 
-  static bool get ltvGreaterCAC => getSimulatedLTV() > getCAC();
-
-  static Future<void> logRevenueEvent(double revenue) async {
-    await _analytics.logPurchase(
-      currency: 'USD',
-      value: revenue,
+  static void logShare(String type) {
+    FirebaseAnalytics.instance.logShare(
+      contentType: type,
+      itemId: 'shared_${type}',
+      method: 'native_share',
     );
-    AppLogger.i('Logged revenue: \$${revenue.toStringAsFixed(2)}');
   }
 
-  static Future<void> logCAC(double cac) async {
-    await _analytics.logEvent(name: 'cac_update', parameters: {'value': cac});
+  // Eventos de Negocio (Funnel de Conversión)
+  Future<void> logPremiumView() async {
+    await _analytics.logEvent(name: 'premium_view');
+  }
+
+  Future<void> logPurchaseStarted(String productId) async {
+    await _analytics.logEvent(
+      name: 'premium_purchase_started',
+      parameters: {'product_id': productId},
+    );
+  }
+
+  Future<void> logBookingStarted(String experienceId, double amount) async {
+    await _analytics.logEvent(
+      name: 'booking_started',
+      parameters: {
+        'experience_id': experienceId,
+        'value': amount,
+        'currency': 'ARS',
+      },
+    );
+    AppLogger.i('Metrics: Registro de inicio de booking para $experienceId');
+  }
+
+  Future<void> logBookingPaid(String bookingId, double amount) async {
+    await _analytics.logEvent(
+      name: 'booking_paid',
+      parameters: {
+        'transaction_id': bookingId,
+        'value': amount,
+      },
+    );
+  }
+
+  // Premium funnel events
+  static void logPremiumViewed() {
+    FirebaseAnalytics.instance.logEvent(name: 'premium_viewed');
+  }
+
+  static void logPremiumPurchaseStarted({required String source}) {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'premium_purchase_started',
+      parameters: {'source': source},
+    );
+  }
+
+  static void logPremiumPurchaseSuccess({required String source}) {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'premium_purchase_success',
+      parameters: {'source': source},
+    );
+  }
+
+  // User actions
+  static void logSaveMoment() {
+    FirebaseAnalytics.instance.logEvent(name: 'save_moment');
+  }
+
+  static void logLoginSuccess() {
+    FirebaseAnalytics.instance.logEvent(name: 'login_success');
+  }
+
+  static void logSubscriptionSuccess() {
+    FirebaseAnalytics.instance.logEvent(name: 'subscription_success');
   }
 }

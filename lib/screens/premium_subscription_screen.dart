@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/analytics_service.dart';
-
-// Asumo que este es el provider que mencionabas en los comentarios
-// final premiumNotifierProvider = ...
+import 'package:google_fonts/google_fonts.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:feeltrip_app/features/premium/presentation/providers/premium_notifier.dart';
+import 'package:feeltrip_app/features/premium/domain/entities/premium_state.dart';
 
 class PremiumSubscriptionScreen extends ConsumerStatefulWidget {
   const PremiumSubscriptionScreen({super.key});
@@ -19,33 +19,24 @@ class _PremiumSubscriptionScreenState
     with TickerProviderStateMixin {
   late AnimationController _particleController;
   late AnimationController _crownController;
-  String? selectedPackageIdentifier;
 
-  final List<Animation<double>> _particleAnimations = [];
+  static const Color rustyEarth = Color(0xFFB85C38);
+  static const Color mossGreen = Color(0xFF4A5D23);
+  static const Color carbonBlack = Color(0xFF1A1A1B);
+  static const Color boneWhite = Color(0xFFF9F6EE);
 
   @override
   void initState() {
     super.initState();
-    AnalyticsService.logPremiumViewed();
     _particleController = AnimationController(
       duration: const Duration(seconds: 20),
       vsync: this,
     )..repeat();
+
     _crownController = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
       vsync: this,
     )..repeat(reverse: true);
-
-    for (int i = 0; i < 25; i++) {
-      _particleAnimations.add(
-        Tween<double>(begin: 0.8, end: 1.2).animate(
-          CurvedAnimation(
-            parent: _particleController,
-            curve: Interval(i * 0.04, 1.0, curve: Curves.easeInOut),
-          ),
-        ),
-      );
-    }
   }
 
   @override
@@ -55,43 +46,85 @@ class _PremiumSubscriptionScreenState
     super.dispose();
   }
 
-  Widget _buildBenefitRow(String emoji, String title, String desc) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
+  @override
+  Widget build(BuildContext context) {
+    final premiumState = ref.watch(premiumNotifierProvider);
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      backgroundColor: carbonBlack,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: Text('FEELTRIP_PREMIUM', 
+          style: GoogleFonts.jetBrainsMono(color: rustyEarth, fontSize: 14, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: rustyEarth),
+      ),
+      body: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.amber.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              emoji,
-              style: const TextStyle(fontSize: 24),
+          // Fondo gradiente base
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF252526), carbonBlack],
+                ),
+              ),
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  desc,
-                  style: const TextStyle(
-                    color: Colors.white60,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
+
+          // Sistema de Partículas (Polvo Dorado)
+          RepaintBoundary(
+            child: AnimatedBuilder(
+              animation: _particleController,
+              builder: (context, _) {
+                return Stack(
+                  children: List.generate(15, (index) {
+                    final x = (index * 137.5) % size.width;
+                    final y = (index * 254.1) % size.height;
+                    final drift = math.sin(_particleController.value * 2 * math.pi + index) * 30;
+                    
+                    return Positioned(
+                      left: x + drift,
+                      top: y + (math.cos(_particleController.value * math.pi + index) * 20),
+                      child: Container(
+                        width: (index % 3 + 1).toDouble(),
+                        height: (index % 3 + 1).toDouble(),
+                        decoration: BoxDecoration(
+                          color: rustyEarth.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(color: rustyEarth.withValues(alpha: 0.1), blurRadius: 10)
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                );
+              },
+            ),
+          ),
+
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 30),
+                  _buildHeader(),
+                  const SizedBox(height: 50),
+                  _buildBenefitsSection(),
+                  const SizedBox(height: 50),
+                  _buildOffersList(premiumState),
+                  const SizedBox(height: 30),
+                  _buildRestoreButton(),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
         ],
@@ -99,183 +132,140 @@ class _PremiumSubscriptionScreenState
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'FeelTrip Premium',
-          style: TextStyle(
-            color: Colors.amber,
-            fontWeight: FontWeight.bold,
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        ScaleTransition(
+          scale: Tween<double>(begin: 1.0, end: 1.05).animate(
+            CurvedAnimation(parent: _crownController, curve: Curves.easeInOutQuad),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: rustyEarth.withValues(alpha: 0.3), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: rustyEarth.withValues(alpha: 0.05),
+                  blurRadius: 40,
+                  spreadRadius: 10,
+                ),
+              ],
+            ),
+            child: const Icon(Icons.auto_awesome, size: 64, color: rustyEarth),
           ),
         ),
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.amber),
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF0D0D0D), Colors.black],
+        const SizedBox(height: 32),
+        Text(
+          'DOMINA LA RUTA',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.jetBrainsMono(
+            color: boneWhite,
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -1,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Desbloquea cartografía avanzada de la V Región y herramientas de análisis con IA para tus expediciones sin conexión.',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.ebGaramond(
+            color: boneWhite.withValues(alpha: 0.7),
+            fontSize: 18,
+            height: 1.3,
+            fontStyle: FontStyle.italic
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBenefitsSection() {
+    return Column(
+      children: [
+        _benefitItem(Icons.public_off_outlined, 'Modo Offline Pro', 'Cartografía vectorial de Quillota y alrededores.'),
+        const SizedBox(height: 20),
+        _benefitItem(Icons.psychology_outlined, 'IA Expert Advisor', 'Consultas técnicas de ruta ilimitadas.'),
+        const SizedBox(height: 20),
+        _benefitItem(Icons.analytics_outlined, 'Telemetry Cloud', 'Sincroniza tus estadísticas al volver a la red.'),
+      ],
+    );
+  }
+
+  Widget _benefitItem(IconData icon, String title, String subtitle) {
+    return Row(
+      children: [
+        Icon(icon, color: mossGreen, size: 24),
+        const SizedBox(width: 20),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: GoogleFonts.jetBrainsMono(color: boneWhite, fontSize: 13, fontWeight: FontWeight.bold)),
+              Text(subtitle, style: GoogleFonts.ebGaramond(color: boneWhite.withValues(alpha: 0.5), fontSize: 14, height: 1.1)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOffersList(PremiumState premiumState) {
+    if (premiumState.isLoading) {
+      return const Center(child: CircularProgressIndicator(color: rustyEarth, strokeWidth: 1));
+    }
+    
+    final offerings = premiumState.offerings as List<Package>? ?? [];
+    if (offerings.isEmpty) {
+      return Text('// NO_OFFERS_LOADED', style: GoogleFonts.jetBrainsMono(color: rustyEarth, fontSize: 10));
+    }
+    
+    return Column(
+      children: offerings.map<Widget>((Package pkg) {
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: boneWhite.withValues(alpha: 0.02),
+            border: Border.all(color: rustyEarth.withValues(alpha: 0.4), width: 0.5),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: InkWell(
+            onTap: () => ref.read(premiumNotifierProvider.notifier).purchasePackage(pkg),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Text(pkg.storeProduct.title.toUpperCase(), 
+                    style: GoogleFonts.jetBrainsMono(color: boneWhite, fontSize: 11, letterSpacing: 2)),
+                  const SizedBox(height: 12),
+                  Text(pkg.storeProduct.priceString, 
+                    style: GoogleFonts.jetBrainsMono(color: rustyEarth, fontSize: 32, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    color: rustyEarth,
+                    child: Center(
+                      child: Text('ACTIVAR_SUSCRIPCIÓN', 
+                        style: GoogleFonts.jetBrainsMono(color: carbonBlack, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          ...List.generate(
-            25,
-            (index) => AnimatedBuilder(
-              animation: _particleAnimations[index],
-              builder: (context, child) {
-                final size = MediaQuery.of(context).size;
-                final x = (index * 123.45) % size.width;
-                final y = (index * 234.56) % size.height;
-                return Positioned(
-                  left: x +
-                      (math.sin(_particleController.value * 2 * math.pi) * 15),
-                  top: y + (math.cos(_particleController.value * math.pi) * 10),
-                  child: Container(
-                    width: 4 + 2 * _particleAnimations[index].value,
-                    height: 4 + 2 * _particleAnimations[index].value,
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                // Premium Header
-                Column(
-                  children: [
-                    ScaleTransition(
-                      scale: Tween<double>(begin: 1.0, end: 1.1).animate(
-                        CurvedAnimation(
-                            parent: _crownController, curve: Curves.easeInOut),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.amber.withValues(alpha: 0.6),
-                              blurRadius: 25,
-                              spreadRadius: 2,
-                            ),
-                            BoxShadow(
-                              color: Colors.amber.withValues(alpha: 0.3),
-                              blurRadius: 40,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.workspace_premium,
-                          size: 80,
-                          color: Colors.amber,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'FeelTrip Premium',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.amber,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Desbloquea IA ilimitada, mapas exclusivos y analytics avanzados',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 18,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-                // Benefits
-                Column(
-                  children: [
-                    _buildBenefitRow('✨', 'Sin anuncios',
-                        'Disfruta la app sin interrupciones'),
-                    _buildBenefitRow(
-                        '🗺️', 'Mapas exclusivos', 'Descubre destinos únicos'),
-                    _buildBenefitRow(
-                        '🤖', 'IA ilimitada', 'Genera planes sin límites'),
-                    _buildBenefitRow('📊', 'Analytics avanzados',
-                        'Métricas de tu transformación'),
-                  ],
-                ),
-                const SizedBox(height: 40),
+        );
+      }).toList(),
+    );
+  }
 
-                // Aquí deberías mapear tus paquetes reales de RevenueCat
-                // Por ahora, el botón de CTA se mantiene visible
-
-                const SizedBox(height: 24),
-                // CTA Button
-                Container(
-                  width: double.infinity,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Colors.amber, Colors.orange],
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.amber.withValues(alpha: 0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: ElevatedButton(
-                    onPressed: selectedPackageIdentifier != null
-                        ? () {
-                            // Lógica de compra
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text(
-                      'Prueba 7 días GRATIS',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
-            ),
-          ),
-        ],
-      ),
+  Widget _buildRestoreButton() {
+    return TextButton(
+      onPressed: () => ref.read(premiumNotifierProvider.notifier).restorePurchases(),
+      child: Text('RESTORE_PREVIOUS_PURCHASES', 
+        style: GoogleFonts.jetBrainsMono(color: boneWhite.withValues(alpha: 0.3), fontSize: 10)),
     );
   }
 }

@@ -1,30 +1,30 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../services/auth_service.dart';
-
-import 'login_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
 import 'onboarding_screen.dart';
 
-/// AuthGate es el "portero" de la autenticación.
-///
-/// Decide qué pantalla mostrar al usuario basado en su estado de autenticación
-/// con Firebase. Maneja los estados de carga, error y éxito.
-class AuthGate extends StatefulWidget {
+class AuthGate extends ConsumerStatefulWidget {
   const AuthGate({super.key});
 
   @override
-  State<AuthGate> createState() => _AuthGateState();
+  ConsumerState<AuthGate> createState() => _AuthGateState();
 }
 
-class _AuthGateState extends State<AuthGate> {
+class _AuthGateState extends ConsumerState<AuthGate> {
   bool _timeoutReached = false;
+
+  // Paleta FeelTrip Oficial
+  static const Color boneWhite = Color(0xFFF5F2ED);
+  static const Color carbonBlack = Color(0xFF1A1A1A);
+  static const Color mossGreen = Color(0xFF4A5D4E);
+  static const Color oxidizedEarth = Color(0xFFB35A38);
 
   @override
   void initState() {
     super.initState();
-    // Timeout de 10 segundos para evitar que el usuario se quede en una
-    // pantalla de carga infinita si la autenticación no responde.
+    // Temporizador para detectar latencia alta (ej. zonas rurales/offline)
     Future<void>.delayed(const Duration(seconds: 10), () {
       if (mounted) {
         setState(() {
@@ -34,114 +34,175 @@ class _AuthGateState extends State<AuthGate> {
     });
   }
 
-  /// Construye la vista de error que se muestra si el stream de autenticación falla.
-  Widget _buildErrorView(String errorMessage) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(
-                'Ocurrió un error',
-                style: Theme.of(context).textTheme.headlineSmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                errorMessage,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute<void>(
-                        builder: (_) => const LoginScreen()),
-                  );
-                },
-                child: const Text('Ir a Login'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Construye la vista de carga, con una opción de escape si tarda demasiado.
-  Widget _buildLoadingView({bool withTimeoutMessage = false}) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 24),
-              const Text('Verificando sesión...'),
-              if (withTimeoutMessage) ...[
-                const SizedBox(height: 24),
-                const Text(
-                  'La verificación está tardando más de lo esperado.',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute<void>(
-                          builder: (_) => const LoginScreen()),
-                    );
-                  },
-                  child: const Text('Continuar a Login'),
-                ),
-              ]
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: AuthService.userStream,
-      builder: (context, snapshot) {
-        final uid = snapshot.data?.uid;
-        if (uid != null && uid.isNotEmpty) {
-// log: setUserId
-        }
+    final authState = ref.watch(authNotifierProvider);
 
-        if (snapshot.hasError) {
-// log: error_auth_stream
-          debugPrint('AuthGate error: ${snapshot.error}');
-          return _buildErrorView(
-              'No pudimos verificar tu sesión. Por favor, intenta iniciar sesión de nuevo.');
+    return authState.when(
+      loading: () => _buildLoadingView(withTimeoutMessage: _timeoutReached),
+      error: (error, _) => _buildErrorView(
+        'AUTH_CORE_TIMEOUT: No se pudo validar el handshake con el servidor remoto.',
+      ),
+      data: (user) {
+        if (user != null) {
+          // Redirección post-frame para evitar colisiones en el árbol de widgets
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              context.go('/quiz');
+            }
+          });
+          return _buildLoadingView(); // Mantener estética mientras redirige
         }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          if (_timeoutReached) {
-// log: timeout_waiting_auth
-            return _buildLoadingView(withTimeoutMessage: true);
-          }
-          return _buildLoadingView();
-        }
-
-        if (snapshot.data != null) {
-// log: authenticated\n          Navigator.of(context).pushNamedAndRemoveUntil('/quiz', (route) => false);
-          return const SizedBox.shrink(); // Placeholder while Get navigates
-        }
-
-// log: anonymous
         return const OnboardingScreen();
       },
+    );
+  }
+
+  // Vista de Carga Estilo "System Boot" (Consola de Inicio)
+  Widget _buildLoadingView({bool withTimeoutMessage = false}) {
+    return Scaffold(
+      backgroundColor: carbonBlack, 
+      body: Padding(
+        padding: const EdgeInsets.all(40.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Barra de progreso minimalista
+            const LinearProgressIndicator(
+              backgroundColor: Color(0xFF2A2A2A),
+              color: mossGreen,
+              minHeight: 2,
+            ),
+            const SizedBox(height: 32),
+            
+            // Logs de sistema
+            Text(
+              '> INICIALIZANDO_FEELTRIP_OS...',
+              style: GoogleFonts.jetBrainsMono(
+                color: mossGreen, 
+                fontSize: 13,
+                fontWeight: FontWeight.bold
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '> VERIFICANDO_CREDENCIALES_LOCALES...',
+              style: GoogleFonts.jetBrainsMono(
+                color: boneWhite.withValues(alpha: 0.4), 
+                fontSize: 11
+              ),
+            ),
+            
+            if (withTimeoutMessage) ...[
+              const SizedBox(height: 48),
+              // Alerta de latencia (estética explorador)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: oxidizedEarth.withValues(alpha: 0.5)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '// ADVERTENCIA: Latencia elevada.',
+                      style: GoogleFonts.jetBrainsMono(
+                        color: oxidizedEarth, 
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Detectada zona de baja cobertura o modo offline forzado.',
+                      style: GoogleFonts.ebGaramond(
+                        color: boneWhite.withValues(alpha: 0.7),
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextButton(
+                onPressed: () => context.go('/login'),
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                child: Text(
+                  '>> FORZAR_ENTRADA_MANUAL',
+                  style: GoogleFonts.jetBrainsMono(
+                    color: boneWhite,
+                    fontSize: 12,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Vista de Error Crítico (Kernel Panic Style)
+  Widget _buildErrorView(String errorMessage) {
+    return Scaffold(
+      backgroundColor: boneWhite,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '[ FATAL_SYSTEM_ERROR ]',
+                style: GoogleFonts.jetBrainsMono(
+                  color: oxidizedEarth,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(20),
+                color: carbonBlack,
+                width: double.infinity,
+                child: Text(
+                  'STATUS: SESSION_V_FAILED\nTRACE: $errorMessage\n\nSugerencia: Verifique su conexión satelital o regrese a una zona con cobertura.',
+                  style: GoogleFonts.jetBrainsMono(
+                    color: boneWhite.withValues(alpha: 0.9), 
+                    fontSize: 11,
+                    height: 1.5
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: OutlinedButton(
+                  onPressed: () => context.go('/login'),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: carbonBlack, width: 1.5),
+                    shape: const RoundedRectangleBorder(),
+                    backgroundColor: carbonBlack,
+                  ),
+                  child: Text(
+                    '>> REINICIAR_PROTOCOLO_AUTH',
+                    style: GoogleFonts.jetBrainsMono(
+                      color: boneWhite,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

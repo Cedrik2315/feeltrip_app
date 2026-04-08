@@ -1,162 +1,260 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../services/auth_service.dart';
+import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:feeltrip_app/presentation/providers/engagement_provider.dart';
 
-class CreatorStatsScreen extends StatefulWidget {
+class CreatorStatsScreen extends ConsumerWidget {
   const CreatorStatsScreen({super.key});
 
+  // Paleta FeelTrip Técnica
+  static const Color boneWhite = Color(0xFFF5F5DC);
+  static const Color carbonBlack = Color(0xFF1A1A1A);
+  static const Color mossGreen = Color(0xFF4B5320);
+  static const Color signalOrange = Color(0xFFFF8C00);
+
   @override
-  State<CreatorStatsScreen> createState() => _CreatorStatsScreenState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authUserAsync = ref.watch(authNotifierProvider);
+    final userId = authUserAsync.whenOrNull(data: (user) => user?.id);
+
+    if (userId == null) {
+      return _buildTerminalError(
+        icon: Icons.sensors_off,
+        code: 'AUTH_REQUIRED',
+        message: 'Inicia sesión para recibir telemetría de red.',
+      );
+    }
+
+    final statsAsync = ref.watch(creatorStatsProvider(userId));
+
+    return Scaffold(
+      backgroundColor: boneWhite,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: carbonBlack,
+        centerTitle: false,
+        title: Text('CREATOR_METRICS.sys', 
+          style: GoogleFonts.jetBrainsMono(color: boneWhite, fontSize: 13, letterSpacing: 1)),
+        iconTheme: const IconThemeData(color: boneWhite, size: 20),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+      ),
+      body: statsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: mossGreen, strokeWidth: 2)),
+        error: (error, _) => _buildTerminalError(
+          icon: Icons.error_outline,
+          code: 'DATA_FETCH_ERROR',
+          message: error.toString(),
+        ),
+        data: (stats) {
+          final monthlyData = List.generate(
+            stats.monthlyActivity.length,
+            (index) => FlSpot(index.toDouble(), stats.monthlyActivity[index].toDouble()),
+          );
+
+          return RefreshIndicator(
+            color: mossGreen,
+            onRefresh: () async => ref.refresh(creatorStatsProvider(userId).future),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SectionHeader(title: 'DATA_OVERVIEW'),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(child: _StatTerminalCard('STRS', stats.totalStories.toString())),
+                      const SizedBox(width: 10),
+                      Expanded(child: _StatTerminalCard('LKS', stats.totalLikes.toString())),
+                      const SizedBox(width: 10),
+                      Expanded(child: _StatTerminalCard('CMTS', stats.totalComments.toString())),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  const _SectionHeader(title: 'ENGAGEMENT_WAVEFORM'),
+                  const SizedBox(height: 24),
+                  _ActivityChart(monthlyData: monthlyData),
+                  const SizedBox(height: 40),
+                  const _TerminalLogs(
+                    message: 'La actividad mensual usa tus registros de bitácora recientes. La señal se estabilizará con mayor volumen de datos.',
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTerminalError({required IconData icon, required String code, required String message}) {
+    return Scaffold(
+      backgroundColor: boneWhite,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 48, color: carbonBlack.withValues(alpha: 0.2)),
+              const SizedBox(height: 24),
+              Text('// ERROR: $code', 
+                style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.red.shade900)),
+              const SizedBox(height: 8),
+              Text(message, 
+                textAlign: TextAlign.center,
+                style: GoogleFonts.jetBrainsMono(fontSize: 11, color: carbonBlack.withValues(alpha: 0.6))),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _CreatorStatsScreenState extends State<CreatorStatsScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String? currentUid;
-  int totalStories = 0;
-  int totalLikes = 0;
-  int totalComments = 0;
-  List<FlSpot> monthlyData = [];
-
-  @override
-  void initState() {
-    super.initState();
-    currentUid = AuthService.currentUser?.uid;
-    _loadStats();
-    _generateMockMonthlyData();
-  }
-
-  Future<void> _loadStats() async {
-    if (currentUid == null) return;
-
-    try {
-      // Total stories
-      final storySnap =
-          await _firestore.collection('users').doc(currentUid).collection('stories').get();
-      totalStories = storySnap.docs.length;
-
-      // Total likes (sum likes from stories)
-      int likesSum = 0;
-      for (var doc in storySnap.docs) {
-        likesSum += (doc.data()['likes'] as num?)?.toInt() ?? 0;
-      }
-      totalLikes = likesSum;
-
-      // Total comments
-      final commentSnap =
-          await _firestore.collection('stories').where('userId', isEqualTo: currentUid).get();
-      int commentsSum = 0;
-      for (var doc in commentSnap.docs) {
-        final commentsRef = _firestore.collection('stories').doc(doc.id).collection('comments');
-        final commentsSnap = await commentsRef.get();
-        commentsSum += commentsSnap.docs.length;
-      }
-      totalComments = commentsSum;
-
-      setState(() {});
-    } catch (e) {
-      // log eliminado: Error loading stats: $e
-    }
-  }
-
-  void _generateMockMonthlyData() {
-    monthlyData = [];
-    for (int i = 11; i >= 0; i--) {
-      monthlyData.add(FlSpot(i.toDouble(), (20 + (i * 3)).toDouble())); // Mock activity
-    }
-  }
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title});
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Estadísticas Creador'),
-        backgroundColor: Colors.deepPurple,
+    return Row(
+      children: [
+        const Icon(Icons.analytics_outlined, size: 14, color: Color(0xFF4B5320)),
+        const SizedBox(width: 10),
+        Text(title, style: GoogleFonts.jetBrainsMono(
+          fontWeight: FontWeight.w800, 
+          fontSize: 11,
+          letterSpacing: 2,
+          color: const Color(0xFF4B5320),
+        )),
+        const Expanded(child: Divider(indent: 16, color: Color(0x1A000000), thickness: 0.5)),
+      ],
+    );
+  }
+}
+
+class _StatTerminalCard extends StatelessWidget {
+  const _StatTerminalCard(this.label, this.value);
+  final String label, value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        color: Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.zero,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Resumen General',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(child: _statCard('📖 Historias', totalStories.toString())),
-                Expanded(child: _statCard('❤️ Likes', totalLikes.toString())),
-                Expanded(child: _statCard('💬 Comentarios', totalComments.toString())),
-              ],
-            ),
-            const SizedBox(height: 30),
-            const Text(
-              'Actividad Mensual',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              height: 200,
-              padding: const EdgeInsets.all(16),
-              child: LineChart(
-                LineChartData(
-                  borderData: FlBorderData(show: true),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: monthlyData,
-                      isCurved: true,
-                      color: Colors.deepPurple,
-                      barWidth: 3,
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: Colors.deepPurple.withAlpha(77),
-                      ),
-                    ),
-                  ],
-                ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: GoogleFonts.jetBrainsMono(color: Colors.white24, fontSize: 9, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          Text(value.padLeft(2, '0'), style: GoogleFonts.jetBrainsMono(
+            color: const Color(0xFFF5F5DC),
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActivityChart extends StatelessWidget {
+  const _ActivityChart({required this.monthlyData});
+  final List<FlSpot> monthlyData;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 200,
+      padding: const EdgeInsets.fromLTRB(10, 20, 20, 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.5),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+      ),
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: true,
+            getDrawingHorizontalLine: (value) => FlLine(color: Colors.black.withValues(alpha: 0.05), strokeWidth: 1),
+            getDrawingVerticalLine: (value) => FlLine(color: Colors.black.withValues(alpha: 0.05), strokeWidth: 1),
+          ),
+          titlesData: const FlTitlesData(
+            show: true,
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 22,
+                interval: 1,
               ),
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'Datos generados con datos simulados. En producción, consulta Firestore por mes.',
-              style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
-            ),
-            if (currentUid == null)
-              const Center(
-                child: Column(
-                  children: [
-                    Icon(Icons.account_circle, size: 64, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text('Inicia sesión para ver tus estadísticas'),
-                  ],
-                ),
+          ),
+          borderData: FlBorderData(show: false),
+          lineBarsData: [
+            LineChartBarData(
+              spots: monthlyData,
+              isCurved: true,
+              curveSmoothness: 0.35,
+              color: const Color(0xFF4B5320),
+              barWidth: 2,
+              isStrokeCapRound: true,
+              dotData: const FlDotData(show: false),
+              belowBarData: BarAreaData(
+                show: true,
+                color: const Color(0xFF4B5320).withValues(alpha: 0.08),
               ),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _statCard(String title, String value) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                  fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+class _TerminalLogs extends StatelessWidget {
+  const _TerminalLogs({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        border: const Border(left: BorderSide(color: Color(0xFFFF8C00), width: 1.5)),
+        color: Colors.black.withValues(alpha: 0.03),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(Icons.info_outline, size: 12, color: Color(0xFFFF8C00)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'LOG_NOTE: $message',
+              style: GoogleFonts.jetBrainsMono(
+                color: Colors.black.withValues(alpha: 0.5),
+                fontSize: 10,
+                height: 1.5,
+              ),
             ),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

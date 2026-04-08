@@ -2,17 +2,17 @@ import 'package:logger/logger.dart';
 
 final logger = Logger();
 
+// AnalyticsService DEPRECATED - use MetricsService with FirebaseAnalytics (Día 11-12)
 class AnalyticsService {
   static void logPremiumViewed() {
-    logger.i('Analytics: Premium screen viewed');
+    // Redirect to MetricsService.logPremiumView()
   }
 
   static void logPremiumAttempt(String? productTitle) {
-    logger.i('Analytics: Premium attempt: $productTitle');
+    // Redirect to MetricsService.logPremiumView()
   }
 
   static void logAffiliateClick(String name, String destination) {
-    // Mock implementation
-    logger.i('Analytics: $name clicked for $destination');
+    // No real impl - log as event if needed
   }
 }

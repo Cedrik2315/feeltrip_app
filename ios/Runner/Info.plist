@@ -59,6 +59,8 @@
 	<string>FeelTrip necesita acceso a la cámara para identificar destinos y experiencias.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>FeelTrip necesita acceso al micrófono para grabar videos de tus viajes.</string>
+	<key>GMSApiKey</key>
+	<string>AIzaSyC7t5MPjy1ZJ8-gOwZqJR88KidbXqaIhIg</string>
 
 </dict>
 

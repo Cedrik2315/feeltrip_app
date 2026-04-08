@@ -5,6 +5,7 @@ class RouteNames {
   static const String register = '/register';
   static const String authGate = '/auth-gate';
   static const String home = '/home';
+  static const String cart = '/cart';
   static const String premium = '/premium';
   static const String checkout = '/checkout';
   static const String profile = '/profile';
@@ -16,6 +17,7 @@ class RouteNames {
   static const String travelDiary = '/travel-diary';
   static const String experienceImpactDashboard =
       '/experience-impact-dashboard';
+  static const String creatorStats = '/creator-stats';
   static const String referral = '/referral';
   static const String smartCamera = '/smart-camera';
   static const String currencyConverter = '/currency-converter';

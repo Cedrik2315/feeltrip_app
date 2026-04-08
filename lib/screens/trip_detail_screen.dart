@@ -1,372 +1,128 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/trip_model.dart';
-import '../widgets/destination_map_widget.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class TripDetailScreen extends StatefulWidget {
+// --- MODELO & PROVIDER (Simulados) ---
+class Trip {
+  Trip({
+    required this.id,
+    required this.title,
+    required this.destination,
+    required this.description,
+    required this.price,
+    required this.duration,
+    required this.rating,
+    required this.imageUrl,
+    this.difficulty = 'Moderada',
+    this.maxGroupSize = 12,
+  });
+  final String id;
+  final String title;
+  final String destination;
+  final String description;
+  final double price;
+  final int duration;
+  final double rating;
+  final String imageUrl;
+  final String difficulty;
+  final int maxGroupSize;
+}
+
+final tripDetailProvider = FutureProvider.family<Trip, String>((ref, id) async {
+  await Future.delayed(const Duration(milliseconds: 800));
+  return Trip(
+    id: id,
+    title: 'Aventura en el Cerro La Campana',
+    destination: 'Olmué / Quillota',
+    description: 'Explora la reserva de la biosfera en una caminata guiada por senderos rodeados de palmas chilenas milenarias. Una experiencia diseñada para desconectar de la ciudad y reconectar con la biodiversidad del valle central.',
+    price: 45000.0,
+    duration: 1,
+    rating: 4.8,
+    imageUrl: 'https://images.unsplash.com/photo-1596324268112-78a3c89d90d8?q=80&w=1200',
+  );
+});
+
+// --- UI REFINADA ---
+class TripDetailScreen extends ConsumerStatefulWidget {
   const TripDetailScreen({super.key, required this.tripId});
   final String tripId;
 
   @override
-  State<TripDetailScreen> createState() => _TripDetailScreenState();
+  ConsumerState<TripDetailScreen> createState() => _TripDetailScreenState();
 }
 
-class _TripDetailScreenState extends State<TripDetailScreen> {
-  Trip? loadedTrip;
-  bool isLoading = true;
-  String? errorMessage;
-  int _selectedPeople = 1;
+class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   bool _isFavorite = false;
-
-  @override
-  void initState() {
-    super.initState();
-    FirebaseFirestore.instance.collection('trips').doc(widget.tripId).get().then((doc) {
-      if (doc.exists) {
-        setState(() {
-          loadedTrip = Trip.fromJson(doc.data()!);
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          errorMessage = 'Viaje no encontrado';
-          isLoading = false;
-        });
-      }
-    }).catchError((Object error) {
-      setState(() {
-        errorMessage = 'Error cargando viaje: $error';
-        isLoading = false;
-      });
-    });
-  }
+  final Color brandColor = const Color(0xFF00695C); // Teal Naturaleza
+  final Color accentColor = const Color(0xFFFF8F00); // Ámbar Tierra
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Detalles del Viaje')),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
+    final tripAsync = ref.watch(tripDetailProvider(widget.tripId));
 
-    if (errorMessage != null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Error')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 64, color: Colors.red[300]!),
-              const SizedBox(height: 16),
-              Text(errorMessage!, style: const TextStyle(fontSize: 16)),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Volver'),
-              ),
-            ],
-          ),
+    return tripAsync.when(
+      loading: () => Scaffold(body: Center(child: CircularProgressIndicator(color: brandColor))),
+      error: (error, _) => _buildErrorState(),
+      data: (trip) => Scaffold(
+        backgroundColor: Colors.white,
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            _buildSliverAppBar(trip),
+            SliverToBoxAdapter(child: _buildBody(trip)),
+          ],
         ),
-      );
-    }
-
-    final trip = loadedTrip!;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detalles del Viaje'),
-        backgroundColor: Colors.deepPurple,
-        actions: [
-          IconButton(
-            icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
-            onPressed: () {
-              setState(() {
-                _isFavorite = !_isFavorite;
-              });
-            },
-          ),
-        ],
+        bottomNavigationBar: _buildBookingBar(trip),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Galería de imágenes
-            Container(
-              height: 250,
-              color: Colors.grey[300]!,
-              child: trip.imageUrl.isNotEmpty
-                  ? PageView.builder(
-                      itemCount: 1, // Solo una imagen por ahora, según el modelo
-                      itemBuilder: (context, index) {
-                        return Image.network(
-                          trip.imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
-                        );
-                      },
-                    )
-                  : const Icon(Icons.image_not_supported),
-            ),
+    );
+  }
 
-            Padding(
-              padding: const EdgeInsets.all(16),
+  Widget _buildSliverAppBar(Trip trip) {
+    return SliverAppBar(
+      expandedHeight: 400,
+      pinned: true,
+      stretch: true,
+      backgroundColor: brandColor,
+      leading: _buildCircleButton(Icons.arrow_back, () => Navigator.pop(context)),
+      actions: [
+        _buildCircleButton(
+          _isFavorite ? Icons.favorite : Icons.favorite_border,
+          () => setState(() => _isFavorite = !_isFavorite),
+          iconColor: _isFavorite ? Colors.redAccent : Colors.white,
+        ),
+        const SizedBox(width: 16),
+      ],
+      flexibleSpace: FlexibleSpaceBar(
+        stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.network(trip.imageUrl, fit: BoxFit.cover),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.black45, Colors.transparent, Colors.black87],
+                  stops: [0.0, 0.5, 1.0],
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 40,
+              left: 20,
+              right: 20,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Título y precio
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              trip.title,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on, size: 18, color: Colors.grey),
-                                const SizedBox(width: 4),
-                                Text(trip.destination),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            DestinationMapWidget(
-                              destination: trip.destination,
-                              latitude: 0.0, // Valores por defecto, ya que no están en el modelo
-                              longitude: 0.0, // Valores por defecto, ya que no están en el modelo
-                            ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'desde',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            '\$${trip.price.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Información general
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildInfoCard(
-                        Icons.calendar_today,
-                        '${trip.duration} días',
-                        'Duración',
-                      ),
-                      _buildInfoCard(
-                        Icons.trending_up,
-                        'Moderada', // Valor por defecto
-                        'Dificultad',
-                      ),
-                      _buildInfoCard(
-                        Icons.people,
-                        '10', // Valor por defecto
-                        'Máximo',
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Rating
-                  Row(
-                    children: [
-                      RatingBar.builder(
-                        initialRating: trip.rating,
-                        minRating: 1,
-                        allowHalfRating: true,
-                        itemSize: 20,
-                        itemBuilder: (context, _) => const Icon(Icons.star, color: Colors.amber),
-                        onRatingUpdate: (_) {},
-                        ignoreGestures: true,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text('0 reseñas'), // Valor por defecto
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Descripción
-                  const Text(
-                    'Descripción',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(trip.description),
-
-                  const SizedBox(height: 20),
-
-                  // Destino
-                  const Text(
-                    'País/Región',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(trip.destination), // Usamos destination ya que 'country' no existe
-
-                  const SizedBox(height: 20),
-
-                  // Guía
-                  const Text(
-                    'Guía',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text('No asignado'), // Valor por defecto
-
-                  const SizedBox(height: 20),
-
-                  // Destacados
-                  // 'highlights' no existe en el modelo actual, se omite o se usa un valor por defecto
-
-                  // Amenidades
-                  // 'amenities' no existe en el modelo actual, se omite o se usa un valor por defecto
-
-                  // Fechas
-                  const Text(
-                    'Fechas',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${DateFormat('dd/MM/yyyy').format(trip.createdAt.toLocal())} - ${DateFormat('dd/MM/yyyy').format(trip.createdAt.toLocal().add(Duration(days: trip.duration)))}', // Usamos createdAt y duration para simular fechas
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Seleccionar cantidad de personas
-                  const Text(
-                    'Cantidad de Viajeros',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed:
-                              _selectedPeople > 1 ? () => setState(() => _selectedPeople--) : null,
-                        ),
-                        Text(
-                          '$_selectedPeople',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () => setState(() => _selectedPeople++), // No hay maxParticipants, se permite aumentar indefinidamente
-                        ),
-                      ],
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(20)),
+                    child: Text('RECOMENDADO', style: GoogleFonts.jetBrainsMono(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Botón de reservar
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _showBookingDialog(context, trip);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        'Reservar Ahora',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Botón agregar al carrito
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Agregado al carrito',
-                            ),
-                          ),
-                        );
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.deepPurple),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        'Agregar al Carrito',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 8),
+                  Text(trip.title, style: GoogleFonts.playfairDisplay(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold, height: 1.1)),
                 ],
               ),
             ),
@@ -376,74 +132,142 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     );
   }
 
-  Widget _buildInfoCard(IconData icon, String value, String label) {
+  Widget _buildCircleButton(IconData icon, VoidCallback onTap, {Color iconColor = Colors.white}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: CircleAvatar(
+        backgroundColor: Colors.black26,
+        child: IconButton(icon: Icon(icon, color: iconColor, size: 20), onPressed: onTap),
+      ),
+    );
+  }
+
+  Widget _buildBody(Trip trip) {
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.location_on, size: 16, color: accentColor),
+                const SizedBox(width: 4),
+                Text(trip.destination.toUpperCase(), style: GoogleFonts.jetBrainsMono(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.bold)),
+                const Spacer(),
+                _buildRatingBadge(trip.rating),
+              ],
+            ),
+            const SizedBox(height: 32),
+            _buildQuickStats(trip),
+            const SizedBox(height: 32),
+            Text('La Experiencia', style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Text(trip.description, style: TextStyle(fontSize: 16, height: 1.6, color: Colors.grey[800])),
+            const SizedBox(height: 32),
+            _buildMapPreview(),
+            const SizedBox(height: 120),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickStats(Trip trip) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _statItem(Icons.timer_outlined, '${trip.duration} DÍA'),
+        _statItem(Icons.terrain_outlined, trip.difficulty),
+        _statItem(Icons.group_outlined, 'MÁX ${trip.maxGroupSize}'),
+      ],
+    );
+  }
+
+  Widget _statItem(IconData icon, String label) {
     return Column(
       children: [
-        Icon(icon, color: Colors.deepPurple, size: 28),
+        CircleAvatar(backgroundColor: brandColor.withValues(alpha: 0.1), child: Icon(icon, color: brandColor, size: 20)),
         const SizedBox(height: 8),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+        Text(label, style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54)),
+      ],
+    );
+  }
+
+  Widget _buildRatingBadge(double rating) {
+    return Row(
+      children: [
+        Icon(Icons.star, color: accentColor, size: 18),
+        const SizedBox(width: 4),
+        Text(rating.toString(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(' (42 reseñas)', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildMapPreview() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Punto de Encuentro', style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 16),
+        Container(
+          height: 180,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            image: const DecorationImage(
+              image: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=-32.99,-71.18&zoom=13&size=600x300&key=YOUR_KEY_STUB'),
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
+          child: Center(child: Icon(Icons.location_pin, color: brandColor, size: 40)),
         ),
       ],
     );
   }
 
-  void _showBookingDialog(BuildContext context, Trip trip) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar Reserva'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Viaje: ${trip.title}'),
-            const SizedBox(height: 8),
-            Text('Viajeros: $_selectedPeople'),
-            const SizedBox(height: 8),
-            Text(
-              'Total: \$${(trip.price * _selectedPeople).toStringAsFixed(2)}',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+  Widget _buildBookingBar(Trip trip) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -5))],
+      ),
+      child: Row(
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('TOTAL', style: GoogleFonts.jetBrainsMono(fontSize: 10, color: Colors.grey)),
+              Text('\$${trip.price.toStringAsFixed(0)}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Reserva realizada con éxito'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
+          const SizedBox(width: 24),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                HapticFeedback.heavyImpact();
+                // Lógica de Checkout
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: brandColor,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              child: Text('RESERVAR AHORA', style: GoogleFonts.jetBrainsMono(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
-            child: const Text('Confirmar'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Scaffold(
+      body: Center(
+        child: Text('No pudimos conectar con la montaña.', style: GoogleFonts.playfairDisplay(fontSize: 18)),
       ),
     );
   }

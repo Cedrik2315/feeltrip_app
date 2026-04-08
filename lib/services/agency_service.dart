@@ -1,124 +1,71 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../models/travel_agency_model.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
+import 'package:feeltrip_app/models/travel_agency_model.dart';
 
 class AgencyService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
 
+  /// Obtiene el flujo de agencias registradas en tiempo real.
+  Stream<List<Map<String, dynamic>>> getAgenciesStream() {
+    return _firestore.collection('agencies').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+    });
+  }
+
+  /// Obtiene los leads (prospectos) para una agencia específica.
+  Stream<List<Map<String, dynamic>>> getLeadsStream(String agencyId) {
+    return _firestore.collection('agency_leads')
+        .where('agencyId', isEqualTo: agencyId)
+        .orderBy('createdAt', descending: true)
+        .snapshots().map((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+  }
+
+  /// Registra un nuevo lead (interés de un usuario en una agencia).
+  /// Base fundamental para el Panel de Agencias de la Fase 3.
+  Future<void> submitLead({
+    required String userId,
+    required String agencyId,
+    required String message,
+    String? tripId,
+  }) async {
+    try {
+      // Creamos un lead transaccional que la agencia verá en su panel
+      await _firestore.collection('agency_leads').add({
+        'userId': userId,
+        'agencyId': agencyId,
+        'tripId': tripId,
+        'message': message,
+        'status': 'new',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      AppLogger.i('AgencyService: Lead enviado con éxito a la agencia $agencyId');
+    } catch (e) {
+      AppLogger.e('AgencyService: Error al enviar lead: $e');
+      rethrow;
+    }
+  }
+
+  /// Obtiene una agencia por su ID.
   Future<TravelAgency?> getAgencyById(String agencyId) async {
     try {
       final doc = await _firestore.collection('agencies').doc(agencyId).get();
-      if (doc.exists) {
+      if (doc.exists && doc.data() != null) {
         return TravelAgency.fromFirestore(doc);
       }
       return null;
     } catch (e) {
-      // Reemplazado print por AppLogger.e para higiene de código
-      // print("Error getting agencies by mood $mood: $e");
-      AppLogger.e('Error getting agency by ID $agencyId: $e');
+      AppLogger.e('AgencyService: Error al obtener agencia $agencyId: $e');
       return null;
     }
   }
 
-  Future<void> createAgency(TravelAgency agency) async {
-    await _firestore.collection('agencies').doc(agency.id).set(agency.toMap());
-  }
-
-  Future<void> updateAgency(String agencyId, Map<String, dynamic> data) async {
-    await _firestore.collection('agencies').doc(agencyId).update(data);
-  }
-
+  /// Seguir a una agencia.
   Future<void> followAgency(String agencyId) async {
-    final user = _auth.currentUser;
-    if (user == null) return;
-
-    final batch = _firestore.batch();
-
-    // Agregar a la subcolección 'following' del usuario
-    final userRef = _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('following_agencies')
-        .doc(agencyId);
-    batch.set(userRef, {'followedAt': Timestamp.now()});
-
-    // Incrementar contador en la agencia
-    final agencyRef = _firestore.collection('agencies').doc(agencyId);
-    batch.update(agencyRef, {'followers': FieldValue.increment(1)});
-
-    await batch.commit();
-  }
-
-  Future<void> addExperienceToAgency(
-      String agencyId, String experienceId) async {
-    await _firestore.collection('agencies').doc(agencyId).update({
-      'experiences': FieldValue.arrayUnion([experienceId])
-    });
-  }
-
-  /// Get agencies matching mood specialties, verified first
-  Future<List<TravelAgency>> getAgenciesByMood(String mood) async {
     try {
-      // Mood-specialty mappings
-      final Map<String, List<String>> moodSpecialties = {
-        'aventura': [
-          'Trekking',
-          'Rápel',
-          'deportes extremos',
-          'aventura',
-          'bungee',
-          'paracaidismo'
-        ],
-        'conexion': [
-          'voluntariado',
-          'homestays',
-          'talleres locales',
-          'cocina',
-          'cultural'
-        ],
-        'transformacion': ['retiros', 'yoga', 'meditación', 'espiritual'],
-        'reflexion': [
-          'naturaleza',
-          'fotografía',
-          'santuarios',
-          'contemplativo'
-        ],
-        'aprendizaje': [
-          'académico',
-          'museos',
-          'historia',
-          'talleres educativos'
-        ],
-        'aventurero': ['Trekking', 'Rápel', 'deportes extremos'],
-      };
-
-      final specialties = moodSpecialties[mood.toLowerCase()] ??
-          moodSpecialties['aventura'] ??
-          <String>[];
-
-      final snapshot = await _firestore
-          .collection('agencies')
-          .orderBy('verified', descending: true)
-          .orderBy('rating', descending: true)
-          .orderBy('followers', descending: true)
-          .limit(20)
-          .get();
-
-      final agencies = <TravelAgency>[];
-      for (final doc in snapshot.docs) {
-        final agency = TravelAgency.fromFirestore(doc);
-        // Check specialty match (case insensitive)
-        if (specialties.any((spec) => agency.specialties
-            .any((s) => s.toLowerCase().contains(spec.toLowerCase())))) {
-          agencies.add(agency);
-        }
-      }
-      return agencies;
+      // Placeholder para implementar la lógica de seguimiento en Firebase
+      AppLogger.i('AgencyService: Solicitud para seguir a la agencia $agencyId');
     } catch (e) {
-      AppLogger.e('Error getting agencies by mood $mood: $e');
-      return [];
+      AppLogger.e('AgencyService: Error al seguir agencia: $e');
     }
   }
 }

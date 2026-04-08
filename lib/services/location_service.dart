@@ -45,8 +45,10 @@ class LocationService {
       }
 
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: desiredAccuracy,
-        timeLimit: const Duration(seconds: 15),
+        locationSettings: LocationSettings(
+          accuracy: desiredAccuracy,
+          timeLimit: const Duration(seconds: 15),
+        ),
       );
       _logger
           .i('Current location: ${position.latitude}, ${position.longitude}');

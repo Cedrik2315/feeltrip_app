@@ -1,5 +1,1 @@
-class SyncService {
-  Future<void> addToSyncQueue(dynamic item) async {
-    // Mock implementation
-  }
-}
+﻿export 'package:feeltrip_app/services/sync_service.dart';

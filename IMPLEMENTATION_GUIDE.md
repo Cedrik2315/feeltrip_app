@@ -97,7 +97,7 @@ import 'package:feeltrip_app/screens/comments_screen.dart';
 // En tu botón o elemento interactivo:
 ElevatedButton(
   onPressed: () {
-    Get.to(() => CommentsScreen(storyId: storyId));
+    ref.read(routerProvider).push('/comments/$storyId');
   },
   child: Text('Ver Comentarios'),
 )
@@ -149,10 +149,10 @@ await SharingService.shareToWhatsApp(
 ### 3.4: Ver Perfil de Agencia
 
 ```dart
-import 'package:feeltrip_app/screens/agency_profile_screen.dart';
+// Usando GoRouter (configurado en routerProvider)
 
 // Navegar al perfil
-Get.to(() => AgencyProfileScreen(agencyId: 'agency_001'));
+ref.read(routerProvider).push('/agency/agency_001');
 ```
 
 ### 3.5: Usar el Servicio de Agencias

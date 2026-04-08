@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:feeltrip_app/services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -21,32 +22,35 @@ class _NotificationBadgeState extends State<NotificationBadge> {
   Future<void> _updateCount() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
-      final count = await NotificationService().getUnreadCount(userId);
-      if (mounted) setState(() => unreadCount = count);
+      final count = await NotificationService().getUnreadCount();
+      if (mounted) {
+        setState(() => unreadCount = count);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (unreadCount == 0) return const SizedBox();
-    return Positioned(
-      right: 0,
-      top: 0,
-      child: Container(
-        padding: const EdgeInsets.all(2),
-        decoration: const BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        constraints: const BoxConstraints(
-          minWidth: 16,
-          minHeight: 16,
-        ),
+    if (unreadCount == 0) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: const BoxDecoration(
+        // Cambiamos el rojo genérico por el naranja de FeelTrip o un carmesí técnico
+        color: Color(0xFFFF8F00), 
+        borderRadius: BorderRadius.zero, // Estilo brutalista: bordes rectos
+      ),
+      constraints: const BoxConstraints(
+        minWidth: 14,
+        minHeight: 14,
+      ),
+      child: Center(
         child: Text(
-          unreadCount > 99 ? '99+' : '$unreadCount',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
+          unreadCount > 9 ? '9+' : '$unreadCount',
+          style: GoogleFonts.jetBrainsMono(
+            color: Colors.black, // Texto negro sobre fondo naranja para máximo contraste
+            fontSize: 9,
+            fontWeight: FontWeight.w900,
           ),
           textAlign: TextAlign.center,
         ),

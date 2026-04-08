@@ -6,7 +6,23 @@ part of 'premium_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$premiumNotifierHash() => r'8ec5d0fa4b6761b7552aa474b1fe95be20588e9c';
+String _$premiumRepositoryHash() => r'45750990e4f0dc0f37b7b0885cfcc72cce9511a1';
+
+/// See also [premiumRepository].
+@ProviderFor(premiumRepository)
+final premiumRepositoryProvider =
+    AutoDisposeProvider<PremiumRepository>.internal(
+  premiumRepository,
+  name: r'premiumRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$premiumRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef PremiumRepositoryRef = AutoDisposeProviderRef<PremiumRepository>;
+String _$premiumNotifierHash() => r'53877532e965ca462a5759a3f6b426672242eddb';
 
 /// See also [PremiumNotifier].
 @ProviderFor(PremiumNotifier)

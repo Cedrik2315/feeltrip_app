@@ -1,22 +1,69 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../diario/domain/models/momento_model.dart';
-import '../../../../core/local_storage/isar_service.dart';
 
-final momentoProvider = StateNotifierProvider<MomentoNotifier, List<Momento>>((ref) {
-  return MomentoNotifier(IsarService());
+import 'package:feeltrip_app/services/isar_service.dart';
+import 'package:feeltrip_app/services/sync_service.dart';
+import 'package:feeltrip_app/models/momento_model.dart';
+import 'package:feeltrip_app/features/diario/domain/models/momento_model.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
+
+final momentoProvider =
+    StateNotifierProvider<MomentoNotifier, AsyncValue<List<Momento>>>((ref) {
+  final isarService = ref.watch(isarServiceProvider);
+  final syncService = ref.watch(syncServiceProvider);
+  return MomentoNotifier(isarService, syncService);
 });
 
-class MomentoNotifier extends StateNotifier<List<Momento>> {
-  MomentoNotifier(this._isarService) : super([]);
+class MomentoNotifier extends StateNotifier<AsyncValue<List<Momento>>> {
+  MomentoNotifier(this._isarService, this._syncService)
+      : super(const AsyncValue.data([]));
+
   final IsarService _isarService;
+  final SyncService _syncService;
 
   Future<void> loadMomentos(String userId) async {
-    final data = await _isarService.getMomentos(userId);
-    state = data.map((e) => Momento.fromJson(e)).toList();
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final data = await _isarService.getMomentos();
+      return data.where((m) => m.userId == userId).map((m) => m.toDomain()).toList();
+    });
   }
 
   Future<void> addMomento(Momento momento) async {
-    await _isarService.saveMomento(momento);
-    state = [...state, momento];
+    final current = state.valueOrNull ?? <Momento>[];
+    final model = MomentoModel.fromDomain(momento.copyWith(isSynced: false));
+
+    await _isarService.putMomento(model);
+    await _syncService.addToSyncQueue(model);
+
+    state = AsyncValue.data([model.toDomain(), ...current]);
+
+    await syncMomentos(momento.userId);
+  }
+
+  Future<void> deleteMomento(Momento momento) async {
+    await _isarService.deleteMomento(momento.id);
+    final current = state.valueOrNull ?? <Momento>[];
+    state = AsyncValue.data(
+      current.where((item) => item.id != momento.id).toList(),
+    );
+  }
+
+  Future<void> syncMomentos(String userId) async {
+    try {
+      await _syncService.syncPendingMomentos(userId);
+    } catch (e) {
+      AppLogger.e('Error general durante la sincronización: $e');
+    } finally {
+      final data = await _isarService.getMomentos();
+      final filtered = data
+          .where((m) => m.userId == userId)
+          .map((m) => m.toDomain())
+          .toList();
+      state = AsyncValue.data(filtered);
+    }
+  }
+
+  Future<void> retryPendingSync(String userId) async {
+    await syncMomentos(userId);
   }
 }

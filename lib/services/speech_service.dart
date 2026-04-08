@@ -29,7 +29,7 @@ class SpeechService {
       },
       listenFor: const Duration(seconds: 10),
       pauseFor: const Duration(seconds: 3),
-      cancelOnError: true,
+      listenOptions: SpeechListenOptions(cancelOnError: true),
     );
 
     // Esperamos a que deje de escuchar para retornar el resultado

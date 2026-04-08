@@ -21,17 +21,11 @@ class CameraIdNotifier extends StateNotifier<String?> {
     state = cameraId;
   }
 
-  Future<void> switchCamera(List<CameraDescription> cameras) async {
-    final current = state;
-    final currentControllerAsync =
-        current != null ? ref.read(cameraControllerProvider(current)) : null;
-    final currentLens =
-        currentControllerAsync?.valueOrNull?.description.lensDirection;
-    final next = cameras.firstWhere(
-      (camera) => camera.lensDirection != currentLens,
-      orElse: () => cameras.first,
-    );
-    state = next.name;
+  void switchCamera(int index) {
+    final cameras = ref.read(cameraProvider).valueOrNull ?? [];
+    if (cameras.isEmpty) return;
+    final nextCamera = cameras[index % cameras.length];
+    state = nextCamera.name;
   }
 }
 

@@ -1,4 +1,4 @@
-import 'package:feeltrip_app/features/auth/domain/models/auth_user.dart';
+import 'package:feeltrip_app/features/auth/domain/entities/auth_user.dart';
 
 class UserModel {
   UserModel({

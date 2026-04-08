@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:google_fonts/google_fonts.dart';
 
 class TranslatorScreen extends StatefulWidget {
   const TranslatorScreen({super.key, this.initialText});
@@ -15,6 +16,7 @@ class TranslatorScreen extends StatefulWidget {
 class _TranslatorScreenState extends State<TranslatorScreen> {
   final TextEditingController _inputController = TextEditingController();
   final FlutterTts _tts = FlutterTts();
+  
   String _translatedText = '';
   bool _isLoading = false;
   String _fromLang = 'es';
@@ -38,239 +40,218 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
     if (widget.initialText != null) {
       _inputController.text = widget.initialText!;
     }
-    _initTts();
   }
 
-  Future<void> _initTts() async {
-    await _tts.setLanguage('en-US');
-    await _tts.setSpeechRate(0.5);
-  }
-
-  Future<void> _speak() async {
-    if (_translatedText.isNotEmpty) {
-      await _tts.speak(_translatedText);
-    }
-  }
-
-  Future<void> _copyToClipboard() async {
-    await Clipboard.setData(ClipboardData(text: _translatedText));
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Texto copiado')),
-      );
-    }
-  }
-
-  Future<void> _swapLanguages() async {
-    setState(() {
-      final temp = _fromLang;
-      _fromLang = _toLang;
-      _toLang = temp;
-      _translatedText = '';
-    });
-  }
+  // --- LÓGICA DE TRADUCCIÓN ---
 
   Future<void> _translate() async {
-    if (_inputController.text.isEmpty) return;
+    final query = _inputController.text.trim();
+    if (query.isEmpty) return;
+
     setState(() {
       _isLoading = true;
       _error = '';
     });
+
     try {
-      final text = Uri.encodeComponent(_inputController.text);
+      final text = Uri.encodeComponent(query);
       final url = 'https://api.mymemory.translated.net/get?q=$text&langpair=$_fromLang|$_toLang';
-      final response = await http.get(Uri.parse(url));
+      
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final result = data as Map<String, dynamic>;
-        final String translatedText =
-            (result['responseData'] as Map<String, dynamic>?)?['translatedText'] as String? ??
-                'No translation received';
-        setState(() {
-          _translatedText = translatedText;
-        });
-        // Optional auto speak
-        // await _speak();
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final responseData = data['responseData'] as Map<String, dynamic>?;
+        final translated = responseData?['translatedText']?.toString() ?? '';
+        setState(() => _translatedText = translated);
+        HapticFeedback.lightImpact();
       } else {
-        setState(() {
-          _error = 'Error de servidor: ${response.statusCode}';
-        });
+        throw Exception();
       }
     } catch (e) {
-      setState(() {
-        _error = 'Error al traducir: $e';
-      });
+      setState(() => _error = 'Error de conexión. Verifica tu internet.');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      setState(() => _isLoading = false);
     }
   }
 
-  String _getLangCode(String name) {
-    return _languages[name]!;
+  Future<void> _speak() async {
+    if (_translatedText.isEmpty) return;
+    
+    // Mapeo dinámico para voces TTS
+    String ttsLang = _toLang;
+    if (_toLang == 'en') ttsLang = 'en-US';
+    if (_toLang == 'es') ttsLang = 'es-ES';
+
+    await _tts.setLanguage(ttsLang);
+    await _tts.setSpeechRate(0.45);
+    await _tts.speak(_translatedText);
   }
 
-  String _getLangName(String code) {
-    return _languages.keys.firstWhere((name) => _languages[name] == code, orElse: () => 'Español');
+  void _swapLanguages() {
+    setState(() {
+      final temp = _fromLang;
+      _fromLang = _toLang;
+      _toLang = temp;
+      final tempText = _inputController.text;
+      _inputController.text = _translatedText;
+      _translatedText = tempText;
+    });
+    HapticFeedback.mediumImpact();
   }
 
-  List<DropdownMenuItem<String>> _buildLangItems() {
-    return _languages.keys
-        .map((name) => DropdownMenuItem(
-              value: name,
-              child: Text(name),
-            ))
-        .toList();
-  }
+  // --- UI COMPONENTS ---
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color(0xFF004D40); // Teal FeelTrip
+
     return Scaffold(
+      backgroundColor: const Color(0xFFFDFBF7), // Fondo papel
       appBar: AppBar(
-        title: const Text('Traductor Completo'),
-        backgroundColor: Colors.deepPurple,
+        title: Text('TRADUCTOR VIVENCIAL', 
+          style: GoogleFonts.jetBrainsMono(fontSize: 14, letterSpacing: 2, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: primaryColor,
+        elevation: 0,
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            // Dropdowns
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    initialValue: _getLangName(_fromLang),
-                    decoration: const InputDecoration(
-                      labelText: 'Desde',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: _buildLangItems(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _fromLang = _getLangCode(value));
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    initialValue: _getLangName(_toLang),
-                    decoration: const InputDecoration(
-                      labelText: 'Hacia',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: _buildLangItems(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _toLang = _getLangCode(value));
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Input
-            TextField(
-              controller: _inputController,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Ingresa el texto',
-                border: OutlineInputBorder(),
-                alignLabelWithHint: true,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Translate button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isLoading ? null : _translate,
-                icon: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
-                      )
-                    : const Icon(Icons.translate),
-                label: Text(_isLoading ? 'Traduciendo...' : 'Traducir'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-            if (_error.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red[300]!),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.error, color: Colors.red[600]),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(_error)),
-                  ],
-                ),
-              ),
-            ],
+            _buildLanguageHeader(primaryColor),
             const SizedBox(height: 24),
+            _buildInputArea(primaryColor),
+            const SizedBox(height: 20),
+            _buildActionButtons(primaryColor),
             if (_translatedText.isNotEmpty) ...[
-              const Text('Traducción:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green[200]!),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(_translatedText, style: const TextStyle(fontSize: 16)),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.volume_up),
-                          onPressed: _speak,
-                          tooltip: 'Hablar',
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.copy),
-                          onPressed: _copyToClipboard,
-                          tooltip: 'Copiar',
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              const SizedBox(height: 32),
+              _buildResultCard(primaryColor),
             ],
-            const Spacer(),
-            Center(
-              child: ElevatedButton.icon(
-                onPressed: _swapLanguages,
-                icon: const Icon(Icons.swap_horiz),
-                label: const Text('Cambiar idiomas'),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-              ),
-            ),
+            if (_error.isNotEmpty) _buildErrorLabel(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLanguageHeader(Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildLanguageButton(_fromLang),
+          IconButton(
+            icon: Icon(Icons.swap_horizontal_circle, color: color, size: 32),
+            onPressed: _swapLanguages,
+          ),
+          _buildLanguageButton(_toLang),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageButton(String code) {
+    final name = _languages.entries.firstWhere((e) => e.value == code).key;
+    return Text(
+      name.toUpperCase(),
+      style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54),
+    );
+  }
+
+  Widget _buildInputArea(Color color) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.black12),
+      ),
+      child: TextField(
+        controller: _inputController,
+        maxLines: 6,
+        style: const TextStyle(fontSize: 18),
+        decoration: InputDecoration(
+          hintText: 'Ingresa texto aquí...',
+          hintStyle: TextStyle(color: Colors.grey[300]),
+          contentPadding: const EdgeInsets.all(24),
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(Color color) {
+    return SizedBox(
+      width: double.infinity,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _translate,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 0,
+        ),
+        child: _isLoading 
+          ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+          : const Text('TRADUCIR AHORA', style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold, color: Colors.white)),
+      ),
+    );
+  }
+
+  Widget _buildResultCard(Color color) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: color.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('TRADUCCIÓN', style: GoogleFonts.jetBrainsMono(fontSize: 10, color: color, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          Text(_translatedText, style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.w500, color: Colors.black87)),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildCircleTool(Icons.copy, () {
+                Clipboard.setData(ClipboardData(text: _translatedText));
+                HapticFeedback.selectionClick();
+              }),
+              const SizedBox(width: 12),
+              _buildCircleTool(Icons.volume_up, _speak),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCircleTool(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: Colors.black12)),
+        child: Icon(icon, size: 20, color: const Color(0xFF004D40)),
+      ),
+    );
+  }
+
+  Widget _buildErrorLabel() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Text(_error, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
     );
   }
 

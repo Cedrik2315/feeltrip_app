@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  UserService({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  /// Follow a user (task #3)
+  final FirebaseFirestore _firestore;
+
   Future<void> followUser(String currentUserId, String targetUserId) async {
     try {
-      // Add to current user's following
       await _firestore
           .collection('users')
           .doc(currentUserId)
@@ -14,25 +15,19 @@ class UserService {
           .doc(targetUserId)
           .set({'followedAt': FieldValue.serverTimestamp()});
 
-      // Add to target user's followers
       await _firestore
           .collection('users')
           .doc(targetUserId)
           .collection('followers')
           .doc(currentUserId)
           .set({'followedBy': FieldValue.serverTimestamp()});
-
-      // log eliminado: ✅ Followed user $targetUserId
     } catch (e) {
-      // log eliminado: ❌ Error following user: $e
       rethrow;
     }
   }
 
-  /// Unfollow a user (task #3)
   Future<void> unfollowUser(String currentUserId, String targetUserId) async {
     try {
-      // Remove from current user's following
       await _firestore
           .collection('users')
           .doc(currentUserId)
@@ -40,7 +35,6 @@ class UserService {
           .doc(targetUserId)
           .delete();
 
-      // Remove from target user's followers
       await _firestore
           .collection('users')
           .doc(targetUserId)
@@ -52,7 +46,6 @@ class UserService {
     }
   }
 
-  /// Get followers stream (task #3)
   Stream<List<String>> getFollowers(String userId) {
     return _firestore
         .collection('users')
@@ -62,7 +55,6 @@ class UserService {
         .map((snapshot) => snapshot.docs.map((doc) => doc.id).toList());
   }
 
-  /// Get following stream (task #3)
   Stream<List<String>> getFollowing(String userId) {
     return _firestore
         .collection('users')
@@ -72,7 +64,6 @@ class UserService {
         .map((snapshot) => snapshot.docs.map((doc) => doc.id).toList());
   }
 
-  /// Check if current user is following target (task #4)
   Future<bool> isFollowing(String currentUserId, String targetUserId) async {
     try {
       final doc = await _firestore
