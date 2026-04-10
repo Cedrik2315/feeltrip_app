@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.feeltrip_app",
+      "sha256_cert_fingerprints": [
+        "db:e9:f9:34:52:fe:08:3f:ea:c0:44:0f:c6:e7:79:44:c3:a4:bb:45:1b:72:08:de:c1:8f:68:4e:5e:2c:5e:d2"
+      ]
+    }
+  }
+]

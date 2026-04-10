@@ -93,6 +93,7 @@ class IsarService {
       _profileBox = await Hive.openBox<UserProfile>(_profileBoxName);
       _isInitialized = true;
       AppLogger.i('IsarService (Hive backend) initialized');
+      AppLogger.i('FUTURE: Migrate to Isar using lib/core/local_storage/chronicle_schema.dart');
     } catch (e) {
       AppLogger.e('Hive init error: $e');
       rethrow;

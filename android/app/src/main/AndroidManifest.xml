@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
-    <!-- CÃ¡mara -->
+    <!-- Cámara -->
     <uses-permission android:name="android.permission.CAMERA" />
     
     <!-- Almacenamiento (Android < 13) -->
@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     
-    <!-- MicrÃ³fono (para voz en traductor) -->
+    <!-- Micrófono (para voz en traductor) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     
     <!-- Internet -->
@@ -29,9 +29,9 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <application
-        android:label="feeltrip_app"
+        android:label="FeelTrip"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

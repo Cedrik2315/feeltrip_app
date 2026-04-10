@@ -41,6 +41,11 @@ class FeedScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.map_outlined, color: boneWhite, size: 20),
+            onPressed: () => context.push('/map'),
+            tooltip: 'Cartografía IA',
+          ),
+          IconButton(
             icon: const Icon(Icons.insights_rounded, color: boneWhite, size: 20),
             onPressed: () => context.push('/impact-dashboard'),
             tooltip: 'Ver mi impacto',

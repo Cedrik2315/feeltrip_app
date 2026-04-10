@@ -22,7 +22,7 @@ final premiumRepositoryProvider =
 );
 
 typedef PremiumRepositoryRef = AutoDisposeProviderRef<PremiumRepository>;
-String _$premiumNotifierHash() => r'53877532e965ca462a5759a3f6b426672242eddb';
+String _$premiumNotifierHash() => r'4fe7208cc91a47458efe7bb7d9f49c529b9b49e4';
 
 /// See also [PremiumNotifier].
 @ProviderFor(PremiumNotifier)

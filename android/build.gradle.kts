@@ -27,6 +27,25 @@ subprojects {
 
     project.evaluationDependsOn(":app")
 
+    plugins.withId("com.android.library") {
+        extensions.findByName("android")?.let { androidExtension ->
+            val getNamespace = androidExtension.javaClass.methods.find { it.name == "getNamespace" }
+            val currentNamespace = getNamespace?.invoke(androidExtension) as String?
+            if (currentNamespace.isNullOrBlank()) {
+                val setNamespace = androidExtension.javaClass.methods.find {
+                    it.name == "setNamespace" && it.parameterTypes.contentEquals(arrayOf(String::class.java))
+                }
+                if (setNamespace != null) {
+                    val fallbackNamespace = when (project.name) {
+                        "isar_flutter_libs" -> "dev.isar.flutter.libs"
+                        else -> "feeltrip.generated.${project.name.replace('-', '_')}"
+                    }
+                    setNamespace.invoke(androidExtension, fallbackNamespace)
+                }
+            }
+        }
+    }
+
     // 1. Forzamos Java 17 de forma directa
     tasks.withType<JavaCompile>().configureEach {
         sourceCompatibility = JavaVersion.VERSION_17.toString()

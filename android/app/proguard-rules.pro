@@ -23,3 +23,7 @@
 # === STRIPE - pushProvisioning es opcional ===
 -dontwarn com.stripe.android.pushProvisioning.**
 -dontwarn com.reactnativestripesdk.pushprovisioning.**
+# === MAIN ACTIVITY ===
+-keep class com.feeltrip.app.MainActivity { *; }
+-keep class com.feeltrip.app.** { *; }
+

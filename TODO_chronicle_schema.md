@@ -9,6 +9,10 @@
 - [ ] 6. `flutter analyze lib/core/local_storage/` - confirm 0 errors
 - [ ] 7. Update TODO_ISAR_FIX.md with progress
 - [x] 8. Test IsarService.init() compatibility (no changes needed for Hive)
+- [x] 9. Schema synced with MomentoModel/ItineraryModel fields. Future-ready.
+
+**Status:** ✅ COMPLETE - Schema created matching models.
+
 - [ ] 9. attempt_completion
 
 **Status:** Schema ready for future Isar migration while keeping Hive current.

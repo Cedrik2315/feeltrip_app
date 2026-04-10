@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  app_links
   cloud_firestore
   connectivity_plus
   file_selector_windows
@@ -12,6 +13,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_secure_storage_windows
   flutter_tts
   geolocator_windows
+  isar_flutter_libs
   permission_handler_windows
   sentry_flutter
   share_plus
