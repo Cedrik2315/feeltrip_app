@@ -1,90 +1,99 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Para HapticFeedback
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-// Importamos tu provider de preferencias
-import '../user_preferences.dart';
+import 'package:feeltrip_app/user_preferences.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
+  // Centralizamos los colores de la marca
+  static const brandTeal = Color(0xFF00695C);
+  static const accentAmber = Color(0xFFFF8F00);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(userPreferencesProvider);
-    final prefsNotifier = ref.read(userPreferencesProvider.notifier);
+    final notifier = ref.read(userPreferencesProvider.notifier);
 
-    const brandColor = Color(0xFF00695C); // Teal
-    const accentColor = Color(0xFFFF8F00); // Ámbar
+    final isDark = prefs.darkMode;
+    final bgColor = isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
 
     return Scaffold(
-      backgroundColor: prefs.darkMode ? const Color(0xFF121212) : const Color(0xFFF5F5F5),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        title: Text('CONFIGURACIÓN DEL SISTEMA', 
-          style: GoogleFonts.jetBrainsMono(fontSize: 14, letterSpacing: 2)),
+        title: Text(
+          'CONFIGURACIÓN DEL SISTEMA',
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 14, 
+            letterSpacing: 2, 
+            color: Colors.white
+          ),
+        ),
         elevation: 0,
-        backgroundColor: prefs.darkMode ? Colors.black : brandColor,
+        backgroundColor: isDark ? Colors.black : brandTeal,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
-          _buildHeader(prefs.darkMode),
+          _buildHeader(isDark),
           
-          _SectionTitle(title: 'EXPERIENCIA VISUAL', darkMode: prefs.darkMode),
+          _SectionTitle(title: 'EXPERIENCIA VISUAL', darkMode: isDark),
           _CustomSwitchTile(
             title: 'Modo Oscuro (Carbon)',
             subtitle: 'Optimiza el consumo y reduce la fatiga visual',
             value: prefs.darkMode,
-            onChanged: (val) => prefsNotifier.toggleDarkMode(),
+            onChanged: (val) {
+              HapticFeedback.lightImpact();
+              notifier.toggleDarkMode();
+            },
             icon: Icons.dark_mode_outlined,
-            darkMode: prefs.darkMode,
+            darkMode: isDark,
           ),
 
-          _SectionTitle(title: 'NÚCLEO FEELTRIP', darkMode: prefs.darkMode),
+          _SectionTitle(title: 'NÚCLEO FEELTRIP', darkMode: isDark),
           _CustomSwitchTile(
             title: 'Modo Offline-First',
             subtitle: 'Prioriza datos locales en zonas sin señal',
             value: prefs.offlineFirstMode,
-            onChanged: (val) => prefsNotifier.toggleOfflineMode(),
+            onChanged: (val) {
+              HapticFeedback.mediumImpact();
+              notifier.toggleOfflineMode();
+            },
             icon: Icons.cloud_off_outlined,
-            darkMode: prefs.darkMode,
+            darkMode: isDark,
           ),
           _CustomSwitchTile(
             title: 'Motor Emocional (IA)',
             subtitle: 'Analiza el tono de tus diarios para sugerencias',
             value: prefs.emotionalAnalytics,
-            onChanged: (val) => prefsNotifier.toggleEmotionalEngine(),
-            icon: Icons.psychology_outlined,
-            darkMode: prefs.darkMode,
-          ),
-
-          _SectionTitle(title: 'SISTEMA', darkMode: prefs.darkMode),
-          ListTile(
-            leading: Icon(Icons.translate, color: brandColor),
-            title: Text('Idioma de la interfaz', 
-              style: TextStyle(color: prefs.darkMode ? Colors.white : Colors.black87)),
-            subtitle: Text(prefs.language == 'es' ? 'Español (Chile)' : 'English', 
-              style: TextStyle(color: Colors.grey)),
-            trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-            onTap: () {
-              // Aquí podrías abrir un modal para cambiar el idioma
-              prefsNotifier.setLanguage(prefs.language == 'es' ? 'en' : 'es');
+            onChanged: (val) {
+              HapticFeedback.lightImpact();
+              notifier.toggleEmotionalEngine();
             },
+            icon: Icons.psychology_outlined,
+            darkMode: isDark,
           ),
 
-          const Divider(height: 40, indent: 20, endIndent: 20),
-          
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                Text('FEELTRIP v1.0.4-beta', 
-                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: Colors.grey)),
-                const SizedBox(height: 8),
-                Text('Diseñado en Quillota, Chile', 
-                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: accentColor.withValues(alpha: .7))),
-              ],
+          _SectionTitle(title: 'SISTEMA', darkMode: isDark),
+          ListTile(
+            leading: const Icon(Icons.translate, color: brandTeal),
+            title: Text(
+              'Idioma de la interfaz',
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
             ),
+            subtitle: Text(
+              prefs.language == 'es' ? 'Español (Chile)' : 'English',
+              style: const TextStyle(color: Colors.grey),
+            ),
+            trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+            onTap: () => _showLanguagePicker(context, ref),
           ),
+
+          const Divider(height: 60, indent: 40, endIndent: 40, thickness: 0.5),
+          
+          _buildFooter(),
         ],
       ),
     );
@@ -94,21 +103,80 @@ class SettingsScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       decoration: BoxDecoration(
-        color: isDark ? Colors.black : const Color(0xFF00695C),
+        color: isDark ? Colors.black : brandTeal,
       ),
       child: Column(
         children: [
           const CircleAvatar(
             radius: 40,
-            backgroundColor: Color(0xFFFF8F00),
+            backgroundColor: accentAmber,
             child: Icon(Icons.person_outline, size: 40, color: Colors.white),
           ),
           const SizedBox(height: 16),
-          Text('Explorador FeelTrip', 
-            style: GoogleFonts.playfairDisplay(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold)),
-          const Text('ID: FT-2026-XQ', 
-            style: TextStyle(color: Colors.white70, fontSize: 12)),
+          Text(
+            'Explorador FeelTrip',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 22, 
+              color: Colors.white, 
+              fontWeight: FontWeight.bold
+            ),
+          ),
+          const Text(
+            'ID: FT-2026-XQ',
+            style: TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 1.5),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 40),
+      child: Column(
+        children: [
+          Text(
+            'FEELTRIP v1.0.4-beta',
+            style: GoogleFonts.jetBrainsMono(fontSize: 10, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Diseñado en Quillota, Chile',
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 10, 
+              color: accentAmber.withValues(alpha: .5)
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ref.read(userPreferencesProvider).darkMode ? Colors.grey[900] : Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Español (Chile)'),
+              onTap: () {
+                ref.read(userPreferencesProvider.notifier).setLanguage('es');
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('English'),
+              onTap: () {
+                ref.read(userPreferencesProvider.notifier).setLanguage('en');
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -117,19 +185,22 @@ class SettingsScreen extends ConsumerWidget {
 class _SectionTitle extends StatelessWidget {
   final String title;
   final bool darkMode;
+
   const _SectionTitle({required this.title, required this.darkMode});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
-      child: Text(title, 
+      child: Text(
+        title,
         style: GoogleFonts.jetBrainsMono(
-          fontSize: 11, 
-          fontWeight: FontWeight.bold, 
-          color: darkMode ? Colors.white38 : Colors.black38,
-          letterSpacing: 1.2
-        )),
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: darkMode ? Colors.white30 : Colors.black26,
+          letterSpacing: 1.5,
+        ),
+      ),
     );
   }
 }
@@ -138,9 +209,10 @@ class _CustomSwitchTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool value;
-  final Function(bool) onChanged;
+  final ValueChanged<bool> onChanged;
   final IconData icon;
   final bool darkMode;
+
   const _CustomSwitchTile({
     required this.title,
     required this.subtitle,
@@ -152,21 +224,26 @@ class _CustomSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brandColor = const Color(0xFF00695C);
-    
     return ListTile(
-      leading: Icon(icon, color: value ? brandColor : Colors.grey),
-      title: Text(title, 
+      leading: Icon(icon, color: SettingsScreen.brandTeal),
+      title: Text(
+        title,
         style: TextStyle(
-          color: darkMode ? Colors.white : Colors.black87, 
-          fontWeight: FontWeight.w500
-        )),
-      subtitle: Text(subtitle, 
-        style: const TextStyle(fontSize: 12, color: Colors.grey)),
-      trailing: Switch.adaptive(
+          color: darkMode ? Colors.white : Colors.black87,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: GoogleFonts.jetBrainsMono(
+          fontSize: 11,
+          color: Colors.grey[600],
+        ),
+      ),
+      trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeTrackColor: brandColor,
+        activeThumbColor: SettingsScreen.accentAmber,
       ),
     );
   }

@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Importaciones corregidas según tu estructura
+// Importaciones corregidas segÃºn tu estructura
+import '../core/di/providers.dart';
 import '../core/logger/app_logger.dart';
 import '../services/isar_service.dart';
-import '../services/sync_service.dart';
 import '../services/gemini_service.dart';
 import '../features/auth/presentation/providers/auth_notifier.dart';
 import '../models/itinerary_model.dart';
@@ -33,7 +33,7 @@ class _TravelSuggestionsScreenState extends ConsumerState<TravelSuggestionsScree
       final authState = ref.read(authNotifierProvider);
       final String? userId = authState.value?.id;
 
-      if (userId == null) throw Exception('Sesión no encontrada.');
+      if (userId == null) throw Exception('SesiÃ³n no encontrada.');
 
       // Llamada al servicio de IA optimizada
       final proposal = await ref.read(geminiServiceProvider).generateProposalFromProfile(
@@ -60,7 +60,7 @@ class _TravelSuggestionsScreenState extends ConsumerState<TravelSuggestionsScree
     } catch (e) {
       AppLogger.e('Error IA: $e');
       setState(() => _isLoading = false);
-      _showErrorSnackBar('Nuestras brújulas de IA fallaron. Intenta de nuevo.');
+      _showErrorSnackBar('Nuestras brÃºjulas de IA fallaron. Intenta de nuevo.');
     }
   }
 
@@ -79,15 +79,15 @@ class _TravelSuggestionsScreenState extends ConsumerState<TravelSuggestionsScree
 
       await ref.read(isarServiceProvider).putItinerary(itinerary);
       
-      // Sincronización en segundo plano
+      // SincronizaciÃ³n en segundo plano
       ref.read(syncServiceProvider).syncUserEntries(itinerary.userId);
 
       HapticFeedback.mediumImpact();
       if (mounted) _showSuccessDialog();
       
     } catch (e) {
-      AppLogger.e('Error activación: $e');
-      _showErrorSnackBar('No pudimos activar tu ruta. Revisa tu conexión.');
+      AppLogger.e('Error activaciÃ³n: $e');
+      _showErrorSnackBar('No pudimos activar tu ruta. Revisa tu conexiÃ³n.');
     } finally {
       if (mounted) setState(() => _isAccepting = false);
     }
@@ -104,8 +104,8 @@ class _TravelSuggestionsScreenState extends ConsumerState<TravelSuggestionsScree
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('¡Ruta Activada!'),
-        content: const Text('Tu bitácora ahora tiene una nueva misión. Comienza cuando estés listo.'),
+        title: const Text('Â¡Ruta Activada!'),
+        content: const Text('Tu bitÃ¡cora ahora tiene una nueva misiÃ³n. Comienza cuando estÃ©s listo.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('ENTENDIDO'))
         ],
@@ -168,7 +168,7 @@ class _TravelSuggestionsScreenState extends ConsumerState<TravelSuggestionsScree
         Icon(Icons.map_outlined, size: 100, color: Colors.grey[200]),
         const SizedBox(height: 20),
         Text(
-          '¿Hacia dónde fluye tu curiosidad hoy?',
+          'Â¿Hacia dÃ³nde fluye tu curiosidad hoy?',
           textAlign: TextAlign.center,
           style: GoogleFonts.playfairDisplay(fontSize: 20, color: Colors.black54),
         ),

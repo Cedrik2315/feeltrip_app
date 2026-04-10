@@ -3,83 +3,101 @@
 ## Objetivo
 Checklist corta para validar el release candidate real de FeelTrip.
 
-## Smoke test core
+## Smoke test mini release actual
 
-### 1. Auth
-- Abrir app.
-- Verificar splash y ruta inicial.
-- Login con email valido.
-- Login con Google.
-- Login con Facebook.
-- Logout.
-- Recovery / forgot password.
+### Precondiciones
+- Usuario autenticado en la app.
+- Firebase project correcto activo.
+- Cloud Functions desplegadas.
+- `firestore.rules` desplegadas.
+- Variables de entorno de RevenueCat y Mercado Pago configuradas si se va a probar checkout real.
+- Revisar [PAYMENT_DEPLOY_CHECKLIST.md](C:/Users/monch/Documents/feeltrip_app/PAYMENT_DEPLOY_CHECKLIST.md) antes de probar pagos.
 
-### 2. Navegacion
-- Entrar a home.
-- Navegar a search.
-- Navegar a bookings.
-- Navegar a notifications.
-- Volver atras sin errores de routing.
+### 1. Feed y social
+- Abrir `/feed`.
+- Confirmar que el feed carga historias reales sin fallback a mocks.
+- Tocar like en una historia.
+- Confirmar que el contador cambia tras refresh natural del stream.
+- Tocar like de nuevo.
+- Confirmar unlike sin error visible.
+- Abrir una historia desde feed y navegar a comentarios.
+- Confirmar que `/map` abre desde el icono del feed y no cae en ruta inexistente.
 
-### 3. Search
-- Buscar por titulo.
-- Buscar por destino.
-- Confirmar que queries cortas no rompan la UI.
-- Confirmar que la lista no duplique resultados.
+### 2. Stories verticales
+- Abrir `/stories`.
+- Confirmar que usa historias reales y no datos mock locales.
+- Verificar scroll vertical entre historias.
+- Confirmar que título, autor, imagen y likes se renderizan sin crash.
 
-### 4. Diario y momentos
-- Crear momento.
-- Confirmar guardado local.
-- Ver estado `pending` o `synced`.
-- Simular reconexion y reintento de sync.
-- Confirmar que el momento reaparece al reabrir la app.
+### 3. Instagram stories efímeras
+- Abrir `/instagram-stories`.
+- Crear una story desde galería.
+- Confirmar upload a Storage.
+- Confirmar documento en `instagram_stories`.
+- Confirmar visualización posterior en la propia pantalla.
+- Confirmar que feed público no se contamina con stories efímeras.
 
-### 5. Premium
-- Abrir paywall.
-- Cargar offerings.
-- Comprar si hay entorno disponible.
-- Restaurar compra.
-- Confirmar estado premium en UI.
-
-### 6. Bookings
-- Crear booking.
-- Confirmar que aparece en la pantalla de reservas.
-- Verificar estado local y cloud coherente.
-- Confirmar que no hay duplicados.
-
-### 7. Notifications
+### 4. Notificaciones
 - Abrir centro de notificaciones.
-- Ver contador.
-- Abrir una notificacion.
-- Confirmar marcado como leida.
-- Confirmar navegacion al destino correcto.
+- Confirmar que la lista carga desde `users/{userId}/notifications`.
+- Abrir una notificación.
+- Confirmar marcado como leída.
+- Confirmar que el contador baja.
+- Confirmar navegación al destino correcto.
 
-### 8. Smart camera / IA (OCR/VisiÃ³n - OSINT EXPERIMENTAL)
-- [ ] Capturar o seleccionar imagen con Smart Camera.
-- [ ] Ver anÃ¡lisis visiÃ³n (labels/sentiment/OCR).
-- [ ] TraducciÃ³n OCR si texto detectado.
-- [ ] OSINT/Trip proposal: EXPERIMENTAL (lib/experimental/osint_ai_service.dart)
-- [ ] Confirmar errores claros si falla.
+### 5. Premium y checkout
+- Abrir `/premium`.
+- Confirmar que carga offerings o muestra error claro.
+- Crear un booking `pending`.
+- Iniciar checkout.
+- Confirmar que la app abre un `initPoint` válido.
+- Verificar en Firestore que el booking guardó `preferenceId`, `paymentProvider` y `paymentStatus = pending`.
+- Si hay entorno real: completar pago de prueba.
+- Confirmar que webhook actualiza booking a `paid` y agrega `paymentId`.
+- Confirmar que no se usa el flujo client-side legacy de Mercado Pago.
 
-### 9. Observabilidad
-- Confirmar que Sentry/Crashlytics inicializan.
-- Revisar logs de auth, payments, sync y camera.
+### 6. Sync real de proposals e itineraries
+- Abrir `/suggestions`.
+- Generar una propuesta con IA.
+- Confirmar guardado local en Hive.
+- Confirmar documento en `users/{userId}/proposals/{proposalId}`.
+- Aceptar la propuesta para generar un itinerario.
+- Confirmar documento en `users/{userId}/itineraries/{itineraryId}`.
+- Completar un itinerario desde `MyItinerariesScreen`.
+- Confirmar que `impactSummary`, `status` y `syncStatus` se actualizan en Firestore.
+- Repetir con reconexión para validar que un `pending` termina sincronizando.
 
-## Gate de aprobacion
-El build queda aprobado si:
-- no hay crashes en flujos core,
-- auth funciona,
-- search funciona,
-- diario persiste,
-- premium funciona o falla de manera clara,
-- bookings son consistentes,
-- notifications navegan bien.
+### 7. Diario offline-first
+- Crear un `momento` sin red o simulando reconexión.
+- Confirmar guardado local.
+- Reconectar y lanzar sync.
+- Confirmar documento en `users/{userId}/momentos/{momentoId}`.
+- Borrar un `momento` ya sincronizado.
+- Confirmar que desaparece tanto localmente como en Firestore.
 
-## Resultado
+### 8. Smoke técnico rápido
+- Ejecutar `flutter analyze`.
+- Ejecutar `flutter test` si el entorno está listo.
+- Verificar logs de Functions para `toggleStoryLike`, `createMercadoPagoPreference` y `mercadopagoWebhook`.
+- Verificar logs app para `SyncService` y `FirebaseConfig`.
+
+## Gate de aprobación mini release
+La mini release queda aprobada si:
+- likes funcionan desde feed,
+- `/map` ya no rompe,
+- stories verticales usan datos reales,
+- instagram stories escriben en `instagram_stories`,
+- notificaciones leen/escriben en la subcolección correcta,
+- checkout abre preferencia server-side,
+- webhook marca booking como `paid`,
+- momentos, proposals e itineraries suben a Firestore,
+- no hay crashes en estos journeys.
+
+## Resultado sugerido
 Registrar para cada flujo:
 - Pass
 - Fail
 - Notas
 - Dispositivo
-- Version probada
-
+- Build probada
+- Project Firebase usado

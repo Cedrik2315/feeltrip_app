@@ -1,4 +1,4 @@
-import 'package:dartz/dartz.dart';
+﻿import 'package:dartz/dartz.dart';
 import 'package:feeltrip_app/core/error/failures.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'package:feeltrip_app/services/metrics_service.dart' hide metricsServiceProvider;
@@ -46,8 +46,8 @@ class PaymentRepository {
         amount: amount,
         experienceId: experienceId,
       );
-      final initPoint = paymentResult['init_point'] as String?;
-      final preferenceId = paymentResult['id'] as String?;
+      final initPoint = (paymentResult['initPoint'] ?? paymentResult['init_point']) as String?;
+      final preferenceId = (paymentResult['preferenceId'] ?? paymentResult['id']) as String?;
 
       if (initPoint == null || preferenceId == null) {
         return const Left(ServerFailure('Error al generar link de pago'));
@@ -79,3 +79,4 @@ class PaymentRepository {
     }
   }
 }
+

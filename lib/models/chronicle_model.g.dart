@@ -21,9 +21,10 @@ class ChronicleModelAdapter extends TypeAdapter<ChronicleModel> {
       userId: fields[1] as String,
       title: fields[2] as String,
       paragraphs: (fields[3] as List).cast<String>(),
+      expeditionDataJson: (fields[4] as Map).cast<String, dynamic>(),
       generatedAt: fields[5] as DateTime,
       syncStatus: fields[6] as SyncStatus,
-      expeditionNumber: fields[7] as int?,
+      expeditionNumber: fields[7] as int,
       imageUrl: fields[8] as String?,
       visualMetaphor: fields[9] as String?,
     );

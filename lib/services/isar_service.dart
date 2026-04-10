@@ -1,15 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../core/logger/app_logger.dart';
-import '../models/momento_model.dart';
-import '../models/proposal_model.dart';
-import '../models/itinerary_model.dart';
+import '../models/booking_model.dart';
 import '../models/chronicle_model.dart';
 import '../models/gps_models.dart';
+import '../models/itinerary_model.dart';
+import '../models/momento_model.dart';
+import '../models/proposal_model.dart';
 import '../models/syncable_model.dart';
-import '../models/booking_model.dart';
-
 import 'package:feeltrip_app/features/profile/domain/user_profile_model.dart';
 
 class IsarService {
@@ -18,6 +18,7 @@ class IsarService {
   static final IsarService _instance = IsarService._internal();
 
   bool _isInitialized = false;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static const String _boxName = 'momentos';
   static const String _proposalsBoxName = 'proposals';
@@ -41,10 +42,13 @@ class IsarService {
   Box<dynamic>? _prefsBox;
 
   Box<MomentoModel> get box => _ensureBox(_box, _boxName);
-  Box<ProposalModel> get proposalsBox => _ensureBox(_proposalsBox, _proposalsBoxName);
-  Box<ItineraryModel> get itinerariesBox => _ensureBox(_itinerariesBox, _itinerariesBoxName);
+  Box<ProposalModel> get proposalsBox =>
+      _ensureBox(_proposalsBox, _proposalsBoxName);
+  Box<ItineraryModel> get itinerariesBox =>
+      _ensureBox(_itinerariesBox, _itinerariesBoxName);
   Box<RouteModel> get routesBox => _ensureBox(_routesBox, _routesBoxName);
-  Box<ChronicleModel> get chroniclesBox => _ensureBox(_chroniclesBox, _chroniclesBoxName);
+  Box<ChronicleModel> get chroniclesBox =>
+      _ensureBox(_chroniclesBox, _chroniclesBoxName);
   Box<dynamic> get metaBox => _ensureBox(_metaBox, _metaBoxName);
   Box<dynamic> get prefsBox => _ensureBox(_prefsBox, _prefsBoxName);
   Box<UserProfile> get profileBox => _ensureBox(_profileBox, _profileBoxName);
@@ -93,7 +97,9 @@ class IsarService {
       _profileBox = await Hive.openBox<UserProfile>(_profileBoxName);
       _isInitialized = true;
       AppLogger.i('IsarService (Hive backend) initialized');
-      AppLogger.i('FUTURE: Migrate to Isar using lib/core/local_storage/chronicle_schema.dart');
+      AppLogger.i(
+        'FUTURE: Migrate to Isar using lib/core/local_storage/chronicle_schema.dart',
+      );
     } catch (e) {
       AppLogger.e('Hive init error: $e');
       rethrow;
@@ -101,23 +107,37 @@ class IsarService {
   }
 
   Future<void> putMomento(MomentoModel momento) async {
-    await box.put(
-        momento.firestoreId ?? DateTime.now().millisecondsSinceEpoch.toString(),
-        momento);
-    AppLogger.d('Momento saved locally: ${momento.firestoreId}');
+    if (momento.syncStatus == SyncStatus.local) {
+      momento.syncStatus = SyncStatus.pending;
+      momento.lastAttempt = DateTime.now();
+    }
+
+    final existingKey = momento.key;
+    final storageKey = existingKey ?? momento.firestoreId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    await box.put(storageKey, momento);
+    AppLogger.d('Momento saved locally: ${momento.firestoreId ?? storageKey}');
   }
 
   Future<void> putProposal(ProposalModel proposal) async {
+    if (proposal.syncStatus == SyncStatus.local) {
+      proposal.syncStatus = SyncStatus.pending;
+      proposal.lastAttempt = DateTime.now();
+    }
     await proposalsBox.put(proposal.id, proposal);
     AppLogger.d('Proposal saved locally: ${proposal.id}');
   }
 
   Future<void> putItinerary(ItineraryModel itinerary) async {
+    if (itinerary.syncStatus == SyncStatus.local) {
+      itinerary.syncStatus = SyncStatus.pending;
+      itinerary.lastAttempt = DateTime.now();
+    }
     await itinerariesBox.put(itinerary.id, itinerary);
     AppLogger.d('Itinerary saved locally: ${itinerary.id}');
   }
 
-  Future<List<T>> getDataByBoxName<T>(String boxName, {
+  Future<List<T>> getDataByBoxName<T>(
+    String boxName, {
     String? userId,
     SyncStatus? syncStatus,
     String? status,
@@ -195,92 +215,201 @@ class IsarService {
   Future<List<MomentoModel>> getPendingMomentos(String userId) async {
     return _getEntries(targetBox: box, userId: userId, onlyPending: true);
   }
+  Future<void> mergeMomentosFromCloud(String userId) async {
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('momentos')
+        .orderBy('createdAt', descending: true)
+        .get();
+    final remoteIds = <String>{};
+    for (final doc in snapshot.docs) {
+      remoteIds.add(doc.id);
+      final remoteMomento = MomentoModel.fromFirestore(doc.id, doc.data());
+      final localMomento = box.get(doc.id) ?? box.values.cast<MomentoModel?>().firstWhere(
+        (item) => item?.firestoreId == doc.id,
+        orElse: () => null,
+      );
+      if (localMomento != null && localMomento.syncStatus.needsSync) {
+        continue;
+      }
+      remoteMomento.syncStatus = SyncStatus.synced;
+      remoteMomento.errorMessage = null;
+      remoteMomento.lastAttempt = DateTime.now();
+      await box.put(doc.id, remoteMomento);
+    }
+    final staleKeys = box.keys.where((key) {
+      final momento = box.get(key);
+      if (momento == null || momento.userId != userId) {
+        return false;
+      }
+      if (momento.syncStatus != SyncStatus.synced) {
+        return false;
+      }
+      final remoteId = momento.firestoreId;
+      return remoteId != null && remoteId.isNotEmpty && !remoteIds.contains(remoteId);
+    }).toList();
+    if (staleKeys.isNotEmpty) {
+      await box.deleteAll(staleKeys);
+    }
+    AppLogger.d('Merged momentos from cloud for ');
+  }
 
   Future<String> pushMomentoToCloud(MomentoModel momento) async {
     AppLogger.i('Pushing momento to cloud: ${momento.id}');
-    return 'remote_${DateTime.now().millisecondsSinceEpoch}';
+    momento.lastAttempt = DateTime.now();
+    momento.retryCount += 1;
+
+    final collection = _firestore
+        .collection('users')
+        .doc(momento.userId)
+        .collection('momentos');
+
+    final remoteId = momento.firestoreId ?? collection.doc().id;
+    await collection.doc(remoteId).set(momento.toFirestore(), SetOptions(merge: true));
+    return remoteId;
   }
 
   Future<void> markMomentoAsSynced(String key, String remoteId) async {
-    final momento = box.get(int.tryParse(key) ?? key);
-    if (momento != null) {
-      momento.syncStatus = SyncStatus.synced;
-      momento.firestoreId = remoteId;
-      await box.put(key, momento);
-      AppLogger.d('Momento marked synced: $key -> $remoteId');
+    final resolvedKey = int.tryParse(key) ?? key;
+    final momento = box.get(resolvedKey);
+    if (momento == null) return;
+
+    final previousKey = momento.key;
+    momento.syncStatus = SyncStatus.synced;
+    momento.firestoreId = remoteId;
+    momento.errorMessage = null;
+    momento.lastAttempt = DateTime.now();
+
+    await box.put(remoteId, momento);
+    if (previousKey != null && previousKey != remoteId) {
+      await box.delete(previousKey);
     }
+
+    AppLogger.d('Momento marked synced: $resolvedKey -> $remoteId');
   }
 
   Future<void> markMomentoSyncError(String id, String error) async {
     final momento = box.values.firstWhere(
-      (m) => m.id == id, 
-      orElse: () => throw StateError('Momento $id not found')
+      (m) => m.id == id,
+      orElse: () => throw StateError('Momento $id not found'),
     );
     momento.syncStatus = SyncStatus.error;
+    momento.errorMessage = error;
+    momento.lastAttempt = DateTime.now();
     await momento.save();
     AppLogger.w('Momento sync error: $id - $error');
   }
 
+  Future<void> deleteMomentoFromCloud(MomentoModel momento) async {
+    final remoteId = momento.firestoreId;
+    if (remoteId == null || remoteId.isEmpty) {
+      return;
+    }
+
+    await _firestore
+        .collection('users')
+        .doc(momento.userId)
+        .collection('momentos')
+        .doc(remoteId)
+        .delete();
+
+    AppLogger.d('Momento deleted from cloud: ');
+  }
   Future<List<ProposalModel>> getPendingProposalsSync(String userId) async {
-    return _getEntries(targetBox: proposalsBox, userId: userId, onlyPending: true);
+    return _getEntries(
+      targetBox: proposalsBox,
+      userId: userId,
+      onlyPending: true,
+    );
   }
 
   Future<List<ProposalModel>> getPendingProposals(String userId) async {
-    return _getEntries(targetBox: proposalsBox, userId: userId, onlyPending: true);
+    return _getEntries(
+      targetBox: proposalsBox,
+      userId: userId,
+      onlyPending: true,
+    );
   }
 
   Future<void> pushProposalToCloud(ProposalModel proposal) async {
-    throw UnimplementedError('Cloud push implementation pending');
+    proposal.lastAttempt = DateTime.now();
+    proposal.retryCount += 1;
+    await _firestore
+        .collection('users')
+        .doc(proposal.userId)
+        .collection('proposals')
+        .doc(proposal.id)
+        .set(proposal.toFirestore(), SetOptions(merge: true));
   }
 
   Future<void> markProposalAsSynced(String id) async {
     final proposal = proposalsBox.values.firstWhere(
-      (p) => p.id == id, 
-      orElse: () => throw StateError('Proposal $id not found')
+      (p) => p.id == id,
+      orElse: () => throw StateError('Proposal $id not found'),
     );
     proposal.syncStatus = SyncStatus.synced;
+    proposal.lastAttempt = DateTime.now();
     await proposal.save();
     AppLogger.d('Proposal marked synced: $id');
   }
 
   Future<void> markProposalSyncError(String id, String error) async {
     final proposal = proposalsBox.values.firstWhere(
-      (p) => p.id == id, 
-      orElse: () => throw StateError('Proposal $id not found')
+      (p) => p.id == id,
+      orElse: () => throw StateError('Proposal $id not found'),
     );
     proposal.syncStatus = SyncStatus.error;
+    proposal.lastAttempt = DateTime.now();
     await proposal.save();
     AppLogger.w('Proposal sync error: $id - $error');
   }
 
   Future<List<ItineraryModel>> getPendingItinerariesSync(String userId) async {
-    return _getEntries(targetBox: itinerariesBox, userId: userId, onlyPending: true);
+    return _getEntries(
+      targetBox: itinerariesBox,
+      userId: userId,
+      onlyPending: true,
+    );
   }
 
   Future<List<ItineraryModel>> getPendingItineraries(String userId) async {
-    return _getEntries(targetBox: itinerariesBox, userId: userId, onlyPending: true);
+    return _getEntries(
+      targetBox: itinerariesBox,
+      userId: userId,
+      onlyPending: true,
+    );
   }
 
   Future<void> pushItineraryToCloud(ItineraryModel itinerary) async {
-    throw UnimplementedError('Cloud push implementation pending');
+    itinerary.lastAttempt = DateTime.now();
+    itinerary.retryCount += 1;
+    await _firestore
+        .collection('users')
+        .doc(itinerary.userId)
+        .collection('itineraries')
+        .doc(itinerary.id)
+        .set(itinerary.toFirestore(), SetOptions(merge: true));
   }
 
   Future<void> markItineraryAsSynced(String id) async {
     final itinerary = itinerariesBox.values.firstWhere(
-      (i) => i.id == id, 
-      orElse: () => throw StateError('Itinerary $id not found')
+      (i) => i.id == id,
+      orElse: () => throw StateError('Itinerary $id not found'),
     );
     itinerary.syncStatus = SyncStatus.synced;
+    itinerary.lastAttempt = DateTime.now();
     await itinerary.save();
     AppLogger.d('Itinerary marked synced: $id');
   }
 
   Future<void> markItinerarySyncError(String id, String error) async {
     final itinerary = itinerariesBox.values.firstWhere(
-      (i) => i.id == id, 
-      orElse: () => throw StateError('Itinerary $id not found')
+      (i) => i.id == id,
+      orElse: () => throw StateError('Itinerary $id not found'),
     );
     itinerary.syncStatus = SyncStatus.error;
+    itinerary.lastAttempt = DateTime.now();
     await itinerary.save();
     AppLogger.w('Itinerary sync error: $id - $error');
   }
@@ -310,9 +439,10 @@ class IsarService {
   Future<Map<String, dynamic>?> getBookingById(String id) async => null;
 
   Future<List<BookingModel>> getBookingsForUser(String userId) async {
-    final rawBookings = bookingsBox.values.where((item) => 
-      (item as Map<String, dynamic>)['userId'] == userId
-    ).cast<Map<String, dynamic>>().toList();
+    final rawBookings = bookingsBox.values
+        .where((item) => (item as Map<String, dynamic>)['userId'] == userId)
+        .cast<Map<String, dynamic>>()
+        .toList();
     return rawBookings.map((json) => BookingModel.fromJson(json)).toList();
   }
 
@@ -337,8 +467,7 @@ class IsarService {
   }
 
   Future<void> clearUserMomentos(String userId) async {
-    final keys =
-        box.values.where((m) => m.userId == userId).map((m) => m.key).toList();
+    final keys = box.values.where((m) => m.userId == userId).map((m) => m.key).toList();
     await box.deleteAll(keys);
     AppLogger.i('Cleared ${keys.length} momentos for $userId');
   }
@@ -360,6 +489,9 @@ class IsarService {
     return results.length;
   }
 
+  bool get supportsProposalCloudSync => true;
+  bool get supportsItineraryCloudSync => true;
+
   Future<void> close() async {
     await _box?.close();
     _box = null;
@@ -368,3 +500,7 @@ class IsarService {
 }
 
 final isarServiceProvider = Provider<IsarService>((ref) => IsarService());
+
+
+
+

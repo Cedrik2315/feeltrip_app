@@ -1,4 +1,4 @@
-﻿import 'package:cloud_functions/cloud_functions.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -61,6 +61,52 @@ void main() {
       expect(session.externalReference, 'booking_123');
       expect(session.bookingId, 'booking_123');
     });
+
+    test('accepts legacy mercado pago field names', () async {
+      when(() => callable.call<Map<String, dynamic>>(any<Map<String, dynamic>>())).thenAnswer(
+        (_) async => FakeHttpsCallableResult({
+          'id': 'pref_legacy',
+          'init_point': 'https://mp.test/legacy',
+          'external_reference': 'booking_legacy',
+          'status': 'pending',
+        }),
+      );
+
+      final result = await repository.createCheckoutSession(
+        const PaymentRequest(
+          amount: 2000,
+          title: 'Legacy Booking',
+          purpose: 'booking',
+          bookingId: 'booking_legacy',
+        ),
+      );
+
+      expect(result.isRight(), true);
+      final session = result.getOrElse(
+        () => throw StateError('Expected payment session'),
+      );
+      expect(session.preferenceId, 'pref_legacy');
+      expect(session.initPoint, 'https://mp.test/legacy');
+      expect(session.externalReference, 'booking_legacy');
+    });
+
+    test('returns failure when payment session is incomplete', () async {
+      when(() => callable.call<Map<String, dynamic>>(any<Map<String, dynamic>>())).thenAnswer(
+        (_) async => FakeHttpsCallableResult({
+          'preferenceId': 'pref_broken',
+        }),
+      );
+
+      final result = await repository.createCheckoutSession(
+        const PaymentRequest(
+          amount: 500,
+          title: 'Broken Booking',
+          purpose: 'booking',
+          bookingId: 'booking_broken',
+        ),
+      );
+
+      expect(result.isLeft(), true);
+    });
   });
 }
-

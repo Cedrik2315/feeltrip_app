@@ -6,20 +6,44 @@ part 'chronicle_model.g.dart';
 
 @HiveType(typeId: 10)
 class ChronicleModel extends HiveObject with SyncableModel {
-
+  // El constructor principal ahora es "limpio" para Hive
   ChronicleModel({
     required this.id,
     required this.userId,
     required this.title,
     required this.paragraphs,
-    required ExpeditionData expeditionData,
+    required this.expeditionDataJson,
     required this.generatedAt,
     this.syncStatus = SyncStatus.local,
-    int? expeditionNumber,
+    this.expeditionNumber = 0,
     this.imageUrl,
     this.visualMetaphor,
-  })  : expeditionDataJson = expeditionData.toJson(),
-        expeditionNumber = expeditionNumber ?? 0;
+  });
+
+  // Este Factory es el que usas en tu código para crear crónicas nuevas
+  factory ChronicleModel.create({
+    required String id,
+    required String userId,
+    required String title,
+    required List<String> paragraphs,
+    required ExpeditionData expeditionData,
+    required DateTime generatedAt,
+    int? expeditionNumber,
+    String? imageUrl,
+    String? visualMetaphor,
+  }) {
+    return ChronicleModel(
+      id: id,
+      userId: userId,
+      title: title,
+      paragraphs: paragraphs,
+      expeditionDataJson: expeditionData.toJson(),
+      generatedAt: generatedAt,
+      expeditionNumber: expeditionNumber ?? 0,
+      imageUrl: imageUrl,
+      visualMetaphor: visualMetaphor,
+    );
+  }
 
   @HiveField(0)
   final String id;
@@ -51,6 +75,7 @@ class ChronicleModel extends HiveObject with SyncableModel {
   @HiveField(9)
   final String? visualMetaphor;
 
+  // Getter para recuperar el objeto ExpeditionData fácilmente
   ExpeditionData get expeditionData => ExpeditionData.fromJson(expeditionDataJson);
 
   String get fullText {
@@ -69,19 +94,18 @@ class ChronicleModel extends HiveObject with SyncableModel {
 
   @override
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'userId': userId,
-    'title': title,
-    'paragraphs': paragraphs,
-    'expeditionData': expeditionDataJson,
-    'generatedAt': generatedAt.toIso8601String(),
-    'syncStatus': syncStatus.name,
-    'expeditionNumber': expeditionNumber,
-    'imageUrl': imageUrl,
-    'visualMetaphor': visualMetaphor,
-  };
+        'id': id,
+        'userId': userId,
+        'title': title,
+        'paragraphs': paragraphs,
+        'expeditionData': expeditionDataJson,
+        'generatedAt': generatedAt.toIso8601String(),
+        'syncStatus': syncStatus.name,
+        'expeditionNumber': expeditionNumber,
+        'imageUrl': imageUrl,
+        'visualMetaphor': visualMetaphor,
+      };
 
   @override
   String toString() => 'ChronicleModel(id: $id, title: $title)';
 }
-

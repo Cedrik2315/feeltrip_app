@@ -1,3 +1,4 @@
+﻿import 'dart:io';
 import 'dart:async';
 
 
@@ -9,8 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:feeltrip_app/core/error/error_handler.dart';
-import 'package:feeltrip_app/features/stories/domain/models/instagram_story_model.dart';
-import 'package:feeltrip_app/features/stories/presentation/providers/story_provider.dart';
+import 'package:feeltrip_app/models/instagram_story_model.dart';
+import 'package:feeltrip_app/presentation/providers/story_provider.dart';
 
 class InstagramStoriesScreen extends ConsumerStatefulWidget {
   const InstagramStoriesScreen({super.key});
@@ -71,11 +72,11 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
     try {
       await ref.read(instagramStoryServiceProvider).createStory(
             userId: uid,
-            mediaUrl: image.path,
+            imageFile: File(image.path),
           );
       
       if (mounted) {
-        _showStatus('LOG: EXPEDICIÓN_VISUAL_CARGADA');
+        _showStatus('LOG: EXPEDICIÃ“N_VISUAL_CARGADA');
       }
     } catch (error, stackTrace) {
       if (mounted) ErrorHandler.handleError(context, error, stackTrace);
@@ -122,10 +123,10 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
                   },
                 ),
 
-                // Overlay Superior (Gradiente + Progresión)
+                // Overlay Superior (Gradiente + ProgresiÃ³n)
                 _buildTopOverlay(stories.length),
 
-                // Botón de Cierre
+                // BotÃ³n de Cierre
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 16,
                   right: 8,
@@ -271,7 +272,7 @@ class _StorySlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.network(
-      story.mediaUrl,
+      story.imageUrl,
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
@@ -283,3 +284,6 @@ class _StorySlide extends StatelessWidget {
     );
   }
 }
+
+
+

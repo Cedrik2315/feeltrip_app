@@ -1,58 +1,24 @@
-import 'dart:ui';
+﻿import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-// --- MODELO ---
-class TravelerStory {
-  TravelerStory({
-    required this.id,
-    required this.userName,
-    required this.imageUrl,
-    required this.location,
-    required this.description,
-    this.isLiked = false,
-  });
-  final String id;
-  final String userName;
-  final String imageUrl;
-  final String location;
-  final String description;
-  final bool isLiked;
-}
+import 'package:feeltrip_app/models/experience_model.dart';
+import 'package:feeltrip_app/presentation/providers/story_provider.dart';
 
-// --- PROVIDER ---
-final storiesProvider = Provider<List<TravelerStory>>((ref) {
-  return [
-    TravelerStory(
-      id: '1',
-      userName: 'Ana de Limache',
-      imageUrl: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef',
-      location: 'Valle del Aconcagua',
-      description: 'Cosechando tomates limachinos bajo el sol de la mañana. 🍅',
-    ),
-    TravelerStory(
-      id: '2',
-      userName: 'Carlos_Ruta',
-      imageUrl: 'https://images.unsplash.com/photo-1516655855035-d52156588298',
-      location: 'Cerro La Campana',
-      description: 'La vista desde la cumbre hoy estaba increíble. ¡Aire puro!',
-    ),
-  ];
-});
-
-// --- UI ---
 class StoriesScreen extends ConsumerWidget {
   const StoriesScreen({super.key, this.tripId});
+
   final String? tripId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stories = ref.watch(storiesProvider);
-    
+    final storiesAsync = ref.watch(allStoriesProvider);
+
     return Scaffold(
-      extendBodyBehindAppBar: true, // Para que la imagen llegue hasta arriba
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -70,64 +36,109 @@ class StoriesScreen extends ConsumerWidget {
             icon: const Icon(Icons.add_a_photo, color: Colors.white),
             onPressed: () {
               HapticFeedback.mediumImpact();
-              context.push('/smart-camera');
+              context.push('/instagram-stories');
             },
           ),
         ],
       ),
-      body: PageView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: stories.length,
-        itemBuilder: (context, index) => _buildStoryItem(context, stories[index]),
+      body: storiesAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+        error: (error, _) => _ErrorState(message: error.toString()),
+        data: (stories) {
+          if (stories.isEmpty) {
+            return const _EmptyState();
+          }
+
+          return PageView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: stories.length,
+            itemBuilder: (context, index) => _StoryView(story: stories[index]),
+          );
+        },
       ),
     );
   }
+}
 
-  Widget _buildStoryItem(BuildContext context, TravelerStory story) {
+class _StoryView extends StatelessWidget {
+  const _StoryView({required this.story});
+
+  final TravelerStory story;
+
+  @override
+  Widget build(BuildContext context) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // 1. Imagen con Placeholder y Error handling
-        Image.network(
-          story.imageUrl,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(color: Colors.black12, child: const Center(child: CircularProgressIndicator(color: Colors.white24)));
-          },
-        ),
-
-        // 2. Gradientes combinados para contraste editorial
+        if (story.imageUrl.isNotEmpty)
+          Image.network(
+            story.imageUrl,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                color: Colors.black12,
+                child: const Center(
+                  child: CircularProgressIndicator(color: Colors.white24),
+                ),
+              );
+            },
+            errorBuilder: (_, __, ___) => _fallbackBackground(),
+          )
+        else
+          _fallbackBackground(),
         const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.black45, Colors.transparent, Colors.transparent, Colors.black87],
+              colors: [
+                Colors.black45,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.black87,
+              ],
               stops: [0.0, 0.2, 0.6, 1.0],
             ),
           ),
         ),
-
-        // 3. Información con Glassmorphism (Panel Inferior)
         Positioned(
           bottom: 50,
           left: 16,
           right: 80,
-          child: _buildInfoPanel(story),
+          child: _InfoPanel(story: story),
         ),
-
-        // 4. Botones de Acción Verticales
         Positioned(
           right: 12,
           bottom: 100,
-          child: _buildActionColumn(story),
+          child: _ActionColumn(story: story),
         ),
       ],
     );
   }
 
-  Widget _buildInfoPanel(TravelerStory story) {
+  Widget _fallbackBackground() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1A1A), Color(0xFF29443A)],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoPanel extends StatelessWidget {
+  const _InfoPanel({required this.story});
+
+  final TravelerStory story;
+
+  @override
+  Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -147,23 +158,45 @@ class StoriesScreen extends ConsumerWidget {
                 children: [
                   const Icon(Icons.stars, color: Colors.tealAccent, size: 16),
                   const SizedBox(width: 6),
-                  Text(
-                    story.userName.toUpperCase(),
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1),
+                  Expanded(
+                    child: Text(
+                      story.author.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Text(
-                story.description,
-                style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.4),
+                story.story,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  height: 1.4,
+                ),
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
                   const Icon(Icons.location_on, color: Colors.white70, size: 14),
                   const SizedBox(width: 4),
-                  Text(story.location, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                  Expanded(
+                    child: Text(
+                      story.title,
+                      style: const TextStyle(color: Colors.white70, fontSize: 11),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -172,15 +205,22 @@ class StoriesScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildActionColumn(TravelerStory story) {
+class _ActionColumn extends StatelessWidget {
+  const _ActionColumn({required this.story});
+
+  final TravelerStory story;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildCircleAction(Icons.favorite, '2.4k', color: Colors.redAccent),
+        _buildCircleAction(Icons.favorite, '${story.likes}', color: Colors.redAccent),
         const SizedBox(height: 20),
-        _buildCircleAction(Icons.chat_bubble, '124'),
+        _buildCircleAction(Icons.chat_bubble, ''),
         const SizedBox(height: 20),
-        _buildCircleAction(Icons.bookmark_border, 'Save'),
+        _buildCircleAction(Icons.bookmark_border, ''),
         const SizedBox(height: 20),
         _buildCircleAction(Icons.share, ''),
       ],
@@ -194,14 +234,65 @@ class StoriesScreen extends ConsumerWidget {
           onTap: () => HapticFeedback.lightImpact(),
           child: Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black26, border: Border.all(color: Colors.white10)),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.black26,
+              border: Border.all(color: Colors.white10),
+            ),
             child: Icon(icon, color: color, size: 26),
           ),
         ),
         const SizedBox(height: 6),
         if (label.isNotEmpty)
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
       ],
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFF111111),
+      child: const Center(
+        child: Text(
+          'AUN_NO_HAY_HISTORIAS_PUBLICADAS',
+          style: TextStyle(color: Colors.white70, letterSpacing: 1.2),
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  const _ErrorState({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFF111111),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'ERROR_LOADING_STORIES: $message',
+            style: const TextStyle(color: Colors.white70),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
     );
   }
 }

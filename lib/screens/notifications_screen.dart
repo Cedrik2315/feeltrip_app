@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -93,7 +93,7 @@ class NotificationsScreen extends ConsumerWidget {
                     return _NotificationTile(
                       notification: notification,
                       onTap: () async {
-                        await notificationService.markAsRead(notification.id);
+                        await notificationService.markAsRead(notification.id, userId: userId);
                         if (context.mounted) {
                           _navigateFromNotification(context, notification);
                           ref.invalidate(unreadNotificationsCountProvider(userId));
@@ -119,7 +119,7 @@ class NotificationsScreen extends ConsumerWidget {
         children: [
           Icon(Icons.inventory_2_outlined, size: 64, color: carbon.withValues(alpha: 0.1)),
           const SizedBox(height: 24),
-          Text('HISTORIAL_VACÍO', 
+          Text('HISTORIAL_VACÃO', 
             style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.bold, color: carbon)),
           const SizedBox(height: 8),
           Text('No hay nuevos reportes de viaje.', 
@@ -139,7 +139,7 @@ class NotificationsScreen extends ConsumerWidget {
           Text('MODO_OFFLINE_ACTIVO', 
             style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.bold, fontSize: 13)),
           const SizedBox(height: 8),
-          Text('Reconéctate para sincronizar alertas.', 
+          Text('ReconÃ©ctate para sincronizar alertas.', 
             style: GoogleFonts.inter(fontSize: 12, color: carbon.withValues(alpha: 0.5))),
         ],
       ),
@@ -189,7 +189,7 @@ class _NotificationTile extends StatelessWidget {
           image: notification.imageUrl != null 
               ? DecorationImage(image: NetworkImage(notification.imageUrl!), fit: BoxFit.cover)
               : null,
-          borderRadius: BorderRadius.circular(4), // Estética cuadrada industrial
+          borderRadius: BorderRadius.circular(4), // EstÃ©tica cuadrada industrial
         ),
         child: notification.imageUrl == null 
             ? Icon(Icons.sensors_rounded, color: carbon.withValues(alpha: 0.4), size: 20) 
@@ -218,7 +218,7 @@ class _NotificationTile extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'TS: 2026-04-07_LOG', // Podrías usar un format de fecha real aquí
+            'TS: 2026-04-07_LOG', // PodrÃ­as usar un format de fecha real aquÃ­
             style: GoogleFonts.jetBrainsMono(
               fontSize: 9, 
               color: carbon.withValues(alpha: 0.3)

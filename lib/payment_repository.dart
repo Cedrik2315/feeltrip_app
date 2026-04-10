@@ -44,9 +44,9 @@ class PaymentSession {
 
   factory PaymentSession.fromJson(Map<String, dynamic> json) {
     return PaymentSession(
-      preferenceId: json['preferenceId'] as String? ?? '',
-      initPoint: json['initPoint'] as String? ?? '',
-      externalReference: json['externalReference'] as String? ?? '',
+      preferenceId: (json['preferenceId'] ?? json['id']) as String? ?? '',
+      initPoint: (json['initPoint'] ?? json['init_point']) as String? ?? '',
+      externalReference: (json['externalReference'] ?? json['external_reference']) as String? ?? '',
       provider: json['provider'] as String? ?? 'mercadopago',
       status: json['status'] as String? ?? 'pending',
       bookingId: json['bookingId'] as String?,

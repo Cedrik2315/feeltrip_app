@@ -1,66 +1,194 @@
-﻿﻿const functions = require("firebase-functions");
+const functions = require("firebase-functions");
+const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
+const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
-const mercadopago = require("mercadopago");
 const axios = require("axios");
 
 admin.initializeApp();
 
-// Configura tu Access Token de Mercado Pago en Firebase:
-// firebase functions:config:set mercadopago.token="TU_ACCESS_TOKEN"
-mercadopago.configure({
-  access_token: functions.config().mercadopago.token,
-});
+function getMercadoPagoAccessToken() {
+  const token = functions.config().mercadopago?.token;
+  if (!token) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Mercado Pago no est� configurado en Functions config",
+    );
+  }
+  return token;
+}
 
-/**
- * Crea una preferencia de pago en Mercado Pago.
- * Invocada desde el cliente via Firebase Functions Callable.
- */
-exports.createMercadoPagoPreference = functions.https.onCall(async (data, context) => {
-  // Verificación de autenticación
-  if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "Usuario no autenticado");
+exports.toggleStoryLike = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Usuario no autenticado");
   }
 
-  const { bookingId, amount, experienceId } = data;
+  const storyId = request.data?.storyId;
+  if (!storyId || typeof storyId !== "string") {
+    throw new HttpsError("invalid-argument", "storyId es requerido");
+  }
 
-  const preference = {
+  const userId = request.auth.uid;
+  const storyRef = admin.firestore().collection("stories").doc(storyId);
+
+  return admin.firestore().runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(storyRef);
+    if (!snapshot.exists) {
+      throw new HttpsError("not-found", "Historia no encontrada");
+    }
+
+    const story = snapshot.data() || {};
+    const likedBy = Array.isArray(story.likedBy) ? [...story.likedBy] : [];
+    const alreadyLiked = likedBy.includes(userId);
+    const updatedLikedBy = alreadyLiked
+      ? likedBy.filter((id) => id !== userId)
+      : [...likedBy, userId];
+
+    transaction.update(storyRef, {
+      likedBy: updatedLikedBy,
+      likes: updatedLikedBy.length,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return {
+      liked: !alreadyLiked,
+      likes: updatedLikedBy.length,
+    };
+  });
+});
+
+exports.createMercadoPagoPreference = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Usuario no autenticado");
+  }
+
+  const bookingId = request.data?.bookingId;
+  const experienceId = request.data?.experienceId || request.data?.destinationId || null;
+  const amount = Number(request.data?.amount);
+  const title = typeof request.data?.title === "string" && request.data.title.trim().length > 0
+    ? request.data.title.trim()
+    : "FeelTrip Booking";
+  const purpose = typeof request.data?.purpose === "string" && request.data.purpose.trim().length > 0
+    ? request.data.purpose.trim()
+    : "booking";
+  const currency = typeof request.data?.currency === "string" && request.data.currency.trim().length > 0
+    ? request.data.currency.trim().toUpperCase()
+    : "ARS";
+
+  if (!bookingId || typeof bookingId !== "string") {
+    throw new HttpsError("invalid-argument", "bookingId es requerido");
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new HttpsError("invalid-argument", "amount debe ser mayor a 0");
+  }
+
+  const bookingRef = admin.firestore().collection("bookings").doc(bookingId);
+  const bookingDoc = await bookingRef.get();
+  if (!bookingDoc.exists) {
+    throw new HttpsError("not-found", "Booking no encontrado");
+  }
+
+  const booking = bookingDoc.data() || {};
+  if (booking.userId !== request.auth.uid) {
+    throw new HttpsError("permission-denied", "El booking no pertenece al usuario autenticado");
+  }
+
+  if (booking.status !== "pending") {
+    throw new HttpsError("failed-precondition", "El booking ya no est� disponible para pago");
+  }
+
+  const expectedAmount = Number(booking.amount);
+  if (!Number.isFinite(expectedAmount) || expectedAmount <= 0) {
+    throw new HttpsError("failed-precondition", "El booking tiene un monto inv�lido");
+  }
+
+  if (Math.abs(expectedAmount - amount) > 0.01) {
+    throw new HttpsError("failed-precondition", "El monto solicitado no coincide con la reserva");
+  }
+
+  const token = getMercadoPagoAccessToken();
+  const appBaseUrl = functions.config().app?.base_url || "https://feeltrip.app";
+  const webhookUrl = functions.config().app?.webhook_url || null;
+
+  const preferencePayload = {
     items: [
       {
-        id: experienceId,
-        title: "Reserva de Experiencia FeelTrip",
-        unit_price: amount,
+        title,
         quantity: 1,
-        currency_id: "ARS", // O la moneda que corresponda
+        currency_id: currency,
+        unit_price: Number(amount.toFixed(2)),
       },
     ],
     external_reference: bookingId,
-    notification_url: `https://${process.env.GCLOUD_PROJECT}.cloudfunctions.net/mercadopagoWebhook`, // Ya estaba dinámico, pero lo reitero para claridad
+    metadata: {
+      bookingId,
+      userId: request.auth.uid,
+      experienceId,
+      purpose,
+    },
+    back_urls: {
+      success: `${appBaseUrl}/payments/success?bookingId=${bookingId}`,
+      failure: `${appBaseUrl}/payments/failure?bookingId=${bookingId}`,
+      pending: `${appBaseUrl}/payments/pending?bookingId=${bookingId}`,
+    },
+    auto_return: "approved",
   };
 
+  if (webhookUrl) {
+    preferencePayload.notification_url = webhookUrl;
+  }
+
   try {
-    const response = await mercadopago.preferences.create(preference);
-    return response.body; // Retorna id e init_point
+    const response = await axios.post(
+      "https://api.mercadopago.com/checkout/preferences",
+      preferencePayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const preference = response.data || {};
+
+    await bookingRef.update({
+      paymentProvider: "mercadopago",
+      preferenceId: preference.id || null,
+      paymentStatus: "pending",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return {
+      preferenceId: preference.id || "",
+      initPoint: preference.init_point || "",
+      externalReference: bookingId,
+      provider: "mercadopago",
+      status: "pending",
+      bookingId,
+    };
   } catch (error) {
-    console.error("Error creando preferencia MP:", error);
-    throw new functions.https.HttpsError("internal", "No se pudo crear la preferencia");
+    const details = error.response?.data || error.message || "unknown_error";
+    console.error("Error creating Mercado Pago preference:", details);
+    throw new HttpsError(
+      "internal",
+      "No se pudo generar la preferencia de pago",
+      details,
+    );
   }
 });
 
-/**
- * Webhook que recibe la confirmación de pago de Mercado Pago.
- * Valida la transacción, actualiza Firestore y notifica al usuario.
- */
-exports.mercadopagoWebhook = functions.https.onRequest(async (req, res) => {
+const mercadoPagoWebhookHandler = onRequest(async (req, res) => {
   const { action, data, type } = req.body;
 
   if (type === "payment" && (action === "payment.created" || action === "payment.updated")) {
     const paymentId = data.id;
-    const accessToken = functions.config().mercadopago.token;
+    const accessToken = getMercadoPagoAccessToken();
 
     try {
       const mpResponse = await axios.get(
         `https://api.mercadopago.com/v1/payments/${paymentId}`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+        { headers: { Authorization: `Bearer ${accessToken}` } },
       );
 
       const payment = mpResponse.data;
@@ -71,25 +199,23 @@ exports.mercadopagoWebhook = functions.https.onRequest(async (req, res) => {
         const bookingRef = admin.firestore().collection("bookings").doc(bookingId);
         const bookingDoc = await bookingRef.get();
 
-        if (bookingDoc.exists && status === "approved") {
-          const bookingData = bookingDoc.data();
+        if (bookingDoc.exists) {
+          const bookingData = bookingDoc.data() || {};
           const userId = bookingData.userId;
           const expectedAmount = bookingData.amount;
 
-          // VALIDACIÓN DE SEGURIDAD: Verificar que el monto pagado coincida con el esperado
           if (payment.transaction_amount < expectedAmount) {
-            console.error(`Alerta de Fraude: Booking ${bookingId} pagó ${payment.transaction_amount} pero esperaba ${expectedAmount}`);
+            console.error(`Alerta de Fraude: Booking ${bookingId} pag� ${payment.transaction_amount} pero esperaba ${expectedAmount}`);
             return res.status(400).send("Amount mismatch");
           }
 
-          // 1. Actualización atómica del booking
           await bookingRef.update({
-            paymentId: paymentId,
+            paymentId,
             status: "paid",
+            paymentStatus: "approved",
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
 
-          // 2. Enviar notificación push al usuario
           const userDoc = await admin.firestore().collection("users").doc(userId).get();
           const fcmToken = userDoc.data()?.fcmToken;
 
@@ -97,10 +223,10 @@ exports.mercadopagoWebhook = functions.https.onRequest(async (req, res) => {
             await admin.messaging().send({
               token: fcmToken,
               notification: {
-                title: "¡Pago Confirmado! ✈️",
-                body: "Tu reserva en FeelTrip ha sido confirmada con éxito.",
+                title: "Pago confirmado",
+                body: "Tu reserva en FeelTrip ha sido confirmada con �xito.",
               },
-              data: { bookingId: bookingId, type: "booking_success" },
+              data: { bookingId, type: "booking_success" },
             });
           }
         } else {
@@ -109,36 +235,42 @@ exports.mercadopagoWebhook = functions.https.onRequest(async (req, res) => {
       }
     } catch (error) {
       console.error("Error en webhook:", error.message);
-      // Respondemos 500 para que Mercado Pago reintente el envío del webhook
       return res.status(500).send("Internal Server Error");
     }
   }
-  // Respondemos 200 para confirmar recepción en casos que no requieren acción
-  res.status(200).send("OK");
+  return res.status(200).send("OK");
 });
 
-/**
- * BI Pipeline: Exporta eventos de negocio a una colección dedicada para analítica.
- * Se dispara automáticamente cuando un booking cambia a estado 'paid'.
- */
-exports.exportBookingToBI = functions.firestore
-  .document("bookings/{bookingId}")
-  .onUpdate(async (change, context) => {
-    const newValue = change.after.data();
-    const previousValue = change.before.data();
+exports.mercadopagoWebhook = mercadoPagoWebhookHandler;
+exports.mercadoPagoWebhook = mercadoPagoWebhookHandler;
 
-    // Solo exportamos si el estado cambió a 'paid'
-    if (newValue.status === "paid" && previousValue.status !== "paid") {
-      console.log(`BI Pipeline: Exportando booking ${context.params.bookingId} a BI collection`);
-      
-      return admin.firestore().collection("bi_analytics_events").add({
-        eventType: "conversion_success",
-        amount: newValue.amount,
-        experienceId: newValue.experienceId,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        userId: newValue.userId,
-        bookingId: context.params.bookingId
-      });
-    }
-    return null;
+exports.revenueCatWebhook = onRequest(async (req, res) => {
+  console.log("RevenueCat webhook recibido", {
+    method: req.method,
+    headers: req.headers,
   });
+  return res.status(200).send("OK");
+});
+
+exports.exportBookingToBI = onDocumentUpdated("bookings/{bookingId}", async (event) => {
+  const newValue = event.data?.after?.data();
+  const previousValue = event.data?.before?.data();
+
+  if (!newValue || !previousValue) {
+    return null;
+  }
+
+  if (newValue.status === "paid" && previousValue.status !== "paid") {
+    console.log(`BI Pipeline: Exportando booking ${event.params.bookingId} a BI collection`);
+
+    return admin.firestore().collection("bi_analytics_events").add({
+      eventType: "conversion_success",
+      amount: newValue.amount,
+      experienceId: newValue.experienceId,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      userId: newValue.userId,
+      bookingId: event.params.bookingId,
+    });
+  }
+  return null;
+});

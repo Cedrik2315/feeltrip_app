@@ -7,7 +7,7 @@ import 'package:crypto/crypto.dart';
 import '../core/logger/app_logger.dart';
 
 /// Provider para acceder al servicio de Gemini.
-final geminiServiceProvider = Provider((ref) => GeminiService());
+final geminiServiceProvider = Provider<GeminiService>((ref) => GeminiService());
 
 /// Servicio encargado de interactuar con Google Gemini para generar
 /// propuestas de viajes vivenciales personalizadas basadas en el perfil emocional.

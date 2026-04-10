@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:feeltrip_app/core/logger/app_logger.dart';
+import 'package:feeltrip_app/features/diario/domain/models/momento_model.dart';
+import 'package:feeltrip_app/models/syncable_model.dart';
 import 'package:feeltrip_app/services/isar_service.dart';
+import 'package:feeltrip_app/core/di/providers.dart'; // Importa el archivo donde syncServiceProvider estÃ¡ definido
 import 'package:feeltrip_app/services/sync_service.dart';
 import 'package:feeltrip_app/models/momento_model.dart';
-import 'package:feeltrip_app/features/diario/domain/models/momento_model.dart';
-import 'package:feeltrip_app/core/logger/app_logger.dart';
 
 final momentoProvider =
     StateNotifierProvider<MomentoNotifier, AsyncValue<List<Momento>>>((ref) {
@@ -24,7 +26,10 @@ class MomentoNotifier extends StateNotifier<AsyncValue<List<Momento>>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final data = await _isarService.getMomentos();
-      return data.where((m) => m.userId == userId).map((m) => m.toDomain()).toList();
+      return data
+          .where((m) => m.userId == userId && m.syncStatus != SyncStatus.deleted)
+          .map((m) => m.toDomain())
+          .toList();
     });
   }
 
@@ -52,11 +57,11 @@ class MomentoNotifier extends StateNotifier<AsyncValue<List<Momento>>> {
     try {
       await _syncService.syncPendingMomentos(userId);
     } catch (e) {
-      AppLogger.e('Error general durante la sincronización: $e');
+      AppLogger.e('Error general durante la sincronizaciÃƒÂ³n: $e');
     } finally {
       final data = await _isarService.getMomentos();
       final filtered = data
-          .where((m) => m.userId == userId)
+          .where((m) => m.userId == userId && m.syncStatus != SyncStatus.deleted)
           .map((m) => m.toDomain())
           .toList();
       state = AsyncValue.data(filtered);

@@ -5,11 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'package:feeltrip_app/app_router.dart';
+import 'package:feeltrip_app/core/router/app_router.dart';
 import 'package:feeltrip_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:feeltrip_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:feeltrip_app/features/home/data/repositories/home_repository.dart';
-import 'package:feeltrip_app/services/algolia_search_service.dart';
 import 'package:feeltrip_app/models/comment_model.dart';
 import 'package:feeltrip_app/payment_repository.dart';
 import 'package:feeltrip_app/services/agency_service.dart';
@@ -19,7 +18,6 @@ import 'package:feeltrip_app/services/metrics_service.dart';
 import 'package:feeltrip_app/services/notification_service.dart';
 import 'package:feeltrip_app/services/revenuecat_service.dart';
 import 'package:feeltrip_app/services/sync_service.dart';
-
 
 final routerProvider = Provider<GoRouter>((ref) => createAppRouter(ref));
 
@@ -63,11 +61,12 @@ final authRepositoryProvider = Provider<IAuthRepository>((ref) {
 
 final metricsServiceProvider = Provider((ref) => MetricsService());
 
-final syncServiceProvider = Provider<SyncService>((ref) => SyncService());
 
 final paymentRepositoryProvider =
     Provider<IPaymentRepository>((ref) => PaymentRepository());
 
 final homeRepositoryProvider = Provider((ref) => HomeRepository());
 
-final algoliaSearchServiceProvider = Provider((ref) => AlgoliaSearchService());
+final syncServiceProvider = Provider<SyncService>((ref) {
+  return SyncService();
+});

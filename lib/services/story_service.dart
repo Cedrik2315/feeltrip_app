@@ -1,8 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+
 import '../models/experience_model.dart';
 
 class StoryService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  StoryService({FirebaseFirestore? firestore, FirebaseFunctions? functions})
+      : _firestore = firestore ?? FirebaseFirestore.instance,
+        _functions = functions ?? FirebaseFunctions.instance;
+
+  final FirebaseFirestore _firestore;
+  final FirebaseFunctions _functions;
 
   Stream<List<TravelerStory>> getPublicStoriesStream() {
     return _firestore
@@ -18,18 +25,9 @@ class StoryService {
   }
 
   Future<void> toggleLike(String storyId, String userId) async {
-    final ref = _firestore.collection('stories').doc(storyId);
-    final doc = await ref.get();
-    if (!doc.exists) return;
-    final likedBy = List<String>.from((doc.data()?['likedBy'] as List<dynamic>?) ?? []);
-    if (likedBy.contains(userId)) {
-      likedBy.remove(userId);
-    } else {
-      likedBy.add(userId);
-    }
-    await ref.update({
-      'likedBy': likedBy,
-      'likes': likedBy.length,
+    await _functions.httpsCallable('toggleStoryLike').call({
+      'storyId': storyId,
+      'userId': userId,
     });
   }
 

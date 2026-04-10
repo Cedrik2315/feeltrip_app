@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:feeltrip_app/core/di/providers.dart' as di_providers;
 import 'package:feeltrip_app/models/creator_stats_model.dart';
@@ -18,12 +18,13 @@ final notificationsProvider =
     FutureProvider.family<List<NotificationModel>, String>((ref, userId) async {
   return ref
       .watch(di_providers.notificationServiceProvider)
-      .getNotifications();
+      .getNotifications(userId: userId);
 });
 
 final unreadNotificationsCountProvider =
     FutureProvider.family<int, String>((ref, userId) async {
   return ref
       .watch(di_providers.notificationServiceProvider)
-      .getUnreadCount();
+      .getUnreadCount(userId: userId);
 });
+

@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+// --- 1. MODELO DE DATOS ---
 class UserPreferences {
   final bool showAdventure;
   final bool showCultural;
@@ -28,6 +31,38 @@ class UserPreferences {
     this.emotionalAnalytics = false,
     this.language = 'es',
   });
+
+  // Convertimos a Map para persistencia
+  Map<String, dynamic> toMap() => {
+    'showAdventure': showAdventure,
+    'showCultural': showCultural,
+    'showNature': showNature,
+    'showGastronomy': showGastronomy,
+    'showUrban': showUrban,
+    'showBeaches': showBeaches,
+    'showMountains': showMountains,
+    'notificationsEnabled': notificationsEnabled,
+    'offlineFirstMode': offlineFirstMode,
+    'darkMode': darkMode,
+    'emotionalAnalytics': emotionalAnalytics,
+    'language': language,
+  };
+
+  // Creamos desde Map para carga inicial
+  factory UserPreferences.fromMap(Map<String, dynamic> map) => UserPreferences(
+    showAdventure: map['showAdventure'] as bool? ?? true,
+    showCultural: map['showCultural'] as bool? ?? true,
+    showNature: map['showNature'] as bool? ?? true,
+    showGastronomy: map['showGastronomy'] as bool? ?? true,
+    showUrban: map['showUrban'] as bool? ?? true,
+    showBeaches: map['showBeaches'] as bool? ?? true,
+    showMountains: map['showMountains'] as bool? ?? true,
+    notificationsEnabled: map['notificationsEnabled'] as bool? ?? true,
+    offlineFirstMode: map['offlineFirstMode'] as bool? ?? false,
+    darkMode: map['darkMode'] as bool? ?? false,
+    emotionalAnalytics: map['emotionalAnalytics'] as bool? ?? false,
+    language: map['language'] as String? ?? 'es',
+  );
 
   UserPreferences copyWith({
     bool? showAdventure,
@@ -58,22 +93,67 @@ class UserPreferences {
   );
 }
 
+// --- 2. NOTIFIER CON PERSISTENCIA ---
 class UserPreferencesNotifier extends Notifier<UserPreferences> {
-  @override
-  UserPreferences build() => const UserPreferences();
+  static const _key = 'user_preferences_key';
 
-  void toggleDarkMode() => state = state.copyWith(darkMode: !state.darkMode);
-  void toggleOfflineMode() => state = state.copyWith(offlineFirstMode: !state.offlineFirstMode);
-  void toggleEmotionalEngine() => state = state.copyWith(emotionalAnalytics: !state.emotionalAnalytics);
-  void toggleNotifications() => state = state.copyWith(notificationsEnabled: !state.notificationsEnabled);
-  void setLanguage(String lang) => state = state.copyWith(language: lang);
-  void toggleAdventureFilter(bool value) => state = state.copyWith(showAdventure: value);
-  void toggleCulturalFilter(bool value) => state = state.copyWith(showCultural: value);
-  void toggleNatureFilter(bool value) => state = state.copyWith(showNature: value);
-  void toggleGastronomyFilter(bool value) => state = state.copyWith(showGastronomy: value);
-  void toggleUrbanFilter(bool value) => state = state.copyWith(showUrban: value);
-  void toggleBeachesFilter(bool value) => state = state.copyWith(showBeaches: value);
-  void toggleMountainsFilter(bool value) => state = state.copyWith(showMountains: value);
+  @override
+  UserPreferences build() {
+    // Intentamos cargar datos al inicializar
+    _init();
+    return const UserPreferences();
+  }
+
+  Future<void> _init() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_key);
+    if (data != null) {
+      state = UserPreferences.fromMap(jsonDecode(data) as Map<String, dynamic>);
+    }
+  }
+
+  Future<void> _save() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_key, jsonEncode(state.toMap()));
+  }
+
+  // Métodos de actualización
+  void toggleDarkMode() {
+    state = state.copyWith(darkMode: !state.darkMode);
+    _save();
+  }
+
+  void toggleOfflineMode() {
+    state = state.copyWith(offlineFirstMode: !state.offlineFirstMode);
+    _save();
+  }
+
+  void toggleEmotionalEngine() {
+    state = state.copyWith(emotionalAnalytics: !state.emotionalAnalytics);
+    _save();
+  }
+
+  void toggleNotifications() {
+    state = state.copyWith(notificationsEnabled: !state.notificationsEnabled);
+    _save();
+  }
+
+  void setLanguage(String lang) {
+    state = state.copyWith(language: lang);
+    _save();
+  }
+
+  // Filtros de categoría
+  void toggleAdventureFilter(bool v) { state = state.copyWith(showAdventure: v); _save(); }
+  void toggleCulturalFilter(bool v) { state = state.copyWith(showCultural: v); _save(); }
+  void toggleNatureFilter(bool v) { state = state.copyWith(showNature: v); _save(); }
+  void toggleGastronomyFilter(bool v) { state = state.copyWith(showGastronomy: v); _save(); }
+  void toggleUrbanFilter(bool v) { state = state.copyWith(showUrban: v); _save(); }
+  void toggleBeachesFilter(bool v) { state = state.copyWith(showBeaches: v); _save(); }
+  void toggleMountainsFilter(bool v) { state = state.copyWith(showMountains: v); _save(); }
 }
 
-final userPreferencesProvider = NotifierProvider<UserPreferencesNotifier, UserPreferences>(UserPreferencesNotifier.new);
+// --- 3. PROVIDER ---
+final userPreferencesProvider = NotifierProvider<UserPreferencesNotifier, UserPreferences>(
+  UserPreferencesNotifier.new,
+);

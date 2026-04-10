@@ -20,8 +20,8 @@ final chronicleServiceProvider = Provider<ChronicleService>((ref) {
 
 final chronicleRepositoryProvider = Provider<ChronicleRepository>((ref) {
   final service = ref.watch(chronicleServiceProvider);
-  final hiveService = ref.read(isarServiceProvider);
-  return ChronicleRepositoryImpl(service: service, hiveService: hiveService);
+  final isarService = ref.read(isarServiceProvider); // Usamos IsarService como contenedor de Boxes
+  return ChronicleRepositoryImpl(service: service, isarService: isarService);
 });
 
 /// Estado de lista (offline, siempre disponible)
@@ -57,14 +57,16 @@ class ChronicleGeneratorNotifier extends AsyncNotifier<ChronicleModel?> {
   @override
   Future<ChronicleModel?> build() async => null;
 
-  /// Llama a la API, guarda en Hive y refresca la lista.
   Future<void> generate(ExpeditionData data) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final repo = ref.read(chronicleRepositoryProvider);
       final authState = ref.read(authNotifierProvider);
       final userId = authState.value?.id ?? 'guest_user';
+      
       final chronicle = await repo.generateAndSave(data: data, userId: userId);
+      
+      // Refrescamos la lista local inmediatamente
       ref.read(chronicleListProvider.notifier).refresh();
       return chronicle;
     });
@@ -73,20 +75,18 @@ class ChronicleGeneratorNotifier extends AsyncNotifier<ChronicleModel?> {
   void reset() => state = const AsyncData(null);
 }
 
-/// Repositorio que orquesta generación + persistencia en Hive.
-/// Implementa el flujo Offline-First: API -> Local (Hive) -> SyncService (Firestore).
+/// Implementación del Repositorio
 class ChronicleRepositoryImpl implements ChronicleRepository {
   ChronicleRepositoryImpl({
     required ChronicleService service,
-    required IsarService hiveService,
+    required IsarService isarService,
   })  : _service = service,
-        _isar = hiveService {
+        _isar = isarService {
     _box = _isar.chroniclesBox;
     _metaBox = _isar.metaBox;
   }
 
   static const String _counterKey = '__expedition_counter__';
-
   final ChronicleService _service;
   final IsarService _isar;
   late final Box<ChronicleModel> _box;
@@ -100,13 +100,16 @@ class ChronicleRepositoryImpl implements ChronicleRepository {
     try {
       final number = await _nextExpeditionNumber(userId);
 
+      // La API genera el contenido
       final chronicle = await _service.generateChronicle(
         data: data,
         userId: userId,
         expeditionNumber: number,
       );
 
-      _box.put(chronicle.id, chronicle);
+      // PERSISTENCIA: Hive guarda el objeto. 
+      // El modelo ya tiene el factory y el manejo de JSON interno.
+      await _box.put(chronicle.id, chronicle);
 
       AppLogger.i('ChronicleRepository: Crónica #${chronicle.expeditionNumber} guardada localmente.');
       return chronicle;
@@ -119,13 +122,14 @@ class ChronicleRepositoryImpl implements ChronicleRepository {
   @override
   List<ChronicleModel> getAll() {
     final list = _box.values.toList();
-    list.sort((ChronicleModel a, ChronicleModel b) => b.generatedAt.compareTo(a.generatedAt));
+    // Ordenamos por fecha descendente (lo más nuevo arriba)
+    list.sort((a, b) => b.generatedAt.compareTo(a.generatedAt));
     return list;
   }
 
   @override
   Future<void> delete(String id) async {
-    _box.delete(id);
+    await _box.delete(id);
   }
 
   Future<int> _nextExpeditionNumber(String userId) async {
@@ -133,7 +137,7 @@ class ChronicleRepositoryImpl implements ChronicleRepository {
     final rawCurrent = _metaBox.get(key);
     int current = (rawCurrent as int?) ?? 100;
     int next = current + 1;
-    _metaBox.put(key, next);
+    await _metaBox.put(key, next);
     return next;
   }
 }

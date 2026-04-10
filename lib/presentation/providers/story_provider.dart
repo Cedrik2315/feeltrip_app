@@ -1,7 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:feeltrip_app/models/instagram_story_model.dart';
 import 'package:feeltrip_app/models/experience_model.dart';
+import 'package:feeltrip_app/models/instagram_story_model.dart';
 import 'package:feeltrip_app/services/instagram_story_service.dart';
 import 'package:feeltrip_app/services/story_service.dart';
 

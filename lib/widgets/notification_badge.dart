@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:feeltrip_app/services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,7 +22,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
   Future<void> _updateCount() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
-      final count = await NotificationService().getUnreadCount();
+      final count = await NotificationService().getUnreadCount(userId: userId);
       if (mounted) {
         setState(() => unreadCount = count);
       }
@@ -36,7 +36,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       decoration: const BoxDecoration(
-        // Cambiamos el rojo genérico por el naranja de FeelTrip o un carmesí técnico
+        // Cambiamos el rojo genÃ©rico por el naranja de FeelTrip o un carmesÃ­ tÃ©cnico
         color: Color(0xFFFF8F00), 
         borderRadius: BorderRadius.zero, // Estilo brutalista: bordes rectos
       ),
@@ -48,7 +48,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
         child: Text(
           unreadCount > 9 ? '9+' : '$unreadCount',
           style: GoogleFonts.jetBrainsMono(
-            color: Colors.black, // Texto negro sobre fondo naranja para máximo contraste
+            color: Colors.black, // Texto negro sobre fondo naranja para mÃ¡ximo contraste
             fontSize: 9,
             fontWeight: FontWeight.w900,
           ),

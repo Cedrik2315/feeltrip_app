@@ -18,7 +18,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset('assets/videos/bienvenida.mp4')
+    _controller = VideoPlayerController.asset('assets/videos/Bienvenida.mp4')
       ..initialize().then((_) {
         if (!mounted) return;
         setState(() => _initialized = true);
@@ -96,7 +96,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     
                     // Texto con estilo de consola
                     Text(
-                      'EXPEDICIÓN LISTEILOR // PROTOCOLO ACTIVO',
+                      'BIENVENIDO A TU NUEVA AVENTURA',
                       style: GoogleFonts.jetBrainsMono(
                         color: terminalColor.withValues(alpha: 0.7),
                         fontSize: 10,

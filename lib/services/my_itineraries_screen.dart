@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import 'package:feeltrip_app/core/di/providers.dart' hide syncServiceProvider;
+import 'package:feeltrip_app/core/di/providers.dart';
 import 'package:feeltrip_app/services/isar_service.dart';
-import 'package:feeltrip_app/services/sync_service.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
 
 import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
@@ -47,7 +46,7 @@ class MyItinerariesScreen extends ConsumerWidget {
                         size: 80, color: Colors.grey),
                     const SizedBox(height: 24),
                     const Text(
-                      'Aún no tienes un itinerario activo.',
+                      'AÃºn no tienes un itinerario activo.',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -81,7 +80,7 @@ class MyItinerariesScreen extends ConsumerWidget {
                           .read(routerProvider)
                           .push('/transformation-history'),
                       icon: const Icon(Icons.history),
-                      label: const Text('Ver mi Historial de Transformación'),
+                      label: const Text('Ver mi Historial de TransformaciÃ³n'),
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.deepPurple,
                       ),
@@ -198,18 +197,18 @@ class MyItinerariesScreen extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('¿Finalizar aventura?'),
+        title: const Text('Â¿Finalizar aventura?'),
         content: const Text(
-          'Se generará un resumen de tu transformación basado en lo vivido.',
+          'Se generarÃ¡ un resumen de tu transformaciÃ³n basado en lo vivido.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Aún no'),
+            child: const Text('AÃºn no'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('¡Sí, he vuelto!'),
+            child: const Text('Â¡SÃ­, he vuelto!'),
           ),
         ],
       ),
@@ -230,7 +229,7 @@ class MyItinerariesScreen extends ConsumerWidget {
               children: [
                 CircularProgressIndicator(),
                 SizedBox(height: 16),
-                Text('Gemini está analizando tu transformación...'),
+                Text('Gemini estÃ¡ analizando tu transformaciÃ³n...'),
               ],
             ),
           ),

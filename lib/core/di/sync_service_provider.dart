@@ -1,7 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:feeltrip_app/services/sync_service.dart';
-
-final syncServiceProvider = Provider<SyncService>((ref) {
-  return SyncService();
-});
+﻿@Deprecated('Use lib/core/di/providers.dart syncServiceProvider instead.')
+export 'package:feeltrip_app/core/di/providers.dart' show syncServiceProvider;

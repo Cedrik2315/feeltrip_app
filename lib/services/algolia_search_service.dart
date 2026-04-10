@@ -1,9 +1,10 @@
+﻿@Deprecated('Use SearchRepository/SearchNotifier instead of calling Algolia directly from presentation.')
 import 'package:algoliasearch/algoliasearch.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
 
-/// Servicio para la integración con Algolia (Fase 3).
-/// Permite realizar búsquedas rápidas y semánticas a gran escala.
+/// Servicio para la integraciÃ³n con Algolia (Fase 3).
+/// Permite realizar bÃºsquedas rÃ¡pidas y semÃ¡nticas a gran escala.
 class AlgoliaSearchService {
   late final SearchClient _client;
   static const String _indexName = 'experiences';
@@ -19,7 +20,7 @@ class AlgoliaSearchService {
     _client = SearchClient(appId: appId, apiKey: apiKey);
   }
 
-  /// Realiza una búsqueda de experiencias.
+  /// Realiza una bÃºsqueda de experiencias.
   Future<List<Map<String, dynamic>>> searchExperiences(String query) async {
     try {
       if (query.trim().isEmpty) return [];
