@@ -1,0 +1,1 @@
+- [x] 1. flutter build apk --debug running to generate keystore. Then keytool SHA-1

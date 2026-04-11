@@ -1,0 +1,55 @@
+name: PR Quality Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 🔍 Analyze Code
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+      - name: 🧪 Run Tests
+        run: flutter test --coverage
+
+      - name: 📊 Check Coverage Threshold
+        uses: VeryGoodOpenSource/very_good_coverage@v2
+        with:
+          path: './coverage/lcov.info'
+          min_coverage: 60
+          exclude: '**/*.g.dart **/*.freezed.dart **/firebase_options.dart'
+
+      - name: 📝 Upload Coverage Report
+        uses: codecov/codecov-action@v3
+        if: github.event_name == 'pull_request'
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: true
+          verbose: true
+
+      - name: 💬 Comment PR with Coverage
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        if: github.event_name == 'pull_request'
+        with:
+          lcov-file: ./coverage/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}

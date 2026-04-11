@@ -1,0 +1,44 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Check code formatting
+      run: dart format --output=none --set-exit-if-changed .
+      
+    - name: Analyze code
+      run: flutter analyze --fatal-infos
+      
+    - name: Run tests
+      run: flutter test
+      
+    - name: Check for outdated dependencies
+      run: flutter pub outdated
+      
+    - name: Build Android (dry-run)
+      run: flutter build apk --debug
+      
+    - name: Build iOS framework (dry-run)
+      run: flutter build ios-framework --debug
+

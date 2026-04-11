@@ -1,0 +1,1009 @@
+Analyzing feeltrip_app...                                       
+
+warning - Unused import: 'package:feeltrip_app/screens/stories_screen.dart' - app_router.dart:11:8 - unused_import
+   info - The line length exceeds the 80-character limit - booking_success_screen.dart:36:81 - lines_longer_than_80_chars
+   info - 'AutoDisposeRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead - cache_providers.dart:8:32 - deprecated_member_use
+   info - Sort directive sections alphabetically - checkout_screen.dart:7:1 - directives_ordering
+   info - Missing a required trailing comma - checkout_screen.dart:16:63 - require_trailing_commas
+   info - To-do comment doesn't follow the Flutter style - checkout_screen.dart:52:9 - flutter_style_todos
+   info - Missing a required trailing comma - checkout_screen.dart:136:68 - require_trailing_commas
+   info - Missing a newline at the end of the file - checkout_screen.dart:219:2 - eol_at_end_of_file
+   info - The referenced name isn't visible in scope - custom_map_screen.dart:38:20 - comment_references
+   info - The line length exceeds the 80-character limit - custom_map_screen.dart:44:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - custom_map_screen.dart:46:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\config\firebase_config.dart:38:81 - lines_longer_than_80_chars
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:4:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:5:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:6:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:7:8 - always_use_package_imports
+   info - Closure should be a tearoff - lib\controllers\experience_controller.dart:18:3 - unnecessary_lambdas
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:71:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:156:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:169:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:226:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:252:81 - lines_longer_than_80_chars
+  error - The method 'copyWith' isn't defined for the type 'DiaryEntry' - lib\controllers\experience_controller.dart:258:55 - undefined_method
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:303:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:317:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:333:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\controllers\experience_controller.dart:352:2 - eol_at_end_of_file
+warning - The generic type 'RxList<dynamic>' should have explicit type arguments but doesn't - lib\controllers\premium_controller.dart:6:9 - strict_raw_type
+warning - The type argument(s) of 'List' can't be inferred - lib\controllers\premium_controller.dart:6:28 - inference_failure_on_collection_literal
+warning - Unused import: 'package:feeltrip_app/services/analytics_service.dart' - lib\main.dart:3:8 - unused_import
+   info - Sort directive sections alphabetically - lib\main.dart:4:1 - directives_ordering
+warning - Unused import: 'package:feeltrip_app/screens/agency_profile_screen.dart' - lib\main.dart:6:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/bookings_screen.dart' - lib\main.dart:7:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/cart_screen.dart' - lib\main.dart:8:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/comments_screen.dart' - lib\main.dart:9:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/creator_stats_screen.dart' - lib\main.dart:10:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/emotional_preferences_quiz_screen.dart' - lib\main.dart:11:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/experience_impact_dashboard_screen.dart' - lib\main.dart:12:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/feed_screen.dart' - lib\main.dart:13:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/home_screen.dart' - lib\main.dart:14:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/instagram_stories_screen.dart' - lib\main.dart:15:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/login_screen.dart' - lib\main.dart:16:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/ocr_screen.dart' - lib\main.dart:17:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/onboarding_screen.dart' - lib\main.dart:18:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/premium_subscription_screen.dart' - lib\main.dart:19:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/profile_screen.dart' - lib\main.dart:20:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/reels_screen.dart' - lib\main.dart:21:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/register_screen.dart' - lib\main.dart:22:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/search_screen.dart' - lib\main.dart:23:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/stories_screen.dart' - lib\main.dart:24:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/translator_screen.dart' - lib\main.dart:25:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/travel_diary_screen.dart' - lib\main.dart:26:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/trip_detail_screen.dart' - lib\main.dart:27:8 - unused_import
+   info - Unnecessary duplication of receiver - lib\main.dart:38:7 - cascade_invocations
+   info - Unnecessary duplication of receiver - lib\main.dart:39:7 - cascade_invocations
+   info - Missing a newline at the end of the file - lib\main.dart:128:2 - eol_at_end_of_file
+  error - Const variables must be initialized with a constant value - lib\mock_data.dart:13:37 - const_initialized_with_non_constant_value
+  error - The constructor being called isn't a const constructor - lib\mock_data.dart:13:37 - const_with_non_const
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:27:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:63:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:98:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:134:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:168:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:209:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:219:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:229:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\mock_data.dart:242:19 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\mock_data.dart:254:19 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:269:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:283:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:284:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:296:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:297:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:370:81 - lines_longer_than_80_chars
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:444:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:445:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:446:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:447:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:450:17 - argument_type_not_assignable
+  error - The element type 'dynamic' can't be assigned to the list type 'String' - lib\mock_data.dart:454:18 - list_element_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:455:39 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:476:11 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:477:14 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:478:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:479:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:482:15 - argument_type_not_assignable
+  error - The element type 'dynamic' can't be assigned to the list type 'String' - lib\mock_data.dart:486:16 - list_element_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:487:37 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:503:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:504:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:505:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:506:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String?'.  - lib\mock_data.dart:507:21 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:508:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:509:38 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:513:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:522:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:523:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:524:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:525:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:526:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:527:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:528:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:529:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:530:40 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:531:17 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:531:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:532:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:533:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'bool'.  - lib\mock_data.dart:534:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:535:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:536:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:537:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:539:40 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'DateTime'.  - lib\mock_data.dart:541:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:555:11 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:556:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:557:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:558:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:559:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:560:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:561:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:562:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:563:38 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:564:15 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:564:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:565:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:566:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'bool'.  - lib\mock_data.dart:567:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:568:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:569:14 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:570:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:572:38 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'DateTime'.  - lib\mock_data.dart:574:18 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:582:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:582:19 - avoid_dynamic_calls
+  error - The returned type 'dynamic' isn't returnable from a 'bool' function, as required by the closure's context - lib\mock_data.dart:582:19 - return_of_invalid_type_from_closure
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:586:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:587:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:588:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:589:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:590:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:591:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:592:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:593:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:594:40 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:595:17 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:595:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:596:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:597:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'bool'.  - lib\mock_data.dart:598:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:599:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:600:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:601:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:603:40 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'DateTime'.  - lib\mock_data.dart:605:20 - argument_type_not_assignable
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:42:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:47:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:53:9 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\models\agency_model.dart:58:81 - lines_longer_than_80_chars
+  error - Target of URI hasn't been generated: 'package:feeltrip_app/models/booking_model.g.dart' - lib\models\booking_model.dart:5:6 - uri_has_not_been_generated
+  error - The method '_$BookingFromJson' isn't defined for the type 'Booking' - lib\models\booking_model.dart:37:7 - undefined_method
+   info - Missing a required trailing comma - lib\models\experience_model.dart:129:62 - require_trailing_commas
+   info - Missing a required trailing comma - lib\models\experience_model.dart:149:62 - require_trailing_commas
+   info - The referenced name isn't visible in scope - lib\models\experience_model.dart:286:31 - comment_references
+   info - The line length exceeds the 80-character limit - lib\models\instagram_story.dart:13:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\models\observer.dart:52:81 - lines_longer_than_80_chars
+   info - Constructor declarations should be before non-constructor declarations - lib\models\story_model.dart:20:11 - sort_constructors_first
+   info - Missing a required trailing comma - lib\models\user_model.dart:17:49 - require_trailing_commas
+  error - The constructor being called isn't a const constructor - lib\models\user_model.dart:52:33 - const_with_non_const
+   info - Unnecessary use of parentheses - lib\models\user_model.dart:64:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\user_model.dart:67:9 - unnecessary_parenthesis
+   info - Missing a newline at the end of the file - lib\screens\app_logger.dart:9:2 - eol_at_end_of_file
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\archetype_detail_screen.dart:9:9 - sort_constructors_first
+   info - Required named parameters should be before optional named parameters - lib\screens\archetype_detail_screen.dart:9:57 - always_put_required_named_parameters_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\archetype_detail_screen.dart:73:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\archetype_detail_screen.dart:84:43 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\archetype_detail_screen.dart:139:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\archetype_detail_screen.dart:139:85 - avoid_redundant_argument_values
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:142:67 - require_trailing_commas
+  error - The named parameter 'ticksBorderData' isn't defined - lib\screens\archetype_detail_screen.dart:144:25 - undefined_named_parameter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\archetype_detail_screen.dart:151:58 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:166:27 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:197:68 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:205:79 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:207:59 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\archetype_detail_screen.dart:210:24 - require_trailing_commas
+   info - Missing a newline at the end of the file - lib\screens\archetype_detail_screen.dart:220:2 - eol_at_end_of_file
+warning - Unused import: 'package:feeltrip_app/screens/login_screen.dart' - lib\screens\auth_gate.dart:1:8 - unused_import
+warning - Unused import: 'package:firebase_auth/firebase_auth.dart' - lib\screens\auth_gate.dart:5:8 - unused_import
+   info - The line length exceeds the 80-character limit - lib\screens\auth_gate.dart:38:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\auth_gate.dart:139:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\bookings_screen.dart:31:67 - require_trailing_commas
+warning - Use 'const' with the constructor to improve performance - lib\screens\bookings_screen.dart:34:19 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:46:81 - lines_longer_than_80_chars
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\bookings_screen.dart:86:28 - cast_nullable_to_non_nullable
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\bookings_screen.dart:92:28 - cast_nullable_to_non_nullable
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\bookings_screen.dart:98:28 - cast_nullable_to_non_nullable
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:105:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\bookings_screen.dart:116:78 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\bookings_screen.dart:120:71 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\bookings_screen.dart:120:72 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:133:81 - lines_longer_than_80_chars
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\bookings_screen.dart:146:21 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\bookings_screen.dart:166:56 - argument_type_not_assignable
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:176:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the function 'showDialog' can't be inferred - lib\screens\bookings_screen.dart:276:5 - inference_failure_on_function_invocation
+   info - The line length exceeds the 80-character limit - lib\screens\bookings_screen.dart:281:81 - lines_longer_than_80_chars
+   info - Sort directive sections alphabetically - lib\screens\cart_screen.dart:7:1 - directives_ordering
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:130:42 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\cart_screen.dart:192:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:203:66 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:207:49 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\cart_screen.dart:246:33 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:275:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:285:60 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\cart_screen.dart:292:48 - require_trailing_commas
+warning - The type argument(s) of the function 'showModalBottomSheet' can't be inferred - lib\screens\comments_screen.dart:275:5 - inference_failure_on_function_invocation
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\creator_stats_screen.dart:24:30 - static_access_to_instance_member
+   info - The line length exceeds the 80-character limit - lib\screens\creator_stats_screen.dart:134:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\screens\currency_converter_screen.dart:100:39 - prefer_int_literals
+   info - The value of the argument is redundant because it matches the default value - lib\screens\currency_converter_screen.dart:112:37 - avoid_redundant_argument_values
+   info - Unnecessary use of a 'double' literal - lib\screens\currency_converter_screen.dart:116:69 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\currency_converter_screen.dart:119:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\currency_converter_screen.dart:169:66 - require_trailing_commas
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\currency_converter_screen.dart:186:7 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\currency_converter_screen.dart:238:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\currency_converter_screen.dart:249:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\destination_detail_screen.dart:3:1 - directives_ordering
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:91:60 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:96:29 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:154:74 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:154:75 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\destination_detail_screen.dart:162:41 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:172:48 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:173:22 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:180:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:182:15 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:196:51 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:279:9 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\destination_detail_screen.dart:286:45 - prefer_int_literals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:290:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:293:53 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:300:51 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:302:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:317:70 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:321:81 - lines_longer_than_80_chars
+warning - The declaration '_buildInfoRow' isn't referenced - lib\screens\destination_detail_screen.dart:329:10 - unused_element
+   info - Unnecessary use of a 'double' literal - lib\screens\destination_detail_screen.dart:384:47 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:388:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:390:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\destination_detail_screen.dart:397:29 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:399:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:402:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:405:19 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:416:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:423:43 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:431:48 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\destination_detail_screen.dart:446:7 - require_trailing_commas
+   info - Unnecessary type annotation on a local variable - lib\screens\edit_profile_screen.dart:79:5 - omit_local_variable_types
+warning - Local variables should be final - lib\screens\edit_profile_screen.dart:79:5 - prefer_final_locals
+   info - Unnecessary type annotation on a local variable - lib\screens\edit_profile_screen.dart:101:7 - omit_local_variable_types
+   info - Unnecessary type annotation on a local variable - lib\screens\edit_profile_screen.dart:116:13 - omit_local_variable_types
+   info - The line length exceeds the 80-character limit - lib\screens\edit_profile_screen.dart:158:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\screens\edit_profile_screen.dart:171:39 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:189:59 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:201:60 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:263:64 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:271:58 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\edit_profile_screen.dart:271:59 - require_trailing_commas
+   info - Missing a newline at the end of the file - lib\screens\edit_profile_screen.dart:280:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\emotional_preferences_quiz_screen.dart:4:1 - directives_ordering
+   info - Sort directive sections alphabetically - lib\screens\emotional_preferences_quiz_screen.dart:5:1 - directives_ordering
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\emotional_preferences_quiz_screen.dart:27:9 - sort_constructors_first
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:40:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:47:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:54:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:55:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:61:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:68:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:75:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:82:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:89:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:90:81 - lines_longer_than_80_chars
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\emotional_preferences_quiz_screen.dart:101:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\emotional_preferences_quiz_screen.dart:108:9 - sort_constructors_first
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:112:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:113:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:115:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:115:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:115:36 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:115:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:116:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:116:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:116:31 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:117:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:117:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:117:30 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:118:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:118:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:118:30 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:118:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:121:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:122:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:124:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:124:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:124:26 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:125:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:125:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:125:28 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:126:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:126:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:126:35 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:126:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:127:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:127:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:127:34 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:127:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:130:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:131:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:133:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:133:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:133:38 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:134:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:134:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:134:28 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:135:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:135:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:135:36 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:135:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:136:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:136:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:136:36 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:139:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:140:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:142:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:142:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:142:32 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:142:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:143:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:143:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:143:32 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:143:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:144:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:144:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:144:35 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:145:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:145:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:145:29 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:148:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:149:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:151:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:151:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:151:33 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:151:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:152:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:152:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:152:26 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:153:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:153:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:153:30 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:153:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:154:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:154:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:154:38 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:154:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:157:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:158:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:160:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:160:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:160:29 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:160:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:161:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:161:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:161:25 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:162:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:162:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:162:28 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:163:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:163:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:163:27 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:163:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:166:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:167:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:169:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:169:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:169:34 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:169:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:170:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:170:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:170:35 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:170:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:171:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:171:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:171:34 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:171:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:172:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:172:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:172:33 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:172:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:175:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:176:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:178:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:178:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:178:40 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:178:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:179:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:179:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:179:26 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:180:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:180:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:180:30 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:180:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:181:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:181:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:181:36 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:181:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:184:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:185:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:187:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:187:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:187:39 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:188:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:188:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:188:39 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:189:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:189:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:189:35 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:189:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:190:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:190:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:190:32 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:190:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:193:3 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:194:5 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:196:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:196:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:196:40 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:196:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:197:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:197:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:197:30 - prefer_single_quotes
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:198:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:198:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:198:31 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:198:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\emotional_preferences_quiz_screen.dart:199:7 - prefer_const_constructors
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:199:18 - prefer_single_quotes
+   info - Unnecessary use of double quotes - lib\screens\emotional_preferences_quiz_screen.dart:199:39 - prefer_single_quotes
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:199:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\emotional_preferences_quiz_screen.dart:263:30 - avoid_redundant_argument_values
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:318:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:338:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:340:66 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:346:23 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\emotional_preferences_quiz_screen.dart:364:49 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:390:63 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\emotional_preferences_quiz_screen.dart:394:52 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:403:75 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:419:60 - require_trailing_commas
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\emotional_preferences_quiz_screen.dart:467:9 - sort_constructors_first
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:488:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\emotional_preferences_quiz_screen.dart:503:33 - avoid_redundant_argument_values
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\emotional_preferences_quiz_screen.dart:514:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\emotional_preferences_quiz_screen.dart:545:39 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:564:54 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:569:72 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:573:26 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\emotional_preferences_quiz_screen.dart:591:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:591:82 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\emotional_preferences_quiz_screen.dart:600:60 - require_trailing_commas
+   info - Sort directive sections alphabetically - lib\screens\experience_impact_dashboard_screen.dart:2:1 - directives_ordering
+   info - Unnecessary use of a 'double' literal - lib\screens\experience_impact_dashboard_screen.dart:66:41 - prefer_int_literals
+   info - Unnecessary use of parentheses - lib\screens\experience_impact_dashboard_screen.dart:84:25 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:88:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:154:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:187:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:188:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:189:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:212:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:260:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:289:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\experience_impact_dashboard_screen.dart:334:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\experience_impact_dashboard_screen.dart:420:30 - deprecated_member_use
+   info - Missing a newline at the end of the file - lib\screens\experience_impact_dashboard_screen.dart:586:2 - eol_at_end_of_file
+warning - The type argument(s) of the function 'to' can't be inferred - lib\screens\feed_screen.dart:74:30 - inference_failure_on_function_invocation
+warning - Unused import: 'package:go_router/go_router.dart' - lib\screens\historial_screen.dart:3:8 - unused_import
+   info - Unnecessary use of a 'double' literal - lib\screens\historial_screen.dart:91:45 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\historial_screen.dart:96:57 - prefer_int_literals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\historial_screen.dart:100:58 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\historial_screen.dart:103:81 - lines_longer_than_80_chars
+   info - To-do comment doesn't follow the Flutter style - lib\screens\historial_screen.dart:110:23 - flutter_style_todos
+   info - The line length exceeds the 80-character limit - lib\screens\historial_screen.dart:110:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\historial_screen.dart:121:2 - eol_at_end_of_file
+warning - The value of the local variable 'featuredTripsAsync' isn't used - lib\screens\home_screen.dart:34:11 - unused_local_variable
+   info - The line length exceeds the 80-character limit - lib\screens\home_screen.dart:69:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\home_screen.dart:141:81 - lines_longer_than_80_chars
+   info - Use interpolation to compose strings and values - lib\screens\home_screen.dart:151:29 - prefer_interpolation_to_compose_strings
+  error - Undefined name '_featuredTrips' - lib\screens\home_screen.dart:231:23 - undefined_identifier
+  error - Undefined name '_featuredTrips' - lib\screens\home_screen.dart:235:38 - undefined_identifier
+  error - Undefined name '_featuredTrips' - lib\screens\home_screen.dart:247:42 - undefined_identifier
+  error - Undefined name '_featuredTrips' - lib\screens\home_screen.dart:254:34 - undefined_identifier
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\home_screen.dart:374:23 - inference_failure_on_instance_creation
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\home_screen.dart:384:23 - inference_failure_on_instance_creation
+   info - Sort directive sections alphabetically - lib\screens\instagram_stories_screen.dart:6:1 - directives_ordering
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:17:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:20:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:46:81 - lines_longer_than_80_chars
+   info - Closure should be a tearoff - lib\screens\instagram_stories_screen.dart:48:20 - unnecessary_lambdas
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:94:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\instagram_stories_screen.dart:202:42 - deprecated_member_use
+  error - The constructor being called isn't a const constructor - lib\screens\instagram_stories_screen.dart:203:37 - const_with_non_const
+   info - Missing a newline at the end of the file - lib\screens\instagram_stories_screen.dart:227:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\screens\login_screen.dart:2:1 - directives_ordering
+   info - Unnecessary use of a 'double' literal - lib\screens\login_screen.dart:122:39 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\login_screen.dart:122:49 - prefer_int_literals
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:129:24 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\login_screen.dart:131:29 - prefer_const_literals_to_create_immutables
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:146:21 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:147:21 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:149:30 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:179:19 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:181:28 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:226:47 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\login_screen.dart:267:66 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\login_screen.dart:271:66 - require_trailing_commas
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:276:19 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\login_screen.dart:277:31 - prefer_const_literals_to_create_immutables
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:278:23 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:278:39 - prefer_const_constructors
+   info - Missing a required trailing comma - lib\screens\login_screen.dart:282:68 - require_trailing_commas
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:284:23 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\login_screen.dart:284:39 - prefer_const_constructors
+  error - The method 'loginWithGoogle' isn't defined for the type 'LoginController' - lib\screens\login_screen.dart:300:36 - undefined_method
+  error - The method 'loginWithFacebook' isn't defined for the type 'LoginController' - lib\screens\login_screen.dart:315:36 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:341:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:343:48 - deprecated_member_use
+   info - Missing a newline at the end of the file - lib\screens\login_screen.dart:391:2 - eol_at_end_of_file
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\ocr_screen.dart:180:27 - inference_failure_on_instance_creation
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\onboarding_screen.dart:138:31 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\premium_subscription_screen.dart:165:81 - lines_longer_than_80_chars
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:174:42 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:174:42 - avoid_dynamic_calls
+  error - The returned type 'dynamic' isn't returnable from a 'bool' function, as required by the closure's context - lib\screens\premium_subscription_screen.dart:174:42 - return_of_invalid_type_from_closure
+   info - The line length exceeds the 80-character limit - lib\screens\premium_subscription_screen.dart:240:81 - lines_longer_than_80_chars
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Spread elements in list or set literals must implement 'Iterable' - lib\screens\premium_subscription_screen.dart:278:22 - not_iterable_spread
+warning - The type of package can't be inferred; a type must be explicitly provided - lib\screens\premium_subscription_screen.dart:279:29 - inference_failure_on_untyped_parameter
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Package'.  - lib\screens\premium_subscription_screen.dart:279:68 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:302:43 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:302:43 - avoid_dynamic_calls
+warning - The type of p can't be inferred; a type must be explicitly provided - lib\screens\premium_subscription_screen.dart:303:34 - inference_failure_on_untyped_parameter
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:304:37 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:307:33 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:307:33 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\premium_subscription_screen.dart:307:33 - argument_type_not_assignable
+   info - Sort directive sections alphabetically - lib\screens\preview_entry_screen.dart:4:1 - directives_ordering
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\preview_entry_screen.dart:9:9 - sort_constructors_first
+   info - Required named parameters should be before optional named parameters - lib\screens\preview_entry_screen.dart:9:54 - always_put_required_named_parameters_first
+   info - Unnecessary use of a 'double' literal - lib\screens\preview_entry_screen.dart:19:39 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\preview_entry_screen.dart:52:24 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\preview_entry_screen.dart:53:27 - prefer_int_literals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\preview_entry_screen.dart:57:60 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\preview_entry_screen.dart:59:24 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\preview_entry_screen.dart:72:81 - lines_longer_than_80_chars
+   info - To-do comment doesn't follow the Flutter style - lib\screens\preview_entry_screen.dart:82:19 - flutter_style_todos
+   info - The line length exceeds the 80-character limit - lib\screens\preview_entry_screen.dart:82:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\preview_entry_screen.dart:93:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:43:81 - lines_longer_than_80_chars
+   info - 'bool' parameters should be named parameters - lib\screens\profile_provider.dart:73:19 - avoid_positional_boolean_parameters
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:107:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:116:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\profile_provider.dart:138:4 - eol_at_end_of_file
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:7:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:8:8 - always_use_package_imports
+warning - Unused import: '../services/user_service.dart' - lib\screens\profile_screen.dart:8:8 - unused_import
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:9:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:10:8 - always_use_package_imports
+warning - Unused import: 'creator_stats_screen.dart' - lib\screens\profile_screen.dart:10:8 - unused_import
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:11:8 - always_use_package_imports
+warning - Unused import: 'instagram_stories_screen.dart' - lib\screens\profile_screen.dart:11:8 - unused_import
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:12:8 - always_use_package_imports
+warning - Unused import: 'translator_screen.dart' - lib\screens\profile_screen.dart:12:8 - unused_import
+   info - Sort directive sections alphabetically - lib\screens\profile_screen.dart:13:1 - directives_ordering
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\profile_screen.dart:13:8 - always_use_package_imports
+warning - Unused import: 'ocr_screen.dart' - lib\screens\profile_screen.dart:13:8 - unused_import
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:95:17 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:110:81 - lines_longer_than_80_chars
+  error - 2 positional arguments expected by '_buildActionButtons', but 1 found - lib\screens\profile_screen.dart:144:44 - not_enough_positional_arguments
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:190:46 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:190:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:237:76 - require_trailing_commas
+   info - To-do comment doesn't follow the Flutter style - lib\screens\profile_screen.dart:245:35 - flutter_style_todos
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:270:74 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:284:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:286:58 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:292:61 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:296:52 - require_trailing_commas
+warning - The declaration '_buildFollowerStats' isn't referenced - lib\screens\profile_screen.dart:346:10 - unused_element
+  error - The method '_buildStatCard' isn't defined for the type '_ProfileScreenState' - lib\screens\profile_screen.dart:354:11 - undefined_method
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:354:81 - lines_longer_than_80_chars
+  error - The method '_buildStatCard' isn't defined for the type '_ProfileScreenState' - lib\screens\profile_screen.dart:356:11 - undefined_method
+warning - The type argument(s) of the function 'showDialog' can't be inferred - lib\screens\profile_screen.dart:363:5 - inference_failure_on_function_invocation
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\profile_screen.dart:377:42 - use_build_context_synchronously
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:389:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:405:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\profile_screen.dart:405:160 - prefer_const_constructors
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\profile_screen.dart:411:19 - inference_failure_on_instance_creation
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:413:64 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\profile_screen.dart:488:70 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:505:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:507:52 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:507:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\profile_screen.dart:538:29 - avoid_redundant_argument_values
+   info - Missing a newline at the end of the file - lib\screens\profile_screen.dart:566:2 - eol_at_end_of_file
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\reels_screen.dart:40:19 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\reels_screen.dart:41:17 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\reels_screen.dart:51:19 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\reels_screen.dart:52:17 - prefer_const_literals_to_create_immutables
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - lib\screens\reels_screen.dart:64:11 - inference_failure_on_instance_creation
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\screens\reels_screen.dart:95:22 - unawaited_futures
+   info - Missing a required trailing comma - lib\screens\reels_screen.dart:239:60 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\reels_screen.dart:275:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:67:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\referral_screen.dart:94:42 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:117:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:141:81 - lines_longer_than_80_chars
+   info - Sort directive sections alphabetically - lib\screens\register_screen.dart:2:1 - directives_ordering
+   info - Closure should be a tearoff - lib\screens\register_screen.dart:57:3 - unnecessary_lambdas
+warning - Use 'const' with the constructor to improve performance - lib\screens\register_screen.dart:143:23 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\register_screen.dart:144:23 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\register_screen.dart:145:23 - prefer_const_literals_to_create_immutables
+   info - The line length exceeds the 80-character limit - lib\screens\register_screen.dart:152:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\register_screen.dart:165:15 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\register_screen.dart:167:24 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\register_screen.dart:199:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\register_screen.dart:209:81 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\register_screen.dart:209:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\register_screen.dart:218:51 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\register_screen.dart:227:66 - require_trailing_commas
+   info - To-do comment doesn't follow the Flutter style - lib\screens\register_screen.dart:239:33 - flutter_style_todos
+   info - Missing a required trailing comma - lib\screens\register_screen.dart:272:66 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\register_screen.dart:275:78 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\register_screen.dart:283:64 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\register_screen.dart:287:62 - require_trailing_commas
+  error - Expected to find ')' - lib\screens\register_screen.dart:295:6 - expected_token
+warning - The return type of ' Function(String)?' can't be inferred - lib\screens\register_screen.dart:305:5 - inference_failure_on_function_return_type
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\register_screen.dart:309:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\register_screen.dart:311:48 - deprecated_member_use
+   info - Unnecessary use of a raw string - lib\screens\register_screen.dart:344:34 - unnecessary_raw_strings
+   info - Unnecessary use of a raw string - lib\screens\register_screen.dart:345:34 - unnecessary_raw_strings
+   info - Statements in an if should be enclosed in a block - lib\screens\register_screen.dart:345:46 - curly_braces_in_flow_control_structures
+  error - Members can't be declared to be both 'final' and 'var' - lib\screens\results_screen.dart:12:11 - final_and_var
+  error - Members can't be declared to be both 'final' and 'var' - lib\screens\results_screen.dart:13:11 - final_and_var
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:19:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:32:81 - lines_longer_than_80_chars
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\results_screen.dart:87:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\results_screen.dart:104:25 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\results_screen.dart:113:25 - argument_type_not_assignable
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:131:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:139:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\results_screen.dart:170:25 - inference_failure_on_instance_creation
+   info - Sort directive sections alphabetically - lib\screens\search_screen.dart:4:1 - directives_ordering
+   info - Sort directive sections alphabetically - lib\screens\search_screen.dart:5:1 - directives_ordering
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:23:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:27:16 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:30:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:39:24 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:46:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:53:33 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:55:31 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:58:33 - prefer_const_constructors
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:61:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:67:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:87:13 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:91:24 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:95:19 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:97:28 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:99:19 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:103:32 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\search_screen.dart:104:34 - prefer_const_constructors
+   info - Missing a required trailing comma - lib\screens\search_screen.dart:107:63 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\search_screen.dart:121:52 - require_trailing_commas
+  error - Undefined class 'Trip' - lib\screens\search_screen.dart:153:5 - undefined_class
+   info - Unnecessary use of a 'double' literal - lib\screens\search_screen.dart:179:45 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\search_screen.dart:190:78 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\search_screen.dart:197:37 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:62:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:74:81 - lines_longer_than_80_chars
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\screens\smart_camera_screen.dart:125:9 - unawaited_futures
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\screens\smart_camera_screen.dart:183:55 - argument_type_not_assignable
+   info - Closure should be a tearoff - lib\screens\smart_camera_screen.dart:200:3 - unnecessary_lambdas
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:220:64 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:220:65 - require_trailing_commas
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:257:35 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:276:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:280:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:301:55 - deprecated_member_use
+   info - The value of the argument is redundant because it matches the default value - lib\screens\smart_camera_screen.dart:308:31 - avoid_redundant_argument_values
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:311:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:319:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\smart_camera_screen.dart:326:45 - avoid_redundant_argument_values
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:328:51 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:328:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\smart_camera_screen.dart:329:19 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\smart_camera_screen.dart:333:49 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:336:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\smart_camera_screen.dart:347:81 - lines_longer_than_80_chars
+warning - Don't invoke 'print' in production code - lib\screens\storage_service.dart:23:7 - avoid_print
+   info - Missing a newline at the end of the file - lib\screens\storage_service.dart:27:2 - eol_at_end_of_file
+  error - 1 positional argument expected by 'ExperienceController.new', but 0 found - lib\screens\stories_screen.dart:30:40 - not_enough_positional_arguments
+  error - The getter 'stories' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:32:21 - undefined_getter
+  error - The method 'getStoriesStream' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:68:35 - undefined_method
+  error - The getter 'stories' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:106:42 - undefined_getter
+warning - The type of story can't be inferred; a type must be explicitly provided - lib\screens\stories_screen.dart:109:29 - inference_failure_on_untyped_parameter
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\stories_screen.dart:109:39 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\stories_screen.dart:109:39 - avoid_dynamic_calls
+  error - The getter 'stories' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:238:40 - undefined_getter
+warning - The type of s can't be inferred; a type must be explicitly provided - lib\screens\stories_screen.dart:240:42 - inference_failure_on_untyped_parameter
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\stories_screen.dart:240:48 - avoid_dynamic_calls
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\stories_screen.dart:244:53 - static_access_to_instance_member
+  error - The getter 'stories' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:249:47 - undefined_getter
+warning - The type of s can't be inferred; a type must be explicitly provided - lib\screens\stories_screen.dart:251:42 - inference_failure_on_untyped_parameter
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\stories_screen.dart:251:48 - avoid_dynamic_calls
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\stories_screen.dart:255:53 - static_access_to_instance_member
+warning - The type argument(s) of the function 'to' can't be inferred - lib\screens\stories_screen.dart:272:29 - inference_failure_on_function_invocation
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\stories_screen.dart:302:49 - static_access_to_instance_member
+warning - The type argument(s) of the function 'showDialog' can't be inferred - lib\screens\stories_screen.dart:338:5 - inference_failure_on_function_invocation
+  error - A value of type 'dynamic' can't be assigned to a variable of type 'String' - lib\screens\translator_screen.dart:88:29 - invalid_assignment
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\translator_screen.dart:88:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\translator_screen.dart:88:29 - avoid_dynamic_calls
+   info - Missing a required trailing comma - lib\screens\translator_screen.dart:115:32 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\translator_screen.dart:200:76 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\translator_screen.dart:231:78 - require_trailing_commas
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\travel_diary_screen.dart:3:8 - always_use_package_imports
+   info - Sort directive sections alphabetically - lib\screens\travel_diary_screen.dart:4:1 - directives_ordering
+   info - Use 'package:' imports for files in the 'lib' directory - lib\screens\travel_diary_screen.dart:4:8 - always_use_package_imports
+   info - Unnecessary use of a 'double' literal - lib\screens\travel_diary_screen.dart:82:45 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:82:81 - lines_longer_than_80_chars
+warning - Use 'const' with the constructor to improve performance - lib\screens\travel_diary_screen.dart:95:23 - prefer_const_constructors
+warning - Use 'const' with the constructor to improve performance - lib\screens\travel_diary_screen.dart:97:23 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\travel_diary_screen.dart:98:23 - prefer_const_literals_to_create_immutables
+warning - The value of the local variable 'avgDepth' isn't used - lib\screens\travel_diary_screen.dart:160:11 - unused_local_variable
+   info - Unnecessary use of parentheses - lib\screens\travel_diary_screen.dart:160:22 - unnecessary_parenthesis
+warning - The value of the local variable 'uniqueEmotions' isn't used - lib\screens\travel_diary_screen.dart:161:11 - unused_local_variable
+   info - Unnecessary use of parentheses - lib\screens\travel_diary_screen.dart:161:28 - unnecessary_parenthesis
+warning - The value of the local variable 'overallImpact' isn't used - lib\screens\travel_diary_screen.dart:162:11 - unused_local_variable
+   info - Unnecessary use of parentheses - lib\screens\travel_diary_screen.dart:162:27 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\screens\travel_diary_screen.dart:163:33 - unnecessary_parenthesis
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:167:52 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:219:81 - lines_longer_than_80_chars
+  error - Arguments of a constant creation must be constant expressions - lib\screens\travel_diary_screen.dart:251:18 - const_with_non_constant_argument
+   info - Unnecessary 'const' keyword - lib\screens\travel_diary_screen.dart:252:13 - unnecessary_const
+   info - Unnecessary 'const' keyword - lib\screens\travel_diary_screen.dart:255:22 - unnecessary_const
+   info - Unnecessary 'const' keyword - lib\screens\travel_diary_screen.dart:260:13 - unnecessary_const
+  error - The method 'push' isn't defined for the type 'BuildContext' - lib\screens\travel_diary_screen.dart:282:30 - undefined_method
+   info - Unnecessary use of a 'double' literal - lib\screens\travel_diary_screen.dart:285:41 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:312:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:319:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:326:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:327:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\travel_diary_screen.dart:327:83 - deprecated_member_use
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:330:24 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:335:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:402:13 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:426:22 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:453:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:469:75 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\travel_diary_screen.dart:475:76 - require_trailing_commas
+   info - Sort directive sections alphabetically - lib\screens\trip_detail_screen.dart:5:1 - directives_ordering
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\trip_detail_screen.dart:17:3 - sort_constructors_first
+   info - Required named parameters should be before optional named parameters - lib\screens\trip_detail_screen.dart:22:19 - always_put_required_named_parameters_first
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:28:81 - lines_longer_than_80_chars
+  error - Too many positional arguments: 1 expected, but 2 found - lib\screens\trip_detail_screen.dart:36:43 - extra_positional_arguments
+   info - Unnecessary type annotation on a local variable - lib\screens\trip_detail_screen.dart:41:3 - omit_local_variable_types
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:43:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\screens\trip_detail_screen.dart:55:20 - avoid_redundant_argument_values
+   info - Don't cast a nullable value to a non-nullable type - lib\screens\trip_detail_screen.dart:71:24 - cast_nullable_to_non_nullable
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\trip_detail_screen.dart:78:9 - sort_constructors_first
+   info - Required named parameters should be before optional named parameters - lib\screens\trip_detail_screen.dart:78:52 - always_put_required_named_parameters_first
+   info - Closure should be a tearoff - lib\screens\trip_detail_screen.dart:92:18 - unnecessary_lambdas
+   info - Missing a required trailing comma - lib\screens\trip_detail_screen.dart:110:74 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\trip_detail_screen.dart:110:75 - require_trailing_commas
+   info - Use a 'ColoredBox' rather than a 'Container' with only a 'Color' - lib\screens\trip_detail_screen.dart:112:19 - use_colored_box
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:115:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:124:45 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\trip_detail_screen.dart:136:53 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:159:43 - prefer_int_literals
+   info - Missing a required trailing comma - lib\screens\trip_detail_screen.dart:173:71 - require_trailing_commas
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:221:43 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:242:57 - prefer_int_literals
+   info - The value of the argument is redundant because it matches the default value - lib\screens\trip_detail_screen.dart:246:53 - avoid_redundant_argument_values
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:270:39 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:288:45 - prefer_int_literals
+  error - Undefined name 'context' - lib\screens\trip_detail_screen.dart:303:27 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\trip_detail_screen.dart:322:27 - undefined_identifier
+   info - Unnecessary use of a 'double' literal - lib\screens\trip_detail_screen.dart:340:51 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:353:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:363:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:367:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:373:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\trip_detail_screen.dart:388:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\vision_service.dart:7:81 - lines_longer_than_80_chars
+   info - Constructor declarations should be before non-constructor declarations - lib\screens\vision_service.dart:27:3 - sort_constructors_first
+   info - Use of an async 'dart:io' method - lib\screens\vision_service.dart:38:16 - avoid_slow_async_io
+   info - Missing a required trailing comma - lib\screens\vision_service.dart:44:78 - require_trailing_commas
+   info - Missing a required trailing comma - lib\screens\vision_service.dart:49:5 - require_trailing_commas
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:29:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:40:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:51:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:62:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:87:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:110:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:156:81 - lines_longer_than_80_chars
+   info - Unnecessary duplication of receiver - lib\services\admob_service.dart:16:5 - cascade_invocations
+   info - Unnecessary duplication of receiver - lib\services\admob_service.dart:26:5 - cascade_invocations
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\services\admob_service.dart:26:14 - unawaited_futures
+   info - Sort directive sections alphabetically - lib\services\affiliate_service.dart:3:1 - directives_ordering
+   info - Sort directive sections alphabetically - lib\services\affiliate_service.dart:4:1 - directives_ordering
+   info - Missing a required trailing comma - lib\services\affiliate_service.dart:57:50 - require_trailing_commas
+  error - Method invocation or property access on a 'dynamic' target - lib\services\agency_service.dart:173:33 - avoid_dynamic_calls
+   info - Sort directive sections alphabetically - lib\services\auth_service.dart:7:1 - directives_ordering
+   info - Missing a newline at the end of the file - lib\services\auth_service.dart:112:2 - eol_at_end_of_file
+   info - Use 'package:' imports for files in the 'lib' directory - lib\services\cart_service.dart:2:8 - always_use_package_imports
+   info - The line length exceeds the 80-character limit - lib\services\cart_service.dart:21:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\cart_service.dart:25:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\cart_service.dart:37:2 - eol_at_end_of_file
+   info - Missing a required trailing comma - lib\services\country_service.dart:9:25 - require_trailing_commas
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:17:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:18:28 - avoid_dynamic_calls
+   info - The line length exceeds the 80-character limit - lib\services\country_service.dart:18:81 - lines_longer_than_80_chars
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:20:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:20:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:21:23 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:22:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:23:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:25:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:26:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:27:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:27:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:28:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:28:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:29:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:30:24 - avoid_dynamic_calls
+   info - Missing a required trailing comma - lib\services\country_service.dart:45:19 - require_trailing_commas
+warning - Unnecessary cast - lib\services\country_service.dart:53:22 - unnecessary_cast
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:54:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:54:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:55:28 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:55:28 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:56:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:21:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:22:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:26:35 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:49:46 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Map<dynamic, dynamic>'.  - lib\services\currency_service.dart:49:46 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:50:35 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:91:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:92:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:92:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:93:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:93:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:94:17 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:95:17 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:96:24 - avoid_dynamic_calls
+  error - A value of type 'dynamic' can't be assigned to a variable of type 'List<dynamic>' - lib\services\destination_service.dart:114:36 - invalid_assignment
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:123:17 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:127:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:128:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:190:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:190:29 - avoid_dynamic_calls
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:195:81 - lines_longer_than_80_chars
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:226:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:227:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:227:22 - avoid_dynamic_calls
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:227:81 - lines_longer_than_80_chars
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:228:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:230:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:231:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:231:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:231:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:233:23 - avoid_dynamic_calls
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:239:81 - lines_longer_than_80_chars
+warning - The type argument(s) of 'Map' can't be inferred - lib\services\diary_service.dart:155:50 - inference_failure_on_collection_literal
+  error - A value of type 'dynamic' can't be returned from the method 'getDiaryStats' because it has a return type of 'Future<Map<String, dynamic>>' - lib\services\diary_service.dart:156:14 - return_of_invalid_type
+   info - The line length exceeds the 80-character limit - lib\services\forgot_password_screen.dart:45:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\forgot_password_screen.dart:129:81 - lines_longer_than_80_chars
+  error - Instance member 'uploadStoryPhoto' can't be accessed using static access - lib\services\instagram_story_service.dart:43:45 - static_access_to_instance_member
+  error - 3 positional arguments expected by 'uploadStoryPhoto', but 2 found - lib\services\instagram_story_service.dart:43:75 - not_enough_positional_arguments
+   info - The line length exceeds the 80-character limit - lib\services\notification_service.dart:63:81 - lines_longer_than_80_chars
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:29:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:33:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:35:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:35:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:36:30 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:37:30 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:37:31 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:39:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:39:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:39:25 - avoid_dynamic_calls
+   info - The line length exceeds the 80-character limit - lib\services\restaurant_service.dart:39:81 - lines_longer_than_80_chars
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:40:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:40:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:40:25 - avoid_dynamic_calls
+   info - The line length exceeds the 80-character limit - lib\services\restaurant_service.dart:40:81 - lines_longer_than_80_chars
+  error - The getter 'customerInfo' isn't defined for the type 'CustomerInfo' - lib\services\revenuecat_service.dart:104:18 - undefined_getter
+   info - Invalid use of 'default' member in a switch - lib\services\revenuecat_service.dart:228:7 - no_default_cases
+   info - The line length exceeds the 80-character limit - lib\services\sharing_service.dart:13:81 - lines_longer_than_80_chars
+  error - Undefined name 'SharePlus' - lib\services\sharing_service.dart:15:13 - undefined_identifier
+  error - The method 'ShareParams' isn't defined for the type 'SharingService' - lib\services\sharing_service.dart:16:9 - undefined_method
+   info - The line length exceeds the 80-character limit - lib\services\sharing_service.dart:37:81 - lines_longer_than_80_chars
+  error - Undefined name 'SharePlus' - lib\services\sharing_service.dart:39:13 - undefined_identifier
+  error - The method 'ShareParams' isn't defined for the type 'SharingService' - lib\services\sharing_service.dart:40:9 - undefined_method
+  error - Undefined name 'SharePlus' - lib\services\sharing_service.dart:61:13 - undefined_identifier
+  error - The method 'ShareParams' isn't defined for the type 'SharingService' - lib\services\sharing_service.dart:62:18 - undefined_method
+  error - Undefined name 'SharePlus' - lib\services\sharing_service.dart:80:13 - undefined_identifier
+  error - The method 'ShareParams' isn't defined for the type 'SharingService' - lib\services\sharing_service.dart:81:9 - undefined_method
+   info - The line length exceeds the 80-character limit - lib\services\storage_service.dart:30:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\storage_service.dart:41:81 - lines_longer_than_80_chars
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\services\story_service.dart:143:43 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:23:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:25:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:25:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:50:18 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:50:18 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:51:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:51:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:52:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:52:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:53:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:53:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:53:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:54:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:17:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:17:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:18:26 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:18:26 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:18:26 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:20:52 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:20:52 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:20:52 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:21:23 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:21:23 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:22:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:23:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:23:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:45:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:50:28 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:51:35 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:51:35 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:52:34 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:52:34 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:52:34 - avoid_dynamic_calls
+   info - To-do comment doesn't follow the Flutter style - lib\trip_detail_screen.dart:5:1 - flutter_style_todos
+warning - The type argument(s) of the function 'find' can't be inferred - lib\trip_detail_screen.dart:15:28 - inference_failure_on_function_invocation
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:46:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:47:81 - lines_longer_than_80_chars
+  error - Method invocation or property access on a 'dynamic' target - lib\trip_detail_screen.dart:54:36 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\trip_detail_screen.dart:54:36 - avoid_dynamic_calls
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:54:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:65:81 - lines_longer_than_80_chars
+   info - Unnecessary use of parentheses - lib\trip_model.dart:44:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\trip_model.dart:47:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\trip_model.dart:50:9 - unnecessary_parenthesis
+  error - 3 positional arguments expected by 'openAffiliateLink', but 1 found - lib\widgets\affiliate_widget.dart:40:66 - not_enough_positional_arguments
+   info - Sort directive sections alphabetically - lib\widgets\destination_card.dart:3:1 - directives_ordering
+  error - Undefined class 'Trip' - lib\widgets\destination_card.dart:11:9 - undefined_class
+   info - Missing a required trailing comma - lib\widgets\destination_card.dart:51:66 - require_trailing_commas
+   info - Sort directive sections alphabetically - mercado_pago_service.dart:6:1 - directives_ordering
+   info - The line length exceeds the 80-character limit - premium_subscription_screen.dart:6:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - premium_subscription_screen.dart:54:81 - lines_longer_than_80_chars
+   info - Unnecessary duplication of receiver - premium_subscription_screen.dart:224:23 - cascade_invocations
+   info - Dependencies not sorted alphabetically - pubspec.yaml:13:3 - sort_pub_dependencies
+   info - Dependencies not sorted alphabetically - pubspec.yaml:64:3 - sort_pub_dependencies
+   info - Dependencies not sorted alphabetically - pubspec.yaml:80:3 - sort_pub_dependencies
+   info - Sort directive sections alphabetically - search_provider.dart:2:1 - directives_ordering
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - search_provider.dart:30:11 - inference_failure_on_instance_creation
+   info - The line length exceeds the 80-character limit - search_provider.dart:36:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - search_provider.dart:47:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - search_provider.dart:50:9 - inference_failure_on_instance_creation
+   info - Missing a newline at the end of the file - search_provider.dart:52:4 - eol_at_end_of_file
+  error - The function 'InstagramStoryService' isn't defined - story_provider.dart:6:10 - undefined_function
+warning - The type argument(s) of 'List' can't be inferred - test\models\experience_model_test.dart:16:20 - inference_failure_on_collection_literal
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:32:30 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:33:15 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:36:18 - prefer_const_literals_to_create_immutables
+warning - The type argument(s) of 'List' can't be inferred - test\models\experience_model_test.dart:54:19 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:44:19 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:45:23 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:53:21 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:54:22 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:56:32 - inference_failure_on_collection_literal
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\user_model_test.dart:13:24 - prefer_const_literals_to_create_immutables
+warning - The type argument(s) of 'List' can't be inferred - test\models\user_model_test.dart:29:26 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\user_model_test.dart:30:19 - inference_failure_on_collection_literal
+  error - Instance member 'uploadProfilePhoto' can't be accessed using static access - test\services\storage_service_test.dart:7:29 - static_access_to_instance_member
+  error - Instance member 'uploadDiaryPhoto' can't be accessed using static access - test\services\storage_service_test.dart:8:29 - static_access_to_instance_member
+  error - Instance member 'uploadStoryPhoto' can't be accessed using static access - test\services\storage_service_test.dart:9:29 - static_access_to_instance_member
+  error - Instance member 'deleteFile' can't be accessed using static access - test\services\storage_service_test.dart:10:29 - static_access_to_instance_member
+   info - Missing a required trailing comma - trip_repository.dart:28:56 - require_trailing_commas
+
+1005 issues found. (ran in 13.9s)

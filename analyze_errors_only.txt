@@ -1,0 +1,263 @@
+  error - The method 'copyWith' isn't defined for the type 'DiaryEntry' - lib\controllers\experience_controller.dart:258:55 - undefined_method
+  error - Const variables must be initialized with a constant value - lib\mock_data.dart:13:37 - const_initialized_with_non_constant_value
+  error - The constructor being called isn't a const constructor - lib\mock_data.dart:13:37 - const_with_non_const
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:444:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:445:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:446:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:447:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:450:17 - argument_type_not_assignable
+  error - The element type 'dynamic' can't be assigned to the list type 'String' - lib\mock_data.dart:454:18 - list_element_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:455:39 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:476:11 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:477:14 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:478:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:479:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:482:15 - argument_type_not_assignable
+  error - The element type 'dynamic' can't be assigned to the list type 'String' - lib\mock_data.dart:486:16 - list_element_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:487:37 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:503:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:504:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:505:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:506:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String?'.  - lib\mock_data.dart:507:21 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:508:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:509:38 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:513:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:522:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:523:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:524:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:525:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:526:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:527:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:528:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:529:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:530:40 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:531:17 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:531:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:532:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:533:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'bool'.  - lib\mock_data.dart:534:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:535:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:536:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:537:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:539:40 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'DateTime'.  - lib\mock_data.dart:541:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:555:11 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:556:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:557:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:558:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:559:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:560:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:561:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:562:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:563:38 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:564:15 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:564:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:565:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:566:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'bool'.  - lib\mock_data.dart:567:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:568:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:569:14 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:570:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:572:38 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'DateTime'.  - lib\mock_data.dart:574:18 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:582:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:582:19 - avoid_dynamic_calls
+  error - The returned type 'dynamic' isn't returnable from a 'bool' function, as required by the closure's context - lib\mock_data.dart:582:19 - return_of_invalid_type_from_closure
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:586:13 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:587:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:588:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:589:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:590:15 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:591:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:592:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:593:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:594:40 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\mock_data.dart:595:17 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'double'.  - lib\mock_data.dart:595:17 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:596:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\mock_data.dart:597:20 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'bool'.  - lib\mock_data.dart:598:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:599:22 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:600:16 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\mock_data.dart:601:18 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\mock_data.dart:603:40 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'DateTime'.  - lib\mock_data.dart:605:20 - argument_type_not_assignable
+  error - Target of URI hasn't been generated: 'package:feeltrip_app/models/booking_model.g.dart' - lib\models\booking_model.dart:5:6 - uri_has_not_been_generated
+  error - The method '_$BookingFromJson' isn't defined for the type 'Booking' - lib\models\booking_model.dart:37:7 - undefined_method
+  error - The constructor being called isn't a const constructor - lib\models\user_model.dart:52:33 - const_with_non_const
+  error - The named parameter 'ticksBorderData' isn't defined - lib\screens\archetype_detail_screen.dart:144:25 - undefined_named_parameter
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\bookings_screen.dart:146:21 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\bookings_screen.dart:166:56 - argument_type_not_assignable
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\creator_stats_screen.dart:24:30 - static_access_to_instance_member
+  error - Undefined name '_featuredTrips' - lib\screens\home_screen.dart:231:23 - undefined_identifier
+  error - Undefined name '_featuredTrips' - lib\screens\home_screen.dart:235:38 - undefined_identifier
+  error - Undefined name '_featuredTrips' - lib\screens\home_screen.dart:247:42 - undefined_identifier
+  error - Undefined name '_featuredTrips' - lib\screens\home_screen.dart:254:34 - undefined_identifier
+  error - The constructor being called isn't a const constructor - lib\screens\instagram_stories_screen.dart:203:37 - const_with_non_const
+  error - The method 'loginWithGoogle' isn't defined for the type 'LoginController' - lib\screens\login_screen.dart:300:36 - undefined_method
+  error - The method 'loginWithFacebook' isn't defined for the type 'LoginController' - lib\screens\login_screen.dart:315:36 - undefined_method
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:174:42 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:174:42 - avoid_dynamic_calls
+  error - The returned type 'dynamic' isn't returnable from a 'bool' function, as required by the closure's context - lib\screens\premium_subscription_screen.dart:174:42 - return_of_invalid_type_from_closure
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:278:22 - avoid_dynamic_calls
+  error - Spread elements in list or set literals must implement 'Iterable' - lib\screens\premium_subscription_screen.dart:278:22 - not_iterable_spread
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Package'.  - lib\screens\premium_subscription_screen.dart:279:68 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:302:43 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:302:43 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:304:37 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:307:33 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\premium_subscription_screen.dart:307:33 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\premium_subscription_screen.dart:307:33 - argument_type_not_assignable
+  error - 2 positional arguments expected by '_buildActionButtons', but 1 found - lib\screens\profile_screen.dart:144:44 - not_enough_positional_arguments
+  error - The method '_buildStatCard' isn't defined for the type '_ProfileScreenState' - lib\screens\profile_screen.dart:354:11 - undefined_method
+  error - The method '_buildStatCard' isn't defined for the type '_ProfileScreenState' - lib\screens\profile_screen.dart:356:11 - undefined_method
+  error - Expected to find ')' - lib\screens\register_screen.dart:295:6 - expected_token
+  error - Members can't be declared to be both 'final' and 'var' - lib\screens\results_screen.dart:12:11 - final_and_var
+  error - Members can't be declared to be both 'final' and 'var' - lib\screens\results_screen.dart:13:11 - final_and_var
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\results_screen.dart:87:19 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\results_screen.dart:104:25 - argument_type_not_assignable
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'String'.  - lib\screens\results_screen.dart:113:25 - argument_type_not_assignable
+  error - Undefined class 'Trip' - lib\screens\search_screen.dart:153:5 - undefined_class
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'int'.  - lib\screens\smart_camera_screen.dart:183:55 - argument_type_not_assignable
+  error - 1 positional argument expected by 'ExperienceController.new', but 0 found - lib\screens\stories_screen.dart:30:40 - not_enough_positional_arguments
+  error - The getter 'stories' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:32:21 - undefined_getter
+  error - The method 'getStoriesStream' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:68:35 - undefined_method
+  error - The getter 'stories' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:106:42 - undefined_getter
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\stories_screen.dart:109:39 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\stories_screen.dart:109:39 - avoid_dynamic_calls
+  error - The getter 'stories' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:238:40 - undefined_getter
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\stories_screen.dart:240:48 - avoid_dynamic_calls
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\stories_screen.dart:244:53 - static_access_to_instance_member
+  error - The getter 'stories' isn't defined for the type 'ExperienceController' - lib\screens\stories_screen.dart:249:47 - undefined_getter
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\stories_screen.dart:251:48 - avoid_dynamic_calls
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\stories_screen.dart:255:53 - static_access_to_instance_member
+  error - Instance member 'currentUser' can't be accessed using static access - lib\screens\stories_screen.dart:302:49 - static_access_to_instance_member
+  error - A value of type 'dynamic' can't be assigned to a variable of type 'String' - lib\screens\translator_screen.dart:88:29 - invalid_assignment
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\translator_screen.dart:88:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\screens\translator_screen.dart:88:29 - avoid_dynamic_calls
+  error - Arguments of a constant creation must be constant expressions - lib\screens\travel_diary_screen.dart:251:18 - const_with_non_constant_argument
+  error - The method 'push' isn't defined for the type 'BuildContext' - lib\screens\travel_diary_screen.dart:282:30 - undefined_method
+  error - Too many positional arguments: 1 expected, but 2 found - lib\screens\trip_detail_screen.dart:36:43 - extra_positional_arguments
+  error - Undefined name 'context' - lib\screens\trip_detail_screen.dart:303:27 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\trip_detail_screen.dart:322:27 - undefined_identifier
+  error - Method invocation or property access on a 'dynamic' target - lib\services\agency_service.dart:173:33 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:17:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:18:28 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:20:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:20:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:21:23 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:22:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:23:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:25:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:26:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:27:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:27:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:28:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:28:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:29:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:30:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:54:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:54:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:55:28 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:55:28 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\country_service.dart:56:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:21:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:22:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:26:35 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:49:46 - avoid_dynamic_calls
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Map<dynamic, dynamic>'.  - lib\services\currency_service.dart:49:46 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\services\currency_service.dart:50:35 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:91:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:92:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:92:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:93:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:93:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:94:17 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:95:17 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:96:24 - avoid_dynamic_calls
+  error - A value of type 'dynamic' can't be assigned to a variable of type 'List<dynamic>' - lib\services\destination_service.dart:114:36 - invalid_assignment
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:123:17 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:127:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:128:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:190:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:190:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:226:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:227:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:227:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:228:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:230:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:231:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:231:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:231:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\destination_service.dart:233:23 - avoid_dynamic_calls
+  error - A value of type 'dynamic' can't be returned from the method 'getDiaryStats' because it has a return type of 'Future<Map<String, dynamic>>' - lib\services\diary_service.dart:156:14 - return_of_invalid_type
+  error - Instance member 'uploadStoryPhoto' can't be accessed using static access - lib\services\instagram_story_service.dart:43:45 - static_access_to_instance_member
+  error - 3 positional arguments expected by 'uploadStoryPhoto', but 2 found - lib\services\instagram_story_service.dart:43:75 - not_enough_positional_arguments
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:29:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:33:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:35:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:35:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:36:30 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:37:30 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:37:31 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:39:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:39:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:39:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:40:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:40:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\restaurant_service.dart:40:25 - avoid_dynamic_calls
+  error - The getter 'customerInfo' isn't defined for the type 'CustomerInfo' - lib\services\revenuecat_service.dart:104:18 - undefined_getter
+  error - Undefined name 'SharePlus' - lib\services\sharing_service.dart:15:13 - undefined_identifier
+  error - The method 'ShareParams' isn't defined for the type 'SharingService' - lib\services\sharing_service.dart:16:9 - undefined_method
+  error - Undefined name 'SharePlus' - lib\services\sharing_service.dart:39:13 - undefined_identifier
+  error - The method 'ShareParams' isn't defined for the type 'SharingService' - lib\services\sharing_service.dart:40:9 - undefined_method
+  error - Undefined name 'SharePlus' - lib\services\sharing_service.dart:61:13 - undefined_identifier
+  error - The method 'ShareParams' isn't defined for the type 'SharingService' - lib\services\sharing_service.dart:62:18 - undefined_method
+  error - Undefined name 'SharePlus' - lib\services\sharing_service.dart:80:13 - undefined_identifier
+  error - The method 'ShareParams' isn't defined for the type 'SharingService' - lib\services\sharing_service.dart:81:9 - undefined_method
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'Iterable<dynamic>'.  - lib\services\story_service.dart:143:43 - argument_type_not_assignable
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:23:25 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:25:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:25:29 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:50:18 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:50:18 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:51:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:51:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:52:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:52:20 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:53:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:53:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:53:24 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\unsplash_service.dart:54:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:17:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:17:27 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:18:26 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:18:26 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:18:26 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:20:52 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:20:52 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:20:52 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:21:23 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:21:23 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:22:21 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:23:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:23:19 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:45:22 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:50:28 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:51:35 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:51:35 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:52:34 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:52:34 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\services\weather_service.dart:52:34 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\trip_detail_screen.dart:54:36 - avoid_dynamic_calls
+  error - Method invocation or property access on a 'dynamic' target - lib\trip_detail_screen.dart:54:36 - avoid_dynamic_calls
+  error - 3 positional arguments expected by 'openAffiliateLink', but 1 found - lib\widgets\affiliate_widget.dart:40:66 - not_enough_positional_arguments
+  error - Undefined class 'Trip' - lib\widgets\destination_card.dart:11:9 - undefined_class
+  error - The function 'InstagramStoryService' isn't defined - story_provider.dart:6:10 - undefined_function
+  error - Instance member 'uploadProfilePhoto' can't be accessed using static access - test\services\storage_service_test.dart:7:29 - static_access_to_instance_member
+  error - Instance member 'uploadDiaryPhoto' can't be accessed using static access - test\services\storage_service_test.dart:8:29 - static_access_to_instance_member
+  error - Instance member 'uploadStoryPhoto' can't be accessed using static access - test\services\storage_service_test.dart:9:29 - static_access_to_instance_member
+  error - Instance member 'deleteFile' can't be accessed using static access - test\services\storage_service_test.dart:10:29 - static_access_to_instance_member

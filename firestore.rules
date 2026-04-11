@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      match /momentos/{momentoId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /proposals/{proposalId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /itineraries/{itineraryId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /notifications/{notificationId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    match /stories/{storyId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid;
+    }
+
+    match /stories/{storyId}/comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn()
+                            && resource.data.userId == request.auth.uid;
+    }
+
+    match /destinations/{doc} {
+      allow read: if true;
+    }
+
+    match /experiences/{experienceId} {
+      allow read: if true;
+    }
+
+    match /trips/{tripId} {
+      allow read: if true;
+    }
+
+    match /agencies/{agencyId} {
+      allow read: if true;
+    }
+
+
+    match /instagram_stories/{storyId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid;
+    }
+    match /bookings/{bookingId} {
+      // Solo el usuario dueño puede crear el booking, y siempre nace en 'pending'
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.status == 'pending';
+      
+      // El usuario solo puede leer sus propios bookings
+      allow read: if isOwner(resource.data.userId);
+
+      // El usuario NO puede cambiar el status a 'paid' o 'confirmed' manualmente.
+      // Esto lo hará una Cloud Function validando el pago.
+      allow update: if isOwner(resource.data.userId)
+                    && request.resource.data.status == resource.data.status;
+      
+      allow delete: if isOwner(resource.data.userId) && resource.data.status == 'pending';
+    }
+    
+    // Índices recomendados para búsqueda: experienceId + status + createdAt
+    // --- FASE 3: PROTECCIÓN DE DATOS DE ESCALA ---
+    
+    match /agency_leads/{leadId} {
+      // Solo el usuario puede crear el lead. Solo la agencia destino puede leerlo.
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && (resource.data.agencyId == request.auth.uid || resource.data.userId == request.auth.uid);
+    }
+
+    match /ai_responses_cache/{cacheId} {
+      // El caché es de solo lectura para los usuarios (solo Cloud Functions escriben)
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /bi_analytics_events/{eventId} {
+      // Datos de BI son totalmente privados (solo accesibles por Admin/Functions)
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+

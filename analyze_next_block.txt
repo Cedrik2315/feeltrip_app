@@ -1,0 +1,319 @@
+Analyzing feeltrip_app...                                       
+
+warning - Unused import: 'package:feeltrip_app/screens/stories_screen.dart' - app_router.dart:11:8 - unused_import
+   info - The line length exceeds the 80-character limit - booking_success_screen.dart:36:81 - lines_longer_than_80_chars
+   info - 'AutoDisposeRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead - cache_providers.dart:8:32 - deprecated_member_use
+   info - Sort directive sections alphabetically - checkout_screen.dart:7:1 - directives_ordering
+   info - Missing a required trailing comma - checkout_screen.dart:16:63 - require_trailing_commas
+   info - To-do comment doesn't follow the Flutter style - checkout_screen.dart:52:9 - flutter_style_todos
+   info - Missing a required trailing comma - checkout_screen.dart:136:68 - require_trailing_commas
+   info - Missing a newline at the end of the file - checkout_screen.dart:219:2 - eol_at_end_of_file
+   info - The referenced name isn't visible in scope - custom_map_screen.dart:38:20 - comment_references
+   info - The line length exceeds the 80-character limit - custom_map_screen.dart:44:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - custom_map_screen.dart:46:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\config\firebase_config.dart:38:81 - lines_longer_than_80_chars
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:4:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:5:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:6:8 - always_use_package_imports
+   info - Use 'package:' imports for files in the 'lib' directory - lib\controllers\experience_controller.dart:7:8 - always_use_package_imports
+   info - Closure should be a tearoff - lib\controllers\experience_controller.dart:18:3 - unnecessary_lambdas
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:71:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:156:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:169:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:226:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:252:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:309:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:323:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\controllers\experience_controller.dart:339:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\controllers\experience_controller.dart:358:2 - eol_at_end_of_file
+warning - Unused import: 'package:feeltrip_app/services/analytics_service.dart' - lib\main.dart:3:8 - unused_import
+   info - Sort directive sections alphabetically - lib\main.dart:4:1 - directives_ordering
+warning - Unused import: 'package:feeltrip_app/screens/agency_profile_screen.dart' - lib\main.dart:6:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/bookings_screen.dart' - lib\main.dart:7:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/cart_screen.dart' - lib\main.dart:8:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/comments_screen.dart' - lib\main.dart:9:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/creator_stats_screen.dart' - lib\main.dart:10:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/emotional_preferences_quiz_screen.dart' - lib\main.dart:11:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/experience_impact_dashboard_screen.dart' - lib\main.dart:12:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/feed_screen.dart' - lib\main.dart:13:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/home_screen.dart' - lib\main.dart:14:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/instagram_stories_screen.dart' - lib\main.dart:15:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/login_screen.dart' - lib\main.dart:16:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/ocr_screen.dart' - lib\main.dart:17:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/onboarding_screen.dart' - lib\main.dart:18:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/premium_subscription_screen.dart' - lib\main.dart:19:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/profile_screen.dart' - lib\main.dart:20:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/reels_screen.dart' - lib\main.dart:21:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/register_screen.dart' - lib\main.dart:22:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/search_screen.dart' - lib\main.dart:23:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/stories_screen.dart' - lib\main.dart:24:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/translator_screen.dart' - lib\main.dart:25:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/travel_diary_screen.dart' - lib\main.dart:26:8 - unused_import
+warning - Unused import: 'package:feeltrip_app/screens/trip_detail_screen.dart' - lib\main.dart:27:8 - unused_import
+   info - Unnecessary duplication of receiver - lib\main.dart:38:7 - cascade_invocations
+   info - Unnecessary duplication of receiver - lib\main.dart:39:7 - cascade_invocations
+   info - Missing a newline at the end of the file - lib\main.dart:128:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:27:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:63:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:98:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:134:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:168:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:209:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:219:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:229:81 - lines_longer_than_80_chars
+   info - Unnecessary use of a 'double' literal - lib\mock_data.dart:242:19 - prefer_int_literals
+   info - Unnecessary use of a 'double' literal - lib\mock_data.dart:254:19 - prefer_int_literals
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:269:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:283:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:284:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:296:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:297:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:370:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:440:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:444:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:452:81 - lines_longer_than_80_chars
+   info - Unnecessary use of parentheses - lib\mock_data.dart:457:30 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:457:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:479:9 - avoid_redundant_argument_values
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:488:9 - avoid_redundant_argument_values
+   info - Unnecessary type annotation on a local variable - lib\mock_data.dart:497:11 - omit_local_variable_types
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:497:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:511:7 - avoid_redundant_argument_values
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:520:7 - avoid_redundant_argument_values
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:566:22 - avoid_redundant_argument_values
+   info - Unnecessary type annotation on a local variable - lib\mock_data.dart:574:11 - omit_local_variable_types
+   info - The line length exceeds the 80-character limit - lib\mock_data.dart:574:81 - lines_longer_than_80_chars
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:599:20 - avoid_redundant_argument_values
+   info - The value of the argument is redundant because it matches the default value - lib\mock_data.dart:631:26 - avoid_redundant_argument_values
+   info - Missing a newline at the end of the file - lib\mock_data.dart:645:2 - eol_at_end_of_file
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:42:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:47:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\agency_model.dart:53:9 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\models\agency_model.dart:58:81 - lines_longer_than_80_chars
+   info - Missing a required trailing comma - lib\models\experience_model.dart:129:62 - require_trailing_commas
+   info - Missing a required trailing comma - lib\models\experience_model.dart:149:62 - require_trailing_commas
+   info - The referenced name isn't visible in scope - lib\models\experience_model.dart:286:31 - comment_references
+   info - The line length exceeds the 80-character limit - lib\models\instagram_story.dart:13:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\models\observer.dart:52:81 - lines_longer_than_80_chars
+   info - Constructor declarations should be before non-constructor declarations - lib\models\story_model.dart:20:11 - sort_constructors_first
+   info - Missing a required trailing comma - lib\models\user_model.dart:17:49 - require_trailing_commas
+   info - Unnecessary use of parentheses - lib\models\user_model.dart:64:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\models\user_model.dart:67:9 - unnecessary_parenthesis
+   info - Missing a newline at the end of the file - lib\models\user_model.dart:98:2 - eol_at_end_of_file
+   info - Missing a newline at the end of the file - lib\screens\app_logger.dart:9:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\auth_gate.dart:36:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\auth_gate.dart:137:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\cart_screen.dart:191:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\cart_screen.dart:245:33 - deprecated_member_use
+warning - The type argument(s) of the function 'showModalBottomSheet' can't be inferred - lib\screens\comments_screen.dart:275:5 - inference_failure_on_function_invocation
+   info - The line length exceeds the 80-character limit - lib\screens\creator_stats_screen.dart:134:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\creator_stats_screen.dart:181:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\currency_converter_screen.dart:237:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\currency_converter_screen.dart:248:2 - eol_at_end_of_file
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:96:29 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:180:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:290:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\destination_detail_screen.dart:293:53 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:321:81 - lines_longer_than_80_chars
+warning - The declaration '_buildInfoRow' isn't referenced - lib\screens\destination_detail_screen.dart:329:10 - unused_element
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:388:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:390:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:397:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:399:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\destination_detail_screen.dart:402:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\edit_profile_screen.dart:158:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\edit_profile_screen.dart:280:2 - eol_at_end_of_file
+warning - The type argument(s) of the function 'to' can't be inferred - lib\screens\feed_screen.dart:74:30 - inference_failure_on_function_invocation
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\historial_screen.dart:99:58 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\historial_screen.dart:102:81 - lines_longer_than_80_chars
+   info - To-do comment doesn't follow the Flutter style - lib\screens\historial_screen.dart:109:23 - flutter_style_todos
+   info - The line length exceeds the 80-character limit - lib\screens\historial_screen.dart:109:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\historial_screen.dart:120:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\home_screen.dart:70:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\home_screen.dart:142:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\home_screen.dart:375:23 - inference_failure_on_instance_creation
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\home_screen.dart:385:23 - inference_failure_on_instance_creation
+   info - Missing a newline at the end of the file - lib\screens\home_screen.dart:668:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:17:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:20:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:46:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\instagram_stories_screen.dart:94:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\instagram_stories_screen.dart:202:42 - deprecated_member_use
+   info - Missing a newline at the end of the file - lib\screens\instagram_stories_screen.dart:227:2 - eol_at_end_of_file
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:247:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:362:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\login_screen.dart:364:48 - deprecated_member_use
+   info - Missing a newline at the end of the file - lib\screens\login_screen.dart:412:2 - eol_at_end_of_file
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\ocr_screen.dart:180:27 - inference_failure_on_instance_creation
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\onboarding_screen.dart:138:31 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\premium_subscription_screen.dart:165:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\premium_subscription_screen.dart:240:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\preview_entry_screen.dart:57:60 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\preview_entry_screen.dart:72:81 - lines_longer_than_80_chars
+   info - To-do comment doesn't follow the Flutter style - lib\screens\preview_entry_screen.dart:82:19 - flutter_style_todos
+   info - The line length exceeds the 80-character limit - lib\screens\preview_entry_screen.dart:82:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\preview_entry_screen.dart:93:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:43:81 - lines_longer_than_80_chars
+   info - 'bool' parameters should be named parameters - lib\screens\profile_provider.dart:73:19 - avoid_positional_boolean_parameters
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:107:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\profile_provider.dart:116:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\profile_provider.dart:138:4 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:104:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:184:46 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:184:81 - lines_longer_than_80_chars
+   info - To-do comment doesn't follow the Flutter style - lib\screens\profile_screen.dart:239:35 - flutter_style_todos
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:278:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:280:58 - deprecated_member_use
+warning - The declaration '_buildFollowerStats' isn't referenced - lib\screens\profile_screen.dart:340:10 - unused_element
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:348:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:364:35 - deprecated_member_use
+warning - The type argument(s) of the function 'showDialog' can't be inferred - lib\screens\profile_screen.dart:384:5 - inference_failure_on_function_invocation
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\profile_screen.dart:398:42 - use_build_context_synchronously
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:410:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:426:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\profile_screen.dart:432:19 - inference_failure_on_instance_creation
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:526:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:528:52 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\profile_screen.dart:528:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - lib\screens\reels_screen.dart:62:11 - inference_failure_on_instance_creation
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\screens\reels_screen.dart:93:22 - unawaited_futures
+   info - The line length exceeds the 80-character limit - lib\screens\reels_screen.dart:273:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:67:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\referral_screen.dart:94:42 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:117:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\referral_screen.dart:141:81 - lines_longer_than_80_chars
+warning - The return type of ' Function(String)?' can't be inferred - lib\screens\register_screen.dart:213:5 - inference_failure_on_function_return_type
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\register_screen.dart:217:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\register_screen.dart:219:48 - deprecated_member_use
+warning - The declaration '_buildPasswordStrengthIndicator' isn't referenced - lib\screens\register_screen.dart:248:10 - unused_element
+   info - Missing a newline at the end of the file - lib\screens\register_screen.dart:279:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:19:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:32:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:131:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\results_screen.dart:139:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'MaterialPageRoute' can't be inferred - lib\screens\results_screen.dart:170:25 - inference_failure_on_instance_creation
+   info - Missing a newline at the end of the file - lib\screens\results_screen.dart:198:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:24:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:31:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:47:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:62:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\search_screen.dart:68:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\search_screen.dart:208:2 - eol_at_end_of_file
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\screens\smart_camera_screen.dart:127:9 - unawaited_futures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:260:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:306:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\smart_camera_screen.dart:336:45 - deprecated_member_use
+warning - Don't invoke 'print' in production code - lib\screens\storage_service.dart:23:7 - avoid_print
+   info - Missing a newline at the end of the file - lib\screens\storage_service.dart:27:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\translator_screen.dart:87:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\translator_screen.dart:88:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\translator_screen.dart:287:2 - eol_at_end_of_file
+warning - The value of the local variable 'avgDepth' isn't used - lib\screens\travel_diary_screen.dart:161:11 - unused_local_variable
+warning - The value of the local variable 'uniqueEmotions' isn't used - lib\screens\travel_diary_screen.dart:162:11 - unused_local_variable
+warning - The value of the local variable 'overallImpact' isn't used - lib\screens\travel_diary_screen.dart:163:11 - unused_local_variable
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:220:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:313:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:320:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:327:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:328:81 - lines_longer_than_80_chars
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\travel_diary_screen.dart:328:83 - deprecated_member_use
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:336:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\travel_diary_screen.dart:454:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\screens\travel_diary_screen.dart:500:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:27:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:42:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:113:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:311:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:351:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:361:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:365:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\trip_detail_screen.dart:371:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\screens\vision_service.dart:7:81 - lines_longer_than_80_chars
+   info - Use of an async 'dart:io' method - lib\screens\vision_service.dart:38:16 - avoid_slow_async_io
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:29:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:40:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:51:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:62:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:87:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:110:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:133:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\scripts\test_data_generator.dart:156:81 - lines_longer_than_80_chars
+   info - Unnecessary duplication of receiver - lib\services\admob_service.dart:16:5 - cascade_invocations
+   info - Unnecessary duplication of receiver - lib\services\admob_service.dart:26:5 - cascade_invocations
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\services\admob_service.dart:26:14 - unawaited_futures
+   info - Sort directive sections alphabetically - lib\services\affiliate_service.dart:3:1 - directives_ordering
+   info - Sort directive sections alphabetically - lib\services\affiliate_service.dart:4:1 - directives_ordering
+   info - Missing a required trailing comma - lib\services\affiliate_service.dart:57:50 - require_trailing_commas
+   info - Unnecessary type annotation on a local variable - lib\services\agency_service.dart:170:15 - omit_local_variable_types
+   info - Missing a newline at the end of the file - lib\services\agency_service.dart:223:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - lib\services\auth_service.dart:7:1 - directives_ordering
+   info - Missing a newline at the end of the file - lib\services\auth_service.dart:112:2 - eol_at_end_of_file
+   info - Use 'package:' imports for files in the 'lib' directory - lib\services\cart_service.dart:2:8 - always_use_package_imports
+   info - The line length exceeds the 80-character limit - lib\services\cart_service.dart:21:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\cart_service.dart:25:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\cart_service.dart:37:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\country_service.dart:9:81 - lines_longer_than_80_chars
+   info - Unnecessary use of parentheses - lib\services\country_service.dart:24:11 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\services\country_service.dart:56:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:119:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:121:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:194:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\destination_service.dart:238:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\diary_service.dart:291:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\forgot_password_screen.dart:45:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\forgot_password_screen.dart:129:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\instagram_story_service.dart:47:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\instagram_story_service.dart:70:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\notification_service.dart:63:81 - lines_longer_than_80_chars
+   info - Invalid use of 'default' member in a switch - lib\services\revenuecat_service.dart:228:7 - no_default_cases
+   info - Missing a newline at the end of the file - lib\services\revenuecat_service.dart:248:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\sharing_service.dart:13:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\sharing_service.dart:33:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\services\sharing_service.dart:90:2 - eol_at_end_of_file
+   info - The line length exceeds the 80-character limit - lib\services\storage_service.dart:30:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\services\storage_service.dart:41:81 - lines_longer_than_80_chars
+   info - Don't cast a nullable value to a non-nullable type - lib\services\story_service.dart:104:20 - cast_nullable_to_non_nullable
+   info - Missing a required trailing comma - lib\services\story_service.dart:148:68 - require_trailing_commas
+   info - Missing a required trailing comma - lib\services\story_service.dart:159:68 - require_trailing_commas
+   info - To-do comment doesn't follow the Flutter style - lib\trip_detail_screen.dart:4:1 - flutter_style_todos
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:42:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:43:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:47:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - lib\trip_detail_screen.dart:56:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\trip_detail_screen.dart:69:2 - eol_at_end_of_file
+   info - Unnecessary use of parentheses - lib\trip_model.dart:44:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\trip_model.dart:47:9 - unnecessary_parenthesis
+   info - Unnecessary use of parentheses - lib\trip_model.dart:50:9 - unnecessary_parenthesis
+   info - The line length exceeds the 80-character limit - lib\widgets\affiliate_widget.dart:40:81 - lines_longer_than_80_chars
+   info - Missing a newline at the end of the file - lib\widgets\affiliate_widget.dart:81:2 - eol_at_end_of_file
+   info - Sort directive sections alphabetically - mercado_pago_service.dart:6:1 - directives_ordering
+   info - The line length exceeds the 80-character limit - premium_subscription_screen.dart:6:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - premium_subscription_screen.dart:54:81 - lines_longer_than_80_chars
+   info - Unnecessary duplication of receiver - premium_subscription_screen.dart:224:23 - cascade_invocations
+   info - Dependencies not sorted alphabetically - pubspec.yaml:13:3 - sort_pub_dependencies
+   info - Dependencies not sorted alphabetically - pubspec.yaml:64:3 - sort_pub_dependencies
+   info - Dependencies not sorted alphabetically - pubspec.yaml:80:3 - sort_pub_dependencies
+   info - Sort directive sections alphabetically - search_provider.dart:2:1 - directives_ordering
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - search_provider.dart:30:11 - inference_failure_on_instance_creation
+   info - The line length exceeds the 80-character limit - search_provider.dart:36:81 - lines_longer_than_80_chars
+   info - The line length exceeds the 80-character limit - search_provider.dart:47:81 - lines_longer_than_80_chars
+warning - The type argument(s) of the constructor 'Future.delayed' can't be inferred - search_provider.dart:50:9 - inference_failure_on_instance_creation
+   info - Missing a newline at the end of the file - search_provider.dart:52:4 - eol_at_end_of_file
+warning - The type argument(s) of 'List' can't be inferred - test\models\experience_model_test.dart:16:20 - inference_failure_on_collection_literal
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:32:30 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:33:15 - prefer_const_literals_to_create_immutables
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\experience_model_test.dart:36:18 - prefer_const_literals_to_create_immutables
+warning - The type argument(s) of 'List' can't be inferred - test\models\experience_model_test.dart:54:19 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:44:19 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:45:23 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:53:21 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:54:22 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\trip_model_test.dart:56:32 - inference_failure_on_collection_literal
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - test\models\user_model_test.dart:13:24 - prefer_const_literals_to_create_immutables
+warning - The type argument(s) of 'List' can't be inferred - test\models\user_model_test.dart:29:26 - inference_failure_on_collection_literal
+warning - The type argument(s) of 'List' can't be inferred - test\models\user_model_test.dart:30:19 - inference_failure_on_collection_literal
+   info - Missing a required trailing comma - trip_repository.dart:28:56 - require_trailing_commas
+
+315 issues found. (ran in 64.8s)
