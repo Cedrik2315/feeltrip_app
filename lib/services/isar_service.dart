@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../core/logger/app_logger.dart';
 import '../models/booking_model.dart';
@@ -10,6 +12,7 @@ import '../models/itinerary_model.dart';
 import '../models/momento_model.dart';
 import '../models/proposal_model.dart';
 import '../models/syncable_model.dart';
+import '../models/diary_entry_model.dart';
 import 'package:feeltrip_app/features/profile/domain/user_profile_model.dart';
 
 class IsarService {
@@ -19,6 +22,7 @@ class IsarService {
 
   bool _isInitialized = false;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late Isar _isar;
 
   static const String _boxName = 'momentos';
   static const String _proposalsBoxName = 'proposals';
@@ -53,6 +57,12 @@ class IsarService {
   Box<dynamic> get prefsBox => _ensureBox(_prefsBox, _prefsBoxName);
   Box<UserProfile> get profileBox => _ensureBox(_profileBox, _profileBoxName);
 
+  /// Acceso a la instancia de Isar para nuevos modelos
+  Isar get isar {
+    if (!_isInitialized) throw StateError('IsarService no inicializado');
+    return _isar;
+  }
+
   Box<T> _ensureBox<T>(Box<T>? box, String name) {
     if (box == null || !box.isOpen) {
       throw StateError('Hive box "$name" not initialized. Call init() first.');
@@ -64,6 +74,13 @@ class IsarService {
     if (_isInitialized) return;
     try {
       await Hive.initFlutter();
+      
+      final dir = await getApplicationDocumentsDirectory();
+      _isar = await Isar.open(
+        [DiaryEntrySchema],
+        directory: dir.path,
+      );
+
       if (!Hive.isAdapterRegistered(0)) {
         Hive.registerAdapter(MomentoModelAdapter());
       }
@@ -500,7 +517,3 @@ class IsarService {
 }
 
 final isarServiceProvider = Provider<IsarService>((ref) => IsarService());
-
-
-
-

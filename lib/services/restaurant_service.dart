@@ -1,7 +1,11 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:feeltrip_app/core/logger/app_logger.dart';
+
+/// Provider para acceder al servicio de restaurantes desde cualquier parte de la app.
+final restaurantServiceProvider = Provider<RestaurantService>((ref) => RestaurantService());
 
 class RestaurantService {
   static const String _baseUrl = 'https://api.foursquare.com/v3/places/search';

@@ -11,6 +11,7 @@ import 'package:feeltrip_app/screens/creator_stats_screen.dart';
 import 'package:feeltrip_app/screens/custom_map_screen.dart';
 import 'package:feeltrip_app/screens/diary_screen.dart';
 import 'package:feeltrip_app/screens/emotional_preferences_quiz_screen.dart';
+import 'package:feeltrip_app/screens/emotional_results_screen.dart';
 import 'package:feeltrip_app/screens/feed_screen.dart';
 import 'package:feeltrip_app/screens/forgot_password_screen.dart';
 import 'package:feeltrip_app/screens/user_preferences.dart';
@@ -29,6 +30,7 @@ import 'package:feeltrip_app/screens/translator_screen.dart';
 import 'package:feeltrip_app/screens/trip_detail_screen.dart';
 import 'package:feeltrip_app/screens/travel_diary_screen.dart';
 import 'package:feeltrip_app/screens/travel_suggestions_screen.dart';
+import 'package:feeltrip_app/services/emotional_engine_service.dart';
 
 GoRouter createAppRouter(Ref ref) {
   return GoRouter(
@@ -139,6 +141,14 @@ GoRouter createAppRouter(Ref ref) {
         path: '/quiz',
         name: 'quiz',
         builder: (context, state) => const EmotionalPreferencesQuizScreen(),
+      ),
+      GoRoute(
+        path: '/emotional-results',
+        name: 'emotional-results',
+        builder: (context, state) {
+          final analysis = state.extra as EmotionalAnalysis;
+          return EmotionalResultsScreen(analysis: analysis);
+        },
       ),
       GoRoute(
         path: '/agency/:agencyId',

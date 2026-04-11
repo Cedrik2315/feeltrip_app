@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isar/isar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -17,7 +18,11 @@ import 'package:feeltrip_app/services/connectivity_service.dart';
 import 'package:feeltrip_app/services/metrics_service.dart';
 import 'package:feeltrip_app/services/notification_service.dart';
 import 'package:feeltrip_app/services/revenuecat_service.dart';
+import 'package:feeltrip_app/services/restaurant_service.dart';
 import 'package:feeltrip_app/services/sync_service.dart';
+import 'package:feeltrip_app/services/isar_service.dart';
+import 'package:feeltrip_app/services/emotional_engine_service.dart';
+import 'package:feeltrip_app/services/location_suggestions_repository.dart';
 
 final routerProvider = Provider<GoRouter>((ref) => createAppRouter(ref));
 
@@ -62,6 +67,7 @@ final authRepositoryProvider = Provider<IAuthRepository>((ref) {
 final metricsServiceProvider = Provider((ref) => MetricsService());
 
 
+final restaurantServiceProvider = Provider((ref) => RestaurantService());
 final paymentRepositoryProvider =
     Provider<IPaymentRepository>((ref) => PaymentRepository());
 
@@ -70,3 +76,11 @@ final homeRepositoryProvider = Provider((ref) => HomeRepository());
 final syncServiceProvider = Provider<SyncService>((ref) {
   return SyncService();
 });
+
+final emotionalEngineProvider = Provider((ref) => EmotionalEngineService());
+
+final locationSuggestionsRepositoryProvider =
+    Provider((ref) => LocationSuggestionsRepository());
+
+/// Provider para acceder directamente a Isar
+final isarProvider = Provider<Isar>((ref) => ref.watch(isarServiceProvider).isar);
