@@ -29,13 +29,14 @@ class MomentoModelAdapter extends TypeAdapter<MomentoModel> {
       errorMessage: fields[10] as String?,
       retryCount: fields[11] as int,
       lastAttempt: fields[12] as DateTime?,
+      updatedAt: fields[13] as DateTime?,
     )..syncStatusName = fields[8] as String;
   }
 
   @override
   void write(BinaryWriter writer, MomentoModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.userId)
       ..writeByte(1)
@@ -61,7 +62,9 @@ class MomentoModelAdapter extends TypeAdapter<MomentoModel> {
       ..writeByte(11)
       ..write(obj.retryCount)
       ..writeByte(12)
-      ..write(obj.lastAttempt);
+      ..write(obj.lastAttempt)
+      ..writeByte(13)
+      ..write(obj.updatedAt);
   }
 
   @override

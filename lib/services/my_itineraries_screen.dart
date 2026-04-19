@@ -8,8 +8,9 @@ import 'package:feeltrip_app/core/logger/app_logger.dart';
 
 import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:feeltrip_app/models/itinerary_model.dart';
-import 'package:feeltrip_app/services/gemini_service.dart';
+
 import 'package:feeltrip_app/models/syncable_model.dart';
+import 'package:feeltrip_app/widgets/cyber_widgets.dart';
 
 final myItinerariesProvider =
     FutureProvider.autoDispose<List<ItineraryModel>>((ref) async {
@@ -30,11 +31,11 @@ class MyItinerariesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mis Itinerarios Activos'),
-        backgroundColor: Colors.deepPurple,
+        title: const Text('ITINERARIOS ACTIVOS'),
       ),
       body: itinerariesAsync.when<Widget>(
         data: (itineraries) {
+          final theme = Theme.of(context);
           if (itineraries.isEmpty) {
             return Center(
               child: Padding(
@@ -42,37 +43,31 @@ class MyItinerariesScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.map_outlined,
-                        size: 80, color: Colors.grey),
+                    Icon(Icons.map_outlined,
+                        size: 80, color: theme.colorScheme.outline),
                     const SizedBox(height: 24),
-                    const Text(
-                      'AÃºn no tienes un itinerario activo.',
+                    Text(
+                      'Aún no tienes un itinerario activo.',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Genera una propuesta personalizada con nuestra IA para comenzar tu aventura transformadora.',
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 32),
-                    ElevatedButton.icon(
-                      onPressed: () =>
+                    CyberButton(
+                      onTap: () =>
                           ref.read(routerProvider).push('/suggestions'),
-                      icon: const Icon(Icons.auto_awesome),
-                      label: const Text('Generar Propuesta con IA'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                      ),
+                      icon: Icons.auto_awesome,
+                      label: 'Generar Propuesta con IA',
+                      primary: true,
                     ),
                     const SizedBox(height: 12),
                     TextButton.icon(
@@ -80,9 +75,9 @@ class MyItinerariesScreen extends ConsumerWidget {
                           .read(routerProvider)
                           .push('/transformation-history'),
                       icon: const Icon(Icons.history),
-                      label: const Text('Ver mi Historial de TransformaciÃ³n'),
+                      label: const Text('Ver mi Historial de Transformación'),
                       style: TextButton.styleFrom(
-                        foregroundColor: Colors.deepPurple,
+                        foregroundColor: theme.colorScheme.secondary,
                       ),
                     ),
                   ],
@@ -116,13 +111,13 @@ class MyItinerariesScreen extends ConsumerWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.green.withAlpha(38),
+                              color: theme.colorScheme.tertiary.withAlpha(38),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Text(
+                            child: Text(
                               'ACTIVO',
                               style: TextStyle(
-                                color: Colors.green,
+                                color: theme.colorScheme.tertiary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11,
                               ),
@@ -162,16 +157,16 @@ class MyItinerariesScreen extends ConsumerWidget {
                                 _completeItinerary(context, ref, itinerary),
                             icon:
                                 const Icon(Icons.verified, color: Colors.green),
-                            label: const Text(
+                            label: Text(
                               'Completar Viaje',
-                              style: TextStyle(color: Colors.green),
+                              style: TextStyle(color: theme.colorScheme.tertiary),
                             ),
                           ),
                           TextButton.icon(
                             onPressed: () =>
                                 ref.read(routerProvider).push('/diary'),
                             icon: const Icon(Icons.edit_note),
-                            label: const Text('Registrar en el Diario'),
+                            label: Text('Registrar en el Diario', style: TextStyle(color: theme.colorScheme.primary)),
                           ),
                         ],
                       ),
@@ -182,7 +177,7 @@ class MyItinerariesScreen extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary)),
         error: (error, stack) =>
             Center(child: Text('Error al cargar itinerarios: $error')),
       ),
@@ -197,18 +192,18 @@ class MyItinerariesScreen extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Â¿Finalizar aventura?'),
+        title: const Text('¿Finalizar aventura?'),
         content: const Text(
-          'Se generarÃ¡ un resumen de tu transformaciÃ³n basado en lo vivido.',
+          'Se generará un resumen de tu transformación basado en lo vivido.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('AÃºn no'),
+            child: const Text('Aún no'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Â¡SÃ­, he vuelto!'),
+            child: const Text('¡Sí, he vuelto!'),
           ),
         ],
       ),
@@ -229,7 +224,7 @@ class MyItinerariesScreen extends ConsumerWidget {
               children: [
                 CircularProgressIndicator(),
                 SizedBox(height: 16),
-                Text('Gemini estÃ¡ analizando tu transformaciÃ³n...'),
+                Text('Gemini está analizando tu transformación...'),
               ],
             ),
           ),
@@ -289,7 +284,7 @@ class MyItinerariesScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.auto_awesome, size: 48, color: Colors.deepPurple),
+            Icon(Icons.auto_awesome, size: 48, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 16),
             const Text(
               'Tu Resumen de Impacto',

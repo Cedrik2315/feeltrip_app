@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:feeltrip_app/core/navigation/url_launcher_service.dart';
 
 class AffiliateOption {
   const AffiliateOption(
@@ -36,10 +36,7 @@ class AffiliateOptionsService {
     ];
   }
 
-  static Future<void> openAffiliateLink(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  static Future<void> openAffiliateLink(BuildContext context, String url) async {
+    await UrlLauncherService.openUrl(context, url);
   }
 }

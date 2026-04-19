@@ -1,72 +1,46 @@
 ﻿import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Trip {
+  final String id;
+  final String title;
+  final String destination;
+  final String description;
+  final double price;
+  final int duration;
+  final double rating;
+  final String imageUrl;
+  final String difficulty;
+  final int maxGroupSize;
+  final GeoPoint? location;
+
   Trip({
     required this.id,
     required this.title,
-    required this.description,
-    required this.imageUrl,
-    required this.price,
     required this.destination,
+    required this.description,
+    required this.price,
     required this.duration,
-    required this.isFeatured,
-    required this.tags,
     required this.rating,
-    required this.createdAt,
+    required this.imageUrl,
+    this.difficulty = 'Moderada',
+    this.maxGroupSize = 12,
+    this.location,
   });
 
-  factory Trip.fromJson(Map<String, dynamic> json) {
-    return Trip(
-      id: json['id'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      imageUrl: json['imageUrl'] as String? ?? '',
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      destination: json['destination'] as String? ?? '',
-      duration: json['duration'] as int? ?? 1,
-      isFeatured: json['isFeatured'] as bool? ?? false,
-      tags: List<String>.from(json['tags'] as Iterable<dynamic>? ?? []),
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      createdAt: json['createdAt'] is Timestamp
-          ? (json['createdAt'] as Timestamp).toDate()
-          : DateTime.now(),
-    );
-  }
-
   factory Trip.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>? ?? {};
-    data['id'] = doc.id;
-    return Trip.fromJson(data);
-  }
-
-  final String id;
-  final String title;
-  final String description;
-  final String imageUrl;
-  final double price;
-  final String destination;
-  final int duration;
-  final bool isFeatured;
-  final List<String> tags;
-  final double rating;
-  final DateTime createdAt;
-
-  // Getter para verificar si el viaje es transformativo
-  bool get isTransformative => tags.contains('transformative') || tags.contains('experiencia transformadora');
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'imageUrl': imageUrl,
-      'price': price,
-      'destination': destination,
-      'duration': duration,
-      'isFeatured': isFeatured,
-      'tags': tags,
-      'rating': rating,
-      'createdAt': Timestamp.fromDate(createdAt),
-    };
+    final data = doc.data() as Map<String, dynamic>;
+    return Trip(
+      id: doc.id,
+      title: data['title'] as String? ?? '',
+      destination: data['destination'] as String? ?? '',
+      description: data['description'] as String? ?? '',
+      price: (data['price'] as num? ?? 0).toDouble(),
+      duration: data['duration'] as int? ?? 1,
+      rating: (data['rating'] as num? ?? 0.0).toDouble(),
+      imageUrl: data['imageUrl'] as String? ?? 'https://images.unsplash.com/photo-1596324268112-78a3c89d90d8',
+      difficulty: data['difficulty'] as String? ?? 'Moderada',
+      maxGroupSize: data['maxGroupSize'] as int? ?? 12,
+      location: data['location'] as GeoPoint?,
+    );
   }
 }

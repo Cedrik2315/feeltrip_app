@@ -9,8 +9,8 @@ class PremiumState with _$PremiumState {
   const factory PremiumState({
     @Default(false) bool isLoading,
     @Default(false) bool isPremium,
-    @Default([]) List<Offering> offerings,
-    @Default(null) Package? activePackage,
+    @JsonKey(includeToJson: false, includeFromJson: false) @Default([]) List<Offering> offerings,
+    @JsonKey(includeToJson: false, includeFromJson: false) @Default(null) Package? activePackage,
     String? errorMessage,
   }) = _PremiumState;
 

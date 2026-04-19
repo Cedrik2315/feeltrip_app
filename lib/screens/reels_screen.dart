@@ -25,11 +25,9 @@ class _ReelsScreenState extends State<ReelsScreen> {
   // Metadata para la UI
   String? _selectedMusic;
   List<String>? _selectedTransitions;
-  String _loadingMessage = 'INICIANDO_ALQUIMIA...';
+  String _loadingMessage = 'INICIANDO ALQUIMIA...';
 
   // Paleta de colores FeelTrip (Carbon & Bone)
-  static const Color boneWhite = Color(0xFFF5F5DC);
-  static const Color carbon = Color(0xFF1A1A1A);
 
   @override
   void initState() {
@@ -77,17 +75,17 @@ class _ReelsScreenState extends State<ReelsScreen> {
 
     setState(() {
       isGenerating = true;
-      _loadingMessage = 'ANALIZANDO_EMOCIONES...';
+      _loadingMessage = 'ANALIZANDO EMOCIONES...';
     });
 
     try {
       // 1. Simulación de pasos de la IA
       await Future.delayed(const Duration(seconds: 1));
-      setState(() => _loadingMessage = 'COMPONIENDO_BANDA_SONORA...');
+      setState(() => _loadingMessage = 'COMPONIENDO BANDA SONORA...');
       final music = _getRandomMusic();
       
       await Future.delayed(const Duration(seconds: 1));
-      setState(() => _loadingMessage = 'RENDERIZANDO_ATMÓSFERA_RURAL...');
+      setState(() => _loadingMessage = 'RENDERIZANDO ATMÓSFERA RURAL...');
       final transitions = _getRandomTransitions();
 
       // 2. Prompt Técnico (Alquimia Cinematográfica)
@@ -142,16 +140,19 @@ class _ReelsScreenState extends State<ReelsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: boneWhite,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: boneWhite,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         centerTitle: true,
-        title: Text('FEELTRIP_REELS', 
-          style: GoogleFonts.jetBrainsMono(color: carbon, fontSize: 14, fontWeight: FontWeight.bold)),
+        title: Text('FEELTRIP REELS', 
+          style: GoogleFonts.jetBrainsMono(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: carbon),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -160,18 +161,18 @@ class _ReelsScreenState extends State<ReelsScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            _buildHeader(),
+            _buildHeader(colorScheme),
             const SizedBox(height: 32),
-            _buildGenerateButton(),
+            _buildGenerateButton(colorScheme),
             const SizedBox(height: 40),
             if (_lastVideoPath != null && !isGenerating) ...[
-              _buildVideoPreview(),
+              _buildVideoPreview(colorScheme),
               const SizedBox(height: 24),
-              _buildDetailsCard(),
+              _buildDetailsCard(colorScheme),
             ] else if (isGenerating) ...[
-              _buildLoadingState(),
+              _buildLoadingState(colorScheme),
             ] else if (entries.isEmpty) ...[
-              _buildEmptyState(),
+              _buildEmptyState(colorScheme),
             ],
           ],
         ),
@@ -179,81 +180,81 @@ class _ReelsScreenState extends State<ReelsScreen> {
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(ColorScheme colorScheme) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const CircularProgressIndicator(color: carbon),
+        CircularProgressIndicator(color: colorScheme.primary),
         const SizedBox(height: 16),
         Text(
           _loadingMessage,
-          style: GoogleFonts.jetBrainsMono(fontSize: 12),
+          style: GoogleFonts.jetBrainsMono(fontSize: 12, color: colorScheme.onSurface),
           textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(ColorScheme colorScheme) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.movie_outlined, color: carbon.withValues(alpha: 0.3), size: 64),
+        Icon(Icons.movie_outlined, color: colorScheme.onSurface.withValues(alpha: 0.3), size: 64),
         const SizedBox(height: 16),
         Text(
           'Sin reels generados',
-          style: GoogleFonts.jetBrainsMono(fontSize: 14),
+          style: GoogleFonts.jetBrainsMono(fontSize: 14, color: colorScheme.onSurface),
         ),
         const SizedBox(height: 8),
         Text(
           'Genera tu primera historia visual',
-          style: GoogleFonts.jetBrainsMono(fontSize: 12, color: carbon.withValues(alpha: 0.6)),
+          style: GoogleFonts.jetBrainsMono(fontSize: 12, color: colorScheme.onSurface.withValues(alpha: 0.6)),
         ),
       ],
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ColorScheme colorScheme) {
     return Column(
       children: [
-        const Icon(Icons.auto_awesome_outlined, color: carbon, size: 48),
+        Icon(Icons.auto_awesome_outlined, color: colorScheme.primary, size: 48),
         const SizedBox(height: 16),
         Text('TU HISTORIA EN 30"', 
-          style: GoogleFonts.jetBrainsMono(fontSize: 20, fontWeight: FontWeight.bold)),
+          style: GoogleFonts.jetBrainsMono(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
         Text('IA OPTIMIZADA PARA ENTORNOS RURALES', 
-          style: GoogleFonts.jetBrainsMono(fontSize: 10, color: carbon.withValues(alpha: 0.5))),
+          style: GoogleFonts.jetBrainsMono(fontSize: 10, color: colorScheme.onSurface.withValues(alpha: 0.5))),
       ],
     );
   }
 
-  Widget _buildGenerateButton() {
+  Widget _buildGenerateButton(ColorScheme colorScheme) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: carbon, width: 1.5),
+          side: BorderSide(color: colorScheme.primary, width: 1.5),
           padding: const EdgeInsets.symmetric(vertical: 18),
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         ),
         onPressed: isGenerating || entries.isEmpty ? null : generateReel,
         icon: isGenerating 
-          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: carbon))
-          : const Icon(Icons.movie_creation_outlined, color: carbon),
+          ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.primary))
+          : Icon(Icons.movie_creation_outlined, color: colorScheme.primary),
         label: Text(
-          isGenerating ? 'GENERANDO...' : 'GENERAR_EXPEDIENTE_REEL',
-          style: GoogleFonts.jetBrainsMono(color: carbon, fontWeight: FontWeight.bold, letterSpacing: 1),
+          isGenerating ? 'GENERANDO...' : 'GENERAR EXPEDIENTE REEL',
+          style: GoogleFonts.jetBrainsMono(color: colorScheme.primary, fontWeight: FontWeight.bold, letterSpacing: 1),
         ),
       ),
     );
   }
 
-  Widget _buildVideoPreview() {
+  Widget _buildVideoPreview(ColorScheme colorScheme) {
     return Container(
       height: 400,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: carbon,
-        border: Border.all(color: carbon, width: 1),
+        color: Colors.black,
+        border: Border.all(color: colorScheme.outline, width: 1),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -270,11 +271,11 @@ class _ReelsScreenState extends State<ReelsScreen> {
             bottom: 16,
             child: Row(
               children: [
-                _videoActionButton(Icons.play_arrow, () => _videoController?.play()),
+                _videoActionButton(colorScheme, Icons.play_arrow, () => _videoController?.play()),
                 const SizedBox(width: 12),
-                _videoActionButton(Icons.pause, () => _videoController?.pause()),
+                _videoActionButton(colorScheme, Icons.pause, () => _videoController?.pause()),
                 const SizedBox(width: 12),
-                _videoActionButton(Icons.share_outlined, () {}),
+                _videoActionButton(colorScheme, Icons.share_outlined, () {}),
               ],
             ),
           ),
@@ -283,26 +284,26 @@ class _ReelsScreenState extends State<ReelsScreen> {
     );
   }
 
-  Widget _videoActionButton(IconData icon, VoidCallback onTap) {
+  Widget _videoActionButton(ColorScheme colorScheme, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(8),
-        color: boneWhite,
-        child: Icon(icon, color: carbon, size: 20),
+        color: colorScheme.onSurface,
+        child: Icon(icon, color: colorScheme.surface, size: 20),
       ),
     );
   }
 
-  Widget _buildDetailsCard() {
+  Widget _buildDetailsCard(ColorScheme colorScheme) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(border: Border.all(color: carbon.withValues(alpha: 0.1))),
+      decoration: BoxDecoration(border: Border.all(color: colorScheme.onSurface.withValues(alpha: 0.1))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _detailRow('BANDA_SONORA', _selectedMusic ?? 'N/A'),
+          _detailRow('BANDA SONORA', _selectedMusic ?? 'N/A'),
           _detailRow('TRANSICIONES', _selectedTransitions?.join(', ') ?? 'N/A'),
           _detailRow('FORMATO', '16:9_VERTICAL'),
         ],

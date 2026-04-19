@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/syncable_model.dart';
@@ -18,7 +18,7 @@ class BookingModel extends HiveObject with SyncableModel {
     this.paymentId,
     this.externalReference,
     this.status = BookingStatus.pending,
-    this.provider = 'mercado_pago',
+    this.provider = 'server_side',
     required this.amount,
     required this.createdAt,
     required this.updatedAt,
@@ -36,7 +36,7 @@ class BookingModel extends HiveObject with SyncableModel {
         (e) => e.toString() == 'BookingStatus.${json['status'] as String}',
         orElse: () => BookingStatus.pending,
       ),
-      provider: json['provider'] as String? ?? 'mercado_pago',
+      provider: json['provider'] as String? ?? 'server_side',
       amount: (json['amount'] as num).toDouble(),
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       updatedAt: (json['updatedAt'] as Timestamp).toDate(),
@@ -111,6 +111,34 @@ class BookingModel extends HiveObject with SyncableModel {
       ...toJson(),
       'updatedAt': FieldValue.serverTimestamp(),
     };
+  }
+
+  BookingModel copyWith({
+    String? id,
+    String? userId,
+    String? experienceId,
+    String? preferenceId,
+    String? paymentId,
+    String? externalReference,
+    BookingStatus? status,
+    String? provider,
+    double? amount,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return BookingModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      experienceId: experienceId ?? this.experienceId,
+      preferenceId: preferenceId ?? this.preferenceId,
+      paymentId: paymentId ?? this.paymentId,
+      externalReference: externalReference ?? this.externalReference,
+      status: status ?? this.status,
+      provider: provider ?? this.provider,
+      amount: amount ?? this.amount,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 
   // Convenience getters for UI

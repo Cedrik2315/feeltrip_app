@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:feeltrip_app/services/gemini_service.dart';
+
 import 'package:feeltrip_app/services/transformation_history_screen.dart';
 import 'package:feeltrip_app/core/di/providers.dart';
 

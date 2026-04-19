@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,10 +13,15 @@ class PremiumScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: const Text('FeelTrip Premium'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
       ),
       body: Center(
         child: Padding(
@@ -24,29 +29,42 @@ class PremiumScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.auto_awesome,
-                  size: 80, color: Colors.deepPurple),
+              Icon(Icons.auto_awesome,
+                  size: 80, color: colorScheme.primary),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Desbloquea tu potencial viajero',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 24, 
+                  fontWeight: FontWeight.bold, 
+                  color: colorScheme.onSurface
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Suscribete para acceder al diario emocional avanzado, analisis de IA y experiencias exclusivas.',
+              Text(
+                'Suscríbete para acceder al diario emocional avanzado, análisis de IA y experiencias exclusivas.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
               ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
+              const SizedBox(height: 48),
+              SizedBox(
+                width: double.infinity,
+                height: 60,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 8,
+                    shadowColor: colorScheme.primary.withValues(alpha: 0.4),
+                  ),
+                  onPressed: () => _handlePayment(context, ref),
+                  child: const Text(
+                    'COMENZAR SUSCRIPCIÓN',
+                    style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                  ),
                 ),
-                onPressed: () => _handlePayment(context, ref),
-                child: const Text('Comenzar Suscripcion'),
               ),
             ],
           ),

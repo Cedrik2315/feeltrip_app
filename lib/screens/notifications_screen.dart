@@ -1,9 +1,10 @@
-﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
+import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'package:feeltrip_app/core/di/providers.dart' as di_providers;
 import 'package:feeltrip_app/core/providers/connectivity_provider.dart';
 import 'package:feeltrip_app/models/notification_model.dart';
@@ -20,27 +21,31 @@ class NotificationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final connectivity = ref.watch(connectivityProvider);
-    final userId = FirebaseAuth.instance.currentUser?.uid;
+    final userId = ref.read(di_providers.firebaseAuthProvider).currentUser?.uid;
 
     if (userId == null) {
       return Scaffold(
         backgroundColor: boneWhite,
         body: Center(
-          child: Text('LOG: AUTH_REQUIRED', 
-            style: GoogleFonts.jetBrainsMono(color: carbon.withValues(alpha: 0.5))),
+          child: Text('LOG: AUTH_REQUIRED',
+              style: GoogleFonts.jetBrainsMono(
+                  color: carbon.withValues(alpha: 0.5))),
         ),
       );
     }
 
-    final notificationService = ref.watch(di_providers.notificationServiceProvider);
-    final unreadCountAsync = ref.watch(unreadNotificationsCountProvider(userId));
+    final notificationService =
+        ref.watch(di_providers.notificationServiceProvider);
+    final unreadCountAsync =
+        ref.watch(unreadNotificationsCountProvider(userId));
     final notificationsAsync = ref.watch(notificationsProvider(userId));
 
     return Scaffold(
       backgroundColor: boneWhite,
       appBar: AppBar(
-        title: Text('CENTRO_NOTIFICACIONES', 
-          style: GoogleFonts.jetBrainsMono(fontSize: 14, fontWeight: FontWeight.bold)),
+        title: Text('CENTRO DE NOTIFICACIONES',
+            style: GoogleFonts.jetBrainsMono(
+                fontSize: 14, fontWeight: FontWeight.bold)),
         backgroundColor: carbon,
         foregroundColor: boneWhite,
         elevation: 0,
@@ -53,7 +58,8 @@ class NotificationsScreen extends ConsumerWidget {
                       child: Badge(
                         label: Text('$count'),
                         backgroundColor: Colors.redAccent,
-                        child: const Icon(Icons.notifications_none_rounded, size: 22),
+                        child: const Icon(Icons.notifications_none_rounded,
+                            size: 22),
                       ),
                     ),
                   )
@@ -66,11 +72,15 @@ class NotificationsScreen extends ConsumerWidget {
       body: connectivity.when(
         data: (isConnected) {
           if (isConnected != true) return _buildOfflineView();
-          
+
           return notificationsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator(color: carbon, strokeWidth: 1)),
-            error: (error, _) => Center(child: Text('// ERROR_SYNC: $error', 
-              style: GoogleFonts.jetBrainsMono(fontSize: 11, color: Colors.red))),
+            loading: () => const Center(
+                child:
+                    CircularProgressIndicator(color: carbon, strokeWidth: 1)),
+            error: (error, _) => Center(
+                child: Text('// ERROR_SYNC: $error',
+                    style: GoogleFonts.jetBrainsMono(
+                        fontSize: 11, color: Colors.red))),
             data: (notifications) {
               if (notifications.isEmpty) return _buildEmptyView();
 
@@ -84,19 +94,20 @@ class NotificationsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   itemCount: notifications.length,
                   separatorBuilder: (_, __) => Divider(
-                    height: 1, 
-                    indent: 84, 
-                    color: carbon.withValues(alpha: 0.05)
-                  ),
+                      height: 1,
+                      indent: 84,
+                      color: carbon.withValues(alpha: 0.05)),
                   itemBuilder: (context, index) {
                     final notification = notifications[index];
                     return _NotificationTile(
                       notification: notification,
                       onTap: () async {
-                        await notificationService.markAsRead(notification.id, userId: userId);
+                        await notificationService.markAsRead(notification.id,
+                            userId: userId);
                         if (context.mounted) {
                           _navigateFromNotification(context, notification);
-                          ref.invalidate(unreadNotificationsCountProvider(userId));
+                          ref.invalidate(
+                              unreadNotificationsCountProvider(userId));
                         }
                       },
                     );
@@ -106,8 +117,9 @@ class NotificationsScreen extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator(color: carbon)),
-        error: (_, __) => const Center(child: Text('CONN_FAILURE')),
+        loading: () =>
+            const Center(child: CircularProgressIndicator(color: carbon)),
+        error: (_, __) => const Center(child: Text('CONN FAILURE')),
       ),
     );
   }
@@ -117,13 +129,16 @@ class NotificationsScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inventory_2_outlined, size: 64, color: carbon.withValues(alpha: 0.1)),
+          Icon(Icons.inventory_2_outlined,
+              size: 64, color: carbon.withValues(alpha: 0.1)),
           const SizedBox(height: 24),
-          Text('HISTORIAL_VACÃO', 
-            style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.bold, color: carbon)),
+          Text('HISTORIAL VACÍO',
+              style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12, fontWeight: FontWeight.bold, color: carbon)),
           const SizedBox(height: 8),
-          Text('No hay nuevos reportes de viaje.', 
-            style: GoogleFonts.inter(fontSize: 13, color: carbon.withValues(alpha: 0.5))),
+          Text('No hay nuevos reportes de viaje.',
+              style: GoogleFonts.inter(
+                  fontSize: 13, color: carbon.withValues(alpha: 0.5))),
         ],
       ),
     );
@@ -136,22 +151,25 @@ class NotificationsScreen extends ConsumerWidget {
         children: [
           const Icon(Icons.wifi_off_rounded, size: 48, color: Colors.orange),
           const SizedBox(height: 16),
-          Text('MODO_OFFLINE_ACTIVO', 
-            style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.bold, fontSize: 13)),
+          Text('MODO OFFLINE ACTIVO',
+              style: GoogleFonts.jetBrainsMono(
+                  fontWeight: FontWeight.bold, fontSize: 13)),
           const SizedBox(height: 8),
-          Text('ReconÃ©ctate para sincronizar alertas.', 
-            style: GoogleFonts.inter(fontSize: 12, color: carbon.withValues(alpha: 0.5))),
+          Text('Reconéctate para sincronizar alertas.',
+              style: GoogleFonts.inter(
+                  fontSize: 12, color: carbon.withValues(alpha: 0.5))),
         ],
       ),
     );
   }
 
-  void _navigateFromNotification(BuildContext context, NotificationModel notification) {
+  void _navigateFromNotification(
+      BuildContext context, NotificationModel notification) {
     final actionId = notification.actionId;
     if (actionId == null || actionId.isEmpty) return;
 
     final type = notification.actionType ?? notification.type;
-    
+
     switch (type) {
       case 'story':
       case 'story_comments':
@@ -162,7 +180,7 @@ class NotificationsScreen extends ConsumerWidget {
         context.pushNamed('bookings');
         break;
       default:
-        debugPrint('TIPO_NO_MAPEADO: $type');
+        AppLogger.w('Notificación: Acción de tipo desconocido ($type) para ID: $actionId');
     }
   }
 }
@@ -186,13 +204,17 @@ class _NotificationTile extends StatelessWidget {
         height: 52,
         decoration: BoxDecoration(
           color: carbon.withValues(alpha: 0.05),
-          image: notification.imageUrl != null 
-              ? DecorationImage(image: NetworkImage(notification.imageUrl!), fit: BoxFit.cover)
+          image: notification.imageUrl != null
+              ? DecorationImage(
+                  image: NetworkImage(notification.imageUrl!),
+                  fit: BoxFit.cover)
               : null,
-          borderRadius: BorderRadius.circular(4), // EstÃ©tica cuadrada industrial
+          borderRadius:
+              BorderRadius.circular(4), // EstÃ©tica cuadrada industrial
         ),
-        child: notification.imageUrl == null 
-            ? Icon(Icons.sensors_rounded, color: carbon.withValues(alpha: 0.4), size: 20) 
+        child: notification.imageUrl == null
+            ? Icon(Icons.sensors_rounded,
+                color: carbon.withValues(alpha: 0.4), size: 20)
             : null,
       ),
       title: Text(
@@ -207,32 +229,30 @@ class _NotificationTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 4),
-          Text(
-            notification.body, 
-            maxLines: 2, 
-            style: GoogleFonts.inter(
-              fontSize: 13, 
-              color: carbon.withValues(alpha: isRead ? 0.5 : 0.8),
-              height: 1.3
-            )
-          ),
+          Text(notification.body,
+              maxLines: 2,
+              style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: carbon.withValues(alpha: isRead ? 0.5 : 0.8),
+                  height: 1.3)),
           const SizedBox(height: 6),
           Text(
-            'TS: 2026-04-07_LOG', // PodrÃ­as usar un format de fecha real aquÃ­
+            notification.createdAt != null
+                ? 'LOG_TS: ${DateFormat('dd/MM/yyyy HH:mm').format(notification.createdAt!)}'
+                : 'LOG_TS: --/--/---- 00:00',
             style: GoogleFonts.jetBrainsMono(
-              fontSize: 9, 
-              color: carbon.withValues(alpha: 0.3)
-            ),
+                fontSize: 9, color: carbon.withValues(alpha: 0.3)),
           ),
         ],
       ),
-      trailing: !isRead 
-        ? Container(
-            width: 8,
-            height: 8,
-            decoration: const BoxDecoration(color: Colors.blueAccent, shape: BoxShape.circle),
-          )
-        : null,
+      trailing: !isRead
+          ? Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                  color: Colors.blueAccent, shape: BoxShape.circle),
+            )
+          : null,
     );
   }
 }

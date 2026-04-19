@@ -21,7 +21,7 @@ class SyncService {
   late IsarService _isar;
   bool _isInitialized = false;
   bool _isSyncing = false;
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   Future<void> init(IsarService isar) async {
     if (_isInitialized) return;
@@ -30,8 +30,8 @@ class SyncService {
 
     _isInitialized = true;
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
-      (ConnectivityResult result) {
-        if (result != ConnectivityResult.none) {
+      (List<ConnectivityResult> results) {
+        if (results.isNotEmpty && results.first != ConnectivityResult.none) {
           AppLogger.i('SyncService: Conexión detectada. Disparando sync soportado...');
           unawaited(performGlobalSync());
         }

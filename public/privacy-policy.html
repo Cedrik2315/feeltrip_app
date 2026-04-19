@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidad — FeelTrip</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #c8a96e;
+      --accent-dim: rgba(200, 169, 110, 0.15);
+      --text: #e8e4dc;
+      --text-muted: #7a7870;
+      --text-dim: #4a4845;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.8;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(200,169,110,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(200,169,110,0.03) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 60px 40px 80px;
+      border-bottom: 1px solid var(--border);
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .brand-mark::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .hero-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .meta-item span {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Navigation */
+    .toc {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toc-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 8px;
+    }
+
+    .toc-list a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 8px 0;
+      transition: color 0.2s;
+      border-bottom: 1px solid transparent;
+    }
+
+    .toc-list a:hover {
+      color: var(--accent);
+    }
+
+    .toc-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      min-width: 20px;
+    }
+
+    /* Main content */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    .section {
+      margin-bottom: 72px;
+      padding-bottom: 72px;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .section:last-child {
+      border-bottom: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 28px;
+      line-height: 1.3;
+    }
+
+    h3 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 32px 0 12px;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    /* Data cards */
+    .data-grid {
+      display: grid;
+      gap: 2px;
+      margin: 24px 0;
+    }
+
+    .data-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px 24px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+
+    .data-card:first-child {
+      border-radius: 8px 8px 0 0;
+    }
+
+    .data-card:last-child {
+      border-radius: 0 0 8px 8px;
+    }
+
+    .data-card:only-child {
+      border-radius: 8px;
+    }
+
+    .data-card:hover {
+      border-color: var(--accent);
+    }
+
+    .data-icon {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      background: var(--accent-dim);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .data-content strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .data-content p {
+      font-size: 0.82rem;
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    /* ARCO rights */
+    .arco-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin: 24px 0;
+    }
+
+    .arco-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      transition: background 0.2s;
+    }
+
+    .arco-card:nth-child(1) { border-radius: 8px 0 0 0; }
+    .arco-card:nth-child(2) { border-radius: 0 8px 0 0; }
+    .arco-card:nth-child(3) { border-radius: 0 0 0 8px; }
+    .arco-card:nth-child(4) { border-radius: 0 0 8px 0; }
+
+    .arco-card:hover {
+      background: var(--accent-dim);
+    }
+
+    .arco-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .arco-title {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .arco-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Highlight box */
+    .highlight {
+      border-left: 2px solid var(--accent);
+      padding: 20px 24px;
+      background: var(--accent-dim);
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+    }
+
+    .highlight p {
+      font-size: 0.88rem;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .highlight strong {
+      color: var(--accent);
+    }
+
+    /* Contact section */
+    .contact-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      margin-top: 24px;
+    }
+
+    .contact-box a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .contact-box a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px;
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .footer-note {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      header, .toc, main, footer {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .arco-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .arco-card:nth-child(1) { border-radius: 8px 8px 0 0; }
+      .arco-card:nth-child(2) { border-radius: 0; }
+      .arco-card:nth-child(3) { border-radius: 0; }
+      .arco-card:nth-child(4) { border-radius: 0 0 8px 8px; }
+
+      .meta { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <span class="brand-name">FeelTrip</span>
+    </div>
+    <p class="hero-label">Documento Legal</p>
+    <h1>Política de <em>Privacidad</em></h1>
+    <div class="meta">
+      <div class="meta-item">Última actualización: <span>15 de Abril, 2026</span></div>
+      <div class="meta-item">Jurisdicción: <span>República de Chile</span></div>
+      <div class="meta-item">Versión: <span>1.0</span></div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <p class="toc-title">Contenido</p>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="toc-num">01</span> Aspectos Generales</a></li>
+      <li><a href="#s2"><span class="toc-num">02</span> Recopilación de Datos</a></li>
+      <li><a href="#s3"><span class="toc-num">03</span> Uso y Finalidad</a></li>
+      <li><a href="#s4"><span class="toc-num">04</span> Derechos ARCO</a></li>
+      <li><a href="#s5"><span class="toc-num">05</span> Protección y Seguridad</a></li>
+      <li><a href="#s6"><span class="toc-num">06</span> Jurisdicción</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <section class="section" id="s1">
+      <span class="section-num">01 — Aspectos Generales</span>
+      <h2>Normativa Aplicable</h2>
+      <p>Las presentes Políticas de Privacidad rigen el uso de la aplicación móvil <strong style="color:var(--text)">FeelTrip</strong>. Han sido elaboradas en estricto cumplimiento con la legislación chilena vigente, en particular la <strong style="color:var(--text)">Ley N° 19.628 sobre Protección de la Vida Privada</strong> y sus modificaciones, así como los lineamientos de la <strong style="color:var(--text)">Ley N° 19.496 sobre Protección de los Derechos de los Consumidores</strong> (SERNAC).</p>
+      <p>Al crear una cuenta, utilizar nuestros servicios de "Diario de Campo", perfilamiento de Arquetipos o cualquier inteligencia artificial asociada, el Usuario acepta expresamente el tratamiento de sus datos personales bajo los términos aquí descritos.</p>
+    </section>
+
+    <section class="section" id="s2">
+      <span class="section-num">02 — Recopilación de Datos</span>
+      <h2>¿Qué datos recopilamos?</h2>
+      <p>FeelTrip recopila y trata las siguientes categorías de datos personales:</p>
+
+      <div class="data-grid">
+        <div class="data-card">
+          <div class="data-icon">👤</div>
+          <div class="data-content">
+            <strong>Datos de Identificación</strong>
+            <p>Nombre, correo electrónico y datos derivados de la autenticación por terceros (Google / Facebook).</p>
+          </div>
+        </div>
+        <div class="data-card">
+          <div class="data-icon">❤️</div>
+          <div class="data-content">
+            <strong>Datos de Salud / Biometría (Consentimiento Expreso)</strong>
+            <p>Al activar "Sincronización Biométrica", FeelTrip recopila parámetros genéricos como la Variabilidad de Frecuencia Cardíaca (HRV) para vincularlos estadísticamente con las métricas emocionales del viaje. Estos datos NO son compartidos con terceros y son tratados como datos sensibles conforme al Art. 10 de la Ley 19.628.</p>
+          </div>
+        </div>
+        <div class="data-card">
+          <div class="data-icon">📍</div>
+          <div class="data-content">
+            <strong>Datos de Geolocalización</strong>
+            <p>Requeridos para funciones como las "Cápsulas del Tiempo" asíncronas y el trazado de mapas de expedición.</p>
+          </div>
+        </div>
+        <div class="data-card">
+          <div class="data-icon">🧠</div>
+          <div class="data-content">
+            <strong>Datos Psicométricos y Emocionales</strong>
+            <p>Respuestas del Test de Arquetipos y descripciones en texto/audio dentro de la bitácora, utilizadas para generar las "Crónicas" personalizadas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="s3">
+      <span class="section-num">03 — Uso y Finalidad</span>
+      <h2>¿Para qué usamos su información?</h2>
+
+      <h3>Personalización de Experiencia</h3>
+      <p>Para personalizar hiper-específicamente la experiencia de viaje, recomendando destinos o misiones adaptadas al Arquetipo del usuario ("Misión Sombra").</p>
+
+      <h3>Ecosistema Agéntico IA</h3>
+      <p>Para alimentar nuestro ecosistema agéntico capaz de sintetizar diarios en crónicas literarias.</p>
+      <div class="highlight">
+        <p><strong>Importante:</strong> La información enviada a Modelos de Lenguaje (LLMs) externos transita encriptada y bajo acuerdos de estricta confidencialidad API-to-API. NO es utilizada para entrenar modelos públicos externos vinculados a la identidad personal del usuario.</p>
+      </div>
+
+      <h3>Análisis B2B Anónimo</h3>
+      <p>FeelTrip se reserva el derecho de crear y comercializar perfiles de datos agregados (macrométricas) totalmente <strong style="color:var(--text)">anonimizados</strong> respecto a los índices de estrés y respuestas emocionales en zonas turísticas. Es imposible vincular estos reportes consolidados con la identidad individual del usuario, cumpliendo con la exigencia de disociación de datos de la ley chilena.</p>
+    </section>
+
+    <section class="section" id="s4">
+      <span class="section-num">04 — Derechos del Usuario</span>
+      <h2>Derechos ARCO</h2>
+      <p>En conformidad con el Artículo 12 de la Ley 19.628, todo usuario titular de datos personales en FeelTrip tiene el derecho irrenunciable a:</p>
+
+      <div class="arco-grid">
+        <div class="arco-card">
+          <div class="arco-letter">A</div>
+          <div class="arco-title">Acceso</div>
+          <p class="arco-desc">Solicitar información sobre los datos personales almacenados en nuestra plataforma.</p>
+        </div>
+        <div class="arco-card">
+          <div class="arco-letter">R</div>
+          <div class="arco-title">Rectificación</div>
+          <p class="arco-desc">Modificar datos falsos, inexactos o incompletos asociados a su perfil.</p>
+        </div>
+        <div class="arco-card">
+          <div class="arco-letter">C</div>
+          <div class="arco-title">Cancelación</div>
+          <p class="arco-desc">Exigir la eliminación de sus diarios o perfil completo de nuestra plataforma y de Firebase. La eliminación total generará la purga inmediata de Firestore de cualquier "Crónica" asociada al UID solicitante.</p>
+        </div>
+        <div class="arco-card">
+          <div class="arco-letter">O</div>
+          <div class="arco-title">Oposición</div>
+          <p class="arco-desc">Denegar el uso secundario de sus datos para fines distintos a los declarados.</p>
+        </div>
+      </div>
+
+      <p>Para ejercer estos derechos, el Usuario debe contactar al Representante Legal mediante el canal de soporte interno de la aplicación o los medios descritos al final de este documento.</p>
+
+      <div class="contact-box">
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Canal de contacto para derechos ARCO</p>
+        <a href="mailto:soporte@feeltrip.app">soporte@feeltrip.app</a>
+      </div>
+    </section>
+
+    <section class="section" id="s5">
+      <span class="section-num">05 — Protección y Seguridad</span>
+      <h2>¿Cómo protegemos sus datos?</h2>
+      <p>La persistencia local de la aplicación corre bajo motores de encriptación y ofuscación <strong style="color:var(--text)">(Hive — Offline First)</strong>. A nivel nube, la aplicación depende de la infraestructura de backend de Google (Firebase), cumpliendo estándares globales <strong style="color:var(--text)">ISO/IEC 27001</strong> y las normativas ISO sobre privacidad comercial.</p>
+
+      <div class="data-grid">
+        <div class="data-card">
+          <div class="data-icon">🔒</div>
+          <div class="data-content">
+            <strong>Persistencia Local Encriptada</strong>
+            <p>Datos almacenados localmente con Hive bajo encriptación AES.</p>
+          </div>
+        </div>
+        <div class="data-card">
+          <div class="data-icon">☁️</div>
+          <div class="data-content">
+            <strong>Infraestructura Firebase (Google)</strong>
+            <p>Almacenamiento en la nube con certificación ISO/IEC 27001 y reglas de seguridad Firestore por usuario autenticado.</p>
+          </div>
+        </div>
+        <div class="data-card">
+          <div class="data-icon">🛡️</div>
+          <div class="data-content">
+            <strong>Firebase App Check</strong>
+            <p>Verificación de integridad de la aplicación mediante Play Integrity API para prevenir accesos no autorizados.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="s6">
+      <span class="section-num">06 — Jurisdicción</span>
+      <h2>Domicilio Legal</h2>
+      <p>Las presentes Políticas de Privacidad establecen su sede física, legal y representativa en <strong style="color:var(--text)">Santiago, República de Chile</strong>. Cualquier disputa se someterá a los tribunales ordinarios de justicia chilenos.</p>
+
+      <div class="highlight">
+        <p>Documento redactado para validación de <strong>Google Play Console</strong> bajo requerimientos legales T&C locales (Chile). Ley N° 19.628 — Protección de la Vida Privada.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span class="footer-brand">FeelTrip — Viaja para recordar</span>
+    <span class="footer-note">© 2026 FeelTrip. Todos los derechos reservados. Santiago, Chile.</span>
+  </footer>
+
+</body>
+</html>

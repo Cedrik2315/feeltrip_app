@@ -3,14 +3,14 @@
 ## Objetivo
 Checklist corto para desplegar y validar el flujo de pago server-side sin sorpresas.
 
-## 1. Configuración obligatoria de Functions
+## 1. ConfiguraciÃ³n obligatoria de Functions
 Ejecutar y confirmar estos valores antes del deploy:
 
 ```powershell
 npx -y firebase-tools@latest functions:config:get
 ```
 
-Debe existir como mínimo:
+Debe existir como mÃ­nimo:
 - `mercadopago.token`
 - `app.base_url`
 
@@ -38,7 +38,7 @@ flutter test test/payment_repository_test.dart test/services/booking_service_tes
 npx -y firebase-tools@latest deploy --only functions
 ```
 
-## 4. Validación mínima post deploy
+## 4. Validaciï¿½n mï¿½nima post deploy
 - `createMercadoPagoPreference` existe en logs y responde sin `internal error`.
 - `toggleStoryLike` sigue funcionando.
 - El booking queda en `pending` antes de abrir checkout.
@@ -46,7 +46,7 @@ npx -y firebase-tools@latest deploy --only functions
 - El webhook marca `bookings/{bookingId}.status = paid` tras pago aprobado.
 - Se guarda `paymentId` y `paymentStatus = approved`.
 
-## 5. Señales de No-Go
+## 5. Seï¿½ales de No-Go
 - `npm run lint` falla en predeploy.
 - `functions.config().mercadopago.token` no existe.
 - `createMercadoPagoPreference` responde payload incompleto.

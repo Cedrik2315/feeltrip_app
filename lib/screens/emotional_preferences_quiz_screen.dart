@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
+
+import 'package:feeltrip_app/features/profile/presentation/profile_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // --- Modelos ---
 
@@ -18,7 +23,7 @@ class QuizQuestion {
 
 // --- Pantalla de Resultados ---
 
-class QuizResultsScreen extends StatelessWidget {
+class QuizResultsScreen extends ConsumerStatefulWidget {
   const QuizResultsScreen({
     super.key,
     required this.category,
@@ -26,6 +31,13 @@ class QuizResultsScreen extends StatelessWidget {
   });
   final String category;
   final Map<String, dynamic> resultData;
+
+  @override
+  ConsumerState<QuizResultsScreen> createState() => _QuizResultsScreenState();
+}
+
+class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen> {
+  bool _isSaving = false;
 
   static const Color boneWhite = Color(0xFFF5F5DC);
   static const Color mossGreen = Color(0xFF4B5320);
@@ -41,19 +53,24 @@ class QuizResultsScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('ARQUETIPO_DETECTADO', 
+              Text('ARQUETIPO DETECTADO', 
                 style: GoogleFonts.jetBrainsMono(fontSize: 10, letterSpacing: 2, color: mossGreen, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
               Text(
-((resultData['title'] as String?) ?? 'UNKNOWN').toUpperCase(),
+                ((widget.resultData['title'] as String?) ?? 'UNKNOWN').toUpperCase(),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.ebGaramond(fontSize: 42, fontWeight: FontWeight.bold, height: 1),
+                style: GoogleFonts.ebGaramond(
+                  fontSize: 42, 
+                  fontWeight: FontWeight.bold, 
+                  height: 1,
+                  color: carbon,
+                ),
               ),
               const SizedBox(height: 24),
               Container(height: 1, width: 60, color: carbon.withValues(alpha: .1)),
               const SizedBox(height: 24),
               Text(
-(resultData['description'] as String?) ?? '',
+                (widget.resultData['description'] as String?) ?? '',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(fontSize: 16, color: Colors.black87, height: 1.5),
               ),
@@ -66,9 +83,11 @@ class QuizResultsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                   ),
-                  onPressed: () => context.pop(),
-                  child: Text('CONTINUAR EXPEDICIÓN', 
-                    style: GoogleFonts.jetBrainsMono(color: boneWhite, fontSize: 12, fontWeight: FontWeight.bold)),
+                  onPressed: _isSaving ? null : _onContinue,
+                  child: _isSaving 
+                    ? const SizedBox(height: 15, width: 15, child: CircularProgressIndicator(color: boneWhite, strokeWidth: 2))
+                    : Text('CONTINUAR EXPEDICIÓN', 
+                        style: GoogleFonts.jetBrainsMono(color: boneWhite, fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -76,6 +95,44 @@ class QuizResultsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _onContinue() async {
+    AppLogger.i('Iniciando secuencia de cierre de quiz...');
+    setState(() => _isSaving = true);
+    
+    try {
+      final profile = ref.read(profileControllerProvider).value;
+      if (profile != null) {
+        AppLogger.d('Guardando arquetipo detectado: ${widget.category}');
+        
+        // IMPORTANTE: Esperar el guardado. Si falla por permisos, saltará al catch.
+        await ref.read(profileControllerProvider.notifier).updateProfile(
+          profile.copyWith(archetype: widget.category),
+        );
+        AppLogger.i('Arquetipo sincronizado con éxito.');
+      }
+      
+      if (mounted) {
+        AppLogger.i('Redirigiendo a zona de operaciones (Home)...');
+        context.go('/home');
+      }
+    } catch (e) {
+      AppLogger.e('Error crítico en salida de Quiz: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error de persistencia: No tienes permisos para guardar tu arquetipo.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        setState(() => _isSaving = false);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 }
 
@@ -102,7 +159,66 @@ const List<QuizQuestion> questions = [
       QuizAnswer(text: 'Analizas el entorno y su ecosistema', category: 'aprendizaje'),
     ],
   ),
-  // Nota: Extender a 10 preguntas para mayor precisión en producción.
+  QuizQuestion(
+    question: '¿Cómo prefieres documentar tus memorias?',
+    answers: [
+      QuizAnswer(text: 'Retratos de personas que conocí', category: 'conexion'),
+      QuizAnswer(text: 'Escribiendo reflexiones profundas', category: 'transformacion'),
+      QuizAnswer(text: 'Videos de acción y movimiento', category: 'aventura'),
+      QuizAnswer(text: 'Fotos de paisajes minimalistas', category: 'reflexion'),
+      QuizAnswer(text: 'Notas sobre datos históricos y curiosos', category: 'aprendizaje'),
+    ],
+  ),
+  QuizQuestion(
+    question: 'Si el clima arruina tus planes, tú...',
+    answers: [
+      QuizAnswer(text: 'Buscas refugio y charlas con extraños', category: 'conexion'),
+      QuizAnswer(text: 'Meditas sobre la impermanencia', category: 'transformacion'),
+      QuizAnswer(text: 'Buscas una actividad extrema bajo la lluvia', category: 'aventura'),
+      QuizAnswer(text: 'Disfrutas del sonido de la tormenta a solas', category: 'reflexion'),
+      QuizAnswer(text: 'Aprovechas para leer sobre el lugar', category: 'aprendizaje'),
+    ],
+  ),
+  QuizQuestion(
+    question: '¿Cuál es tu equipo de viaje esencial?',
+    answers: [
+      QuizAnswer(text: 'Un regalo para nuevos amigos', category: 'conexion'),
+      QuizAnswer(text: 'Mi diario de vida', category: 'transformacion'),
+      QuizAnswer(text: 'Equipo técnico de alto rendimiento', category: 'aventura'),
+      QuizAnswer(text: 'Unos buenos audífonos canceladores de ruido', category: 'reflexion'),
+      QuizAnswer(text: 'Mi cámara profesional', category: 'aprendizaje'),
+    ],
+  ),
+  QuizQuestion(
+    question: '¿Qué buscas en un alojamiento?',
+    answers: [
+      QuizAnswer(text: 'Espacios comunes para socializar', category: 'conexion'),
+      QuizAnswer(text: 'Un lugar que inspire cambio espiritual', category: 'transformacion'),
+      QuizAnswer(text: 'Una carpa en medio de la nada', category: 'aventura'),
+      QuizAnswer(text: 'Una cabaña aislada y silenciosa', category: 'reflexion'),
+      QuizAnswer(text: 'Cercanía a museos o centros culturales', category: 'aprendizaje'),
+    ],
+  ),
+  QuizQuestion(
+    question: 'Al probar comida local, lo haces por...',
+    answers: [
+      QuizAnswer(text: 'Compartir la mesa con locales', category: 'conexion'),
+      QuizAnswer(text: 'Entender el espíritu del territorio', category: 'transformacion'),
+      QuizAnswer(text: 'El reto de probar algo extraño', category: 'aventura'),
+      QuizAnswer(text: 'Saborear en soledad y calma', category: 'reflexion'),
+      QuizAnswer(text: 'Conocer la tradición culinaria', category: 'aprendizaje'),
+    ],
+  ),
+  QuizQuestion(
+    question: 'Tu viaje ideal termina cuando...',
+    answers: [
+      QuizAnswer(text: 'He hecho amigos para toda la vida', category: 'conexion'),
+      QuizAnswer(text: 'Siento que soy alguien mejor', category: 'transformacion'),
+      QuizAnswer(text: 'He agotado mis energías explorando', category: 'aventura'),
+      QuizAnswer(text: 'He encontrado la paz que buscaba', category: 'reflexion'),
+      QuizAnswer(text: 'He comprendido algo nuevo del mundo', category: 'aprendizaje'),
+    ],
+  ),
 ];
 
 const Map<String, Map<String, dynamic>> resultsDataMap = {
@@ -160,10 +276,17 @@ class _EmotionalPreferencesQuizScreenState extends State<EmotionalPreferencesQui
         elevation: 0,
         backgroundColor: boneWhite,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: carbon),
-          onPressed: () => context.pop(),
+          icon: const Icon(Icons.close_rounded, color: Color(0xFF1A1A1A), size: 24),
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              context.go('/home');
+            }
+          },
         ),
-        title: Text('ARQUETIPO_QUIZ.sys', 
+        title: Text('ARQUETIPO QUIZ.sys', 
           style: GoogleFonts.jetBrainsMono(fontSize: 11, color: carbon, fontWeight: FontWeight.bold, letterSpacing: 1)),
       ),
       body: Column(

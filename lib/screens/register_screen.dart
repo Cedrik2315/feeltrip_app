@@ -1,17 +1,20 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:feeltrip_app/presentation/providers/subscription_provider.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
 
 // Nota: Asegúrate de tener estas dependencias en tu pubspec.yaml si vas a usar Firebase:
 // firebase_auth: ^latest_version
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // Clave global para manejar las validaciones del formulario
   final _formKey = GlobalKey<FormState>();
 
@@ -20,6 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _inviteCodeController = TextEditingController();
 
   // Estados de la UI
   bool _obscurePassword = true;
@@ -33,6 +37,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _inviteCodeController.dispose();
     super.dispose();
   }
 
@@ -65,13 +70,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       // --- INTEGRACIÓN REAL AQUÍ ---
       // Ejemplo con Firebase Auth:
-      // await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      // final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
       //   email: _emailController.text.trim(),
       //   password: _passwordController.text.trim(),
       // );
+      // final userId = credential.user!.uid;
       
       // Simulación de delay de red
       await Future.delayed(const Duration(seconds: 2));
+
+      // ── Sistema de referidos ──────────────────────────────────────────
+      // Reemplaza 'userId' con el UID real del usuario recién creado.
+      // ignore: unused_local_variable
+      const String userId = 'REPLACE_WITH_REAL_UID';
+
+      try {
+        final referralService = ref.read(referralServiceProvider);
+
+        // 1. Generar código de referido para el nuevo usuario
+        await referralService.generateReferralCode(userId);
+
+        // 2. Aplicar código de invitación si se proporcionó
+        final inviteCode = _inviteCodeController.text.trim();
+        if (inviteCode.isNotEmpty) {
+          await referralService.applyInviteCode(userId, inviteCode);
+        }
+      } catch (e, st) {
+        AppLogger.e('RegisterScreen: error en referral post-registro', e, st);
+        // No bloqueamos el registro si el sistema de referidos falla
+      }
 
       if (!mounted) return;
 
@@ -152,6 +179,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       icon: Icons.lock_reset,
                       obscure: true,
                       validator: (v) => v != _passwordController.text ? 'Las contraseñas no coinciden' : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildInputField(
+                      label: 'Código de invitación (opcional)',
+                      controller: _inviteCodeController,
+                      hint: 'FELT-XXXX',
+                      icon: Icons.card_giftcard_outlined,
                     ),
                     
                     const SizedBox(height: 20),
@@ -263,12 +298,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: GestureDetector(
-            onTap: () => setState(() => _agreedToTerms = !_agreedToTerms),
-            child: Text(
-              'Acepto los términos y la política de privacidad',
-              style: TextStyle(color: Colors.grey[700], fontSize: 13),
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Acepto los términos y la',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+              GestureDetector(
+                onTap: () => context.push('/privacy'),
+                child: const Text(
+                  'Política de Privacidad',
+                  style: TextStyle(
+                    color: Colors.teal,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:feeltrip_app/services/analytics_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -10,116 +12,202 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends State<OnboardingScreen>
+    with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
 
-  // Colores del sistema FeelTrip_OS
   static const Color boneWhite = Color(0xFFF5F5DC);
-  static const Color carbon = Color(0xFF1A1A1A);
+  static const Color terminalGreen = Color(0xFF00FF41);
 
-  final List<OnboardingPageData> pages = [
-    OnboardingPageData(
-      title: 'EXPLORACIÓN_OFFLINE',
-      description: 'Navega por rutas remotas sin depender de la red. FeelTrip mantiene tus mapas y diarios activos en todo momento.',
-      icon: Icons.map_outlined,
-      accent: Colors.blueGrey,
+  // Solo 3 páginas ultraconcretas — máximo 20 segundos cada una
+  final List<_OnboardingPageData> _pages = [
+    _OnboardingPageData(
+      tag: '01 // EXPLORA',
+      title: 'Tu próxima\naventura\nempieza aquí.',
+      description: 'Rutas generadas por IA basadas en tu estado emocional.',
+      icon: Icons.explore_outlined,
     ),
-    OnboardingPageData(
-      title: 'MEMORIA_VISUAL',
-      description: 'Captura la esencia de cada destino. Un sistema diseñado para que tus recuerdos prevalezcan sobre la estética efímera.',
-      icon: Icons.auto_awesome_mosaic_outlined,
-      accent: Colors.brown,
+    _OnboardingPageData(
+      tag: '02 // REGISTRA',
+      title: 'Cada momento\ncuenta.',
+      description: 'Diario visual + crónicas automáticas de cada expedición.',
+      icon: Icons.auto_stories_outlined,
     ),
-    OnboardingPageData(
-      title: 'GESTIÓN_DE_RUTA',
-      description: 'Centraliza tus reservas y logística en una interfaz limpia, eliminando el ruido digital de tus vacaciones.',
-      icon: Icons.architecture,
-      accent: const Color(0xFF2C3E50),
+    _OnboardingPageData(
+      tag: '03 // CONECTA',
+      title: 'Una comunidad\nde exploradores.',
+      description: 'Comparte expediciones. Inspira. Sé inspirado.',
+      icon: Icons.public_outlined,
     ),
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeIn);
+    _fadeController.forward();
+    AnalyticsService().logOnboardingStarted();
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
   Future<void> _completeOnboarding() async {
+    HapticFeedback.mediumImpact();
+    await AnalyticsService().logOnboardingCompleted();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_completed', true);
     if (!mounted) return;
-    context.goNamed('login');
+    context.go('/login');
+  }
+
+  void _nextPage() {
+    HapticFeedback.lightImpact();
+    if (_currentPage < _pages.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOutCubic,
+      );
+    } else {
+      _completeOnboarding();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: boneWhite,
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Fondo con degradado técnico sutil
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 600),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  pages[_currentPage].accent.withValues(alpha: 0.15),
-                  boneWhite
+          // Fondo Forest Mist
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/login_bg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.5),
+                    Colors.black.withValues(alpha: 0.92),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Contenido
+          SafeArea(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                children: [
+                  // Skip Button
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: TextButton(
+                      onPressed: _completeOnboarding,
+                      child: Text(
+                        'OMITIR →',
+                        style: GoogleFonts.jetBrainsMono(
+                          color: boneWhite.withValues(alpha: 0.4),
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Page View
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (i) => setState(() => _currentPage = i),
+                      itemCount: _pages.length,
+                      itemBuilder: (context, i) => _buildPage(_pages[i]),
+                    ),
+                  ),
+
+                  // Indicadores + CTA
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(32, 0, 32, 40),
+                    child: Column(
+                      children: [
+                        // Dots
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            _pages.length,
+                            (i) => AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: i == _currentPage ? 24 : 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: i == _currentPage
+                                    ? terminalGreen
+                                    : boneWhite.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // CTA Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: _nextPage,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _currentPage == _pages.length - 1
+                                  ? terminalGreen
+                                  : Colors.transparent,
+                              foregroundColor: _currentPage == _pages.length - 1
+                                  ? Colors.black
+                                  : boneWhite,
+                              side: BorderSide(
+                                color: _currentPage == _pages.length - 1
+                                    ? terminalGreen
+                                    : boneWhite.withValues(alpha: 0.4),
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              _currentPage == _pages.length - 1
+                                  ? 'INICIAR EXPEDICIÓN →'
+                                  : 'CONTINUAR →',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
               ),
-            ),
-          ),
-          
-          PageView.builder(
-            controller: _pageController,
-            onPageChanged: (value) => setState(() => _currentPage = value),
-            itemCount: pages.length,
-            itemBuilder: (context, index) => _buildPage(pages[index]),
-          ),
-
-          // Header: Logo o Label de sistema
-          Positioned(
-            top: 60,
-            left: 40,
-            child: Text(
-              'FEELTRIP_INIT_v1.0',
-              style: GoogleFonts.jetBrainsMono(
-                fontSize: 10, 
-                fontWeight: FontWeight.bold, 
-                color: carbon.withValues(alpha: 0.4)
-              ),
-            ),
-          ),
-
-          Positioned(
-            top: 50,
-            right: 20,
-            child: TextButton(
-              onPressed: _completeOnboarding,
-              child: Text('SALTAR_TUTORIAL', 
-                style: GoogleFonts.jetBrainsMono(
-                  color: carbon.withValues(alpha: 0.6), 
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold
-                )
-              ),
-            ),
-          ),
-
-          // Controles inferiores
-          Positioned(
-            bottom: 60,
-            left: 40,
-            right: 40,
-            child: Column(
-              children: [
-                _buildIndicators(),
-                const SizedBox(height: 48),
-                _buildNavigationButtons(),
-              ],
             ),
           ),
         ],
@@ -127,101 +215,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildIndicators() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: List.generate(
-        pages.length,
-        (index) => AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          height: 2,
-          width: _currentPage == index ? 32 : 12,
-          decoration: BoxDecoration(
-            color: _currentPage == index ? carbon : carbon.withValues(alpha: 0.1),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavigationButtons() {
-    final bool isLastPage = _currentPage == pages.length - 1;
-
-    return Row(
-      children: [
-        if (_currentPage > 0)
-          IconButton(
-            onPressed: () => _pageController.previousPage(
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeOutQuart,
-            ),
-            icon: const Icon(Icons.arrow_back, color: carbon),
-          ),
-        const Spacer(),
-        SizedBox(
-          height: 56,
-          child: ElevatedButton(
-            onPressed: () {
-              if (isLastPage) {
-                _completeOnboarding();
-              } else {
-                _pageController.nextPage(
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeOutQuart,
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: carbon,
-              foregroundColor: boneWhite,
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              elevation: 0,
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  isLastPage ? 'CONFIGURAR_ACCESO' : 'CONTINUAR',
-                  style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.bold, letterSpacing: 1),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward_rounded, size: 16),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPage(OnboardingPageData page) {
+  Widget _buildPage(_OnboardingPageData page) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(page.icon, size: 80, color: carbon),
-          const SizedBox(height: 48),
+          Text(
+            page.tag,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 10,
+              color: terminalGreen,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Icon(page.icon, color: boneWhite, size: 48),
+          const SizedBox(height: 32),
           Text(
             page.title,
-            style: GoogleFonts.jetBrainsMono(
-              fontSize: 22, 
+            style: GoogleFonts.ebGaramond(
+              fontSize: 42,
+              color: boneWhite,
+              height: 1.0,
               fontWeight: FontWeight.bold,
-              color: carbon,
-              letterSpacing: -1,
             ),
           ),
           const SizedBox(height: 20),
           Text(
             page.description,
-            style: GoogleFonts.ebGaramond(
-              fontSize: 20, 
-              color: carbon.withValues(alpha: 0.8), 
-              height: 1.4,
-              fontStyle: FontStyle.italic
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              color: boneWhite.withValues(alpha: 0.6),
+              height: 1.5,
             ),
           ),
         ],
@@ -230,15 +258,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 }
 
-class OnboardingPageData {
-  OnboardingPageData({
-    required this.title,
-    required this.description,
-    required this.icon,
-    required this.accent,
-  });
+class _OnboardingPageData {
+  final String tag;
   final String title;
   final String description;
   final IconData icon;
-  final Color accent;
+
+  const _OnboardingPageData({
+    required this.tag,
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
 }

@@ -48,7 +48,8 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
   Future<bool> purchasePackage(Package package) async {
     state = PremiumState(isLoading: true, isPremium: state.isPremium, customerInfo: state.customerInfo);
     try {
-      final CustomerInfo customerInfo = await Purchases.purchasePackage(package);
+      final result = await Purchases.purchase(PurchaseParams.package(package));
+      final CustomerInfo customerInfo = result.customerInfo;
       _updateState(customerInfo);
       return true;
     } catch (e) {

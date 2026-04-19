@@ -4,14 +4,17 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:feeltrip_app/core/error/failures.dart';
 import 'package:feeltrip_app/features/search/domain/entities/search_result.dart';
+import 'package:feeltrip_app/services/algolia_search_service.dart';
+import 'package:feeltrip_app/core/di/providers.dart';
 import '../../domain/repositories/search_repository.dart';
 
 part 'search_repository_impl.g.dart';
 
 class SearchRepositoryImpl implements SearchRepository {
-  SearchRepositoryImpl(this.firestore);
+  SearchRepositoryImpl(this.firestore, this.algoliaService);
 
   final FirebaseFirestore firestore;
+  final AlgoliaSearchService algoliaService;
 
   @override
   Future<Either<Failure, List<SearchResult>>> searchExperiences(String query) async {
@@ -21,6 +24,24 @@ class SearchRepositoryImpl implements SearchRepository {
         return const Right([]);
       }
 
+      // 1. Intentar con Algolia (Alta performance / SemÃ¡ntica)
+      final algoliaHits = await algoliaService.searchExperiences(normalizedQuery);
+      
+      if (algoliaHits.isNotEmpty) {
+        final results = algoliaHits.map((hit) {
+          return SearchResult(
+            id: (hit['objectID'] ?? hit['id']) as String? ?? '',
+            title: (hit['title'] ?? '') as String,
+            description: (hit['description'] ?? '') as String,
+            rating: (hit['rating'] as num?)?.toDouble() ?? 0.0,
+            imageUrl: (hit['imageUrl'] ?? '') as String,
+            destination: (hit['destination'] ?? '') as String,
+          );
+        }).toList();
+        return Right(results);
+      }
+
+      // 2. Fallback a Firestore (BÃºsqueda bÃ¡sica)
       final titleSnapshot = await firestore
           .collection('experiences')
           .where('title', isGreaterThanOrEqualTo: normalizedQuery)
@@ -28,22 +49,7 @@ class SearchRepositoryImpl implements SearchRepository {
           .limit(10)
           .get();
 
-      final destinationSnapshot = await firestore
-          .collection('experiences')
-          .where('destination', isGreaterThanOrEqualTo: normalizedQuery)
-          .where('destination', isLessThanOrEqualTo: '$normalizedQuery\uf8ff')
-          .limit(10)
-          .get();
-
-      final docsById = <String, QueryDocumentSnapshot<Map<String, dynamic>>>{};
-      for (final doc in titleSnapshot.docs) {
-        docsById[doc.id] = doc;
-      }
-      for (final doc in destinationSnapshot.docs) {
-        docsById[doc.id] = doc;
-      }
-
-      final results = docsById.values.map((doc) {
+      final results = titleSnapshot.docs.map((doc) {
         final data = doc.data();
         return SearchResult(
           id: doc.id,
@@ -53,8 +59,7 @@ class SearchRepositoryImpl implements SearchRepository {
           imageUrl: data['imageUrl'] as String? ?? '',
           destination: data['destination'] as String? ?? '',
         );
-      }).toList()
-        ..sort((a, b) => b.rating.compareTo(a.rating));
+      }).toList();
 
       return Right(results);
     } catch (e) {
@@ -65,5 +70,8 @@ class SearchRepositoryImpl implements SearchRepository {
 
 @riverpod
 SearchRepository searchRepository(SearchRepositoryRef ref) {
-  return SearchRepositoryImpl(FirebaseFirestore.instance);
+  return SearchRepositoryImpl(
+    FirebaseFirestore.instance, 
+    ref.watch(algoliaServiceProvider),
+  );
 }

@@ -32,6 +32,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   void _videoListener() {
     if (!mounted) return;
+    
+    // Si el video termina, navegamos automáticamente
+    if (_controller.value.position >= _controller.value.duration) {
+      context.go('/');
+    }
+
     // Disparamos la UI 800ms antes del final para un fade-in elegante
     if (_controller.value.position >= 
         (_controller.value.duration - const Duration(milliseconds: 800))) {
@@ -93,7 +99,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        'FEELTRIP_PROTOCOL: ONLINE',
+                        'FEELTRIP PROTOCOL: ONLINE',
                         style: GoogleFonts.jetBrainsMono(
                           color: boneWhite.withValues(alpha: 0.5),
                           fontSize: 10,
@@ -104,7 +110,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       OutlinedButton(
                         onPressed: _showUI ? () {
                           HapticFeedback.heavyImpact(); // Feedback táctil "industrial"
-                          context.go('/home');
+                          context.go('/'); 
                         } : null,
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: boneWhite, width: 1.5),

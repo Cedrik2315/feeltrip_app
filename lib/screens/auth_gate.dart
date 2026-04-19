@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:feeltrip_app/features/profile/presentation/profile_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'onboarding_screen.dart';
 
 class AuthGate extends ConsumerStatefulWidget {
@@ -25,7 +28,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   void initState() {
     super.initState();
     // Temporizador para detectar latencia alta (ej. zonas rurales/offline)
-    Future<void>.delayed(const Duration(seconds: 10), () {
+    Future<void>.delayed(const Duration(seconds: 20), () {
       if (mounted) {
         setState(() {
           _timeoutReached = true;
@@ -37,21 +40,39 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+    final profileAsync = ref.watch(profileControllerProvider);
 
     return authState.when(
       loading: () => _buildLoadingView(withTimeoutMessage: _timeoutReached),
       error: (error, _) => _buildErrorView(
-        'AUTH_CORE_TIMEOUT: No se pudo validar el handshake con el servidor remoto.',
+        'AUTH_CORE_ERROR: No se pudo validar el protocolo de seguridad. $error',
       ),
       data: (user) {
         if (user != null) {
-          // Redirección post-frame para evitar colisiones en el árbol de widgets
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              context.go('/quiz');
-            }
-          });
-          return _buildLoadingView(); // Mantener estética mientras redirige
+          return profileAsync.when(
+            loading: () => _buildLoadingView(withTimeoutMessage: _timeoutReached),
+            error: (err, st) {
+              AppLogger.e('AuthGate: Error sincronizando perfil', err, st);
+              // Si falla por red, mostramos una vista de carga con mensaje de error suave
+              return _buildLoadingView(
+                withTimeoutMessage: true, 
+                errorDetail: err.toString()
+              );
+            },
+            data: (profile) {
+              // Redirección post-frame para evitar colisiones en el árbol de widgets
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  if (profile?.archetype == null) {
+                    context.go('/quiz');
+                  } else {
+                    context.go('/home');
+                  }
+                }
+              });
+              return _buildLoadingView();
+            },
+          );
         }
         return const OnboardingScreen();
       },
@@ -59,7 +80,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 
   // Vista de Carga Estilo "System Boot" (Consola de Inicio)
-  Widget _buildLoadingView({bool withTimeoutMessage = false}) {
+  Widget _buildLoadingView({bool withTimeoutMessage = false, String? errorDetail}) {
     return Scaffold(
       backgroundColor: carbonBlack, 
       body: Padding(
@@ -87,9 +108,11 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             ),
             const SizedBox(height: 8),
             Text(
-              '> VERIFICANDO_CREDENCIALES_LOCALES...',
+              withTimeoutMessage 
+                ? '> ALERTA: Respuesta lenta del satélite...'
+                : '> VERIFICANDO_CREDENCIALES_LOCALES...',
               style: GoogleFonts.jetBrainsMono(
-                color: boneWhite.withValues(alpha: 0.4), 
+                color: withTimeoutMessage ? oxidizedEarth : boneWhite.withValues(alpha: 0.4), 
                 fontSize: 11
               ),
             ),
@@ -106,7 +129,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '// ADVERTENCIA: Latencia elevada.',
+                      '// DIAGNÓSTICO: Cobertura intermitente.',
                       style: GoogleFonts.jetBrainsMono(
                         color: oxidizedEarth, 
                         fontSize: 11,
@@ -115,28 +138,52 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Detectada zona de baja cobertura o modo offline forzado.',
+                      errorDetail != null 
+                        ? 'LOG: $errorDetail'
+                        : 'La señal es débil. Intentaremos sincronizar de forma asíncrona mientras exploras.',
                       style: GoogleFonts.ebGaramond(
                         color: boneWhite.withValues(alpha: 0.7),
                         fontSize: 14,
                         fontStyle: FontStyle.italic
                       ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-              TextButton(
-                onPressed: () => context.go('/login'),
-                style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                child: Text(
-                  '>> FORZAR_ENTRADA_MANUAL',
-                  style: GoogleFonts.jetBrainsMono(
-                    color: boneWhite,
-                    fontSize: 12,
-                    decoration: TextDecoration.underline,
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      setState(() => _timeoutReached = false);
+                      ref.invalidate(authNotifierProvider);
+                      ref.invalidate(profileControllerProvider);
+                    },
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                    child: Text(
+                      '>> REINTENTAR_COMMS',
+                      style: GoogleFonts.jetBrainsMono(
+                        color: mossGreen,
+                        fontSize: 12,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
                   ),
-                ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => context.go('/login'),
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                    child: Text(
+                      'FORZAR_LOGIN',
+                      style: GoogleFonts.jetBrainsMono(
+                        color: boneWhite.withValues(alpha: 0.5),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ]
           ],
@@ -183,14 +230,26 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                 width: double.infinity,
                 height: 55,
                 child: OutlinedButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: () async {
+                    try {
+                      // LIMPIEZA ATÓMICA DE PROTOCOLOS
+                      await FirebaseFirestore.instance.terminate();
+                      await FirebaseFirestore.instance.clearPersistence();
+                    } catch (e) {
+                      // Ignorar si ya estaba cerrado
+                    } finally {
+                      if (context.mounted) {
+                        context.go('/login');
+                      }
+                    }
+                  },
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: carbonBlack, width: 1.5),
                     shape: const RoundedRectangleBorder(),
                     backgroundColor: carbonBlack,
                   ),
                   child: Text(
-                    '>> REINICIAR_PROTOCOLO_AUTH',
+                    '>> REINICIAR PROTOCOLO AUTH',
                     style: GoogleFonts.jetBrainsMono(
                       color: boneWhite,
                       fontSize: 12,

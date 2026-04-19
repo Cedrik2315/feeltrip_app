@@ -1,4 +1,3 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +9,6 @@ import 'package:feeltrip_app/presentation/providers/engagement_provider.dart';
 class CreatorStatsScreen extends ConsumerWidget {
   const CreatorStatsScreen({super.key});
 
-  // Paleta FeelTrip Técnica
   static const Color boneWhite = Color(0xFFF5F5DC);
   static const Color carbonBlack = Color(0xFF1A1A1A);
   static const Color mossGreen = Color(0xFF4B5320);
@@ -37,7 +35,7 @@ class CreatorStatsScreen extends ConsumerWidget {
         elevation: 0,
         backgroundColor: carbonBlack,
         centerTitle: false,
-        title: Text('CREATOR_METRICS.sys', 
+        title: Text('CREATOR METRICS.sys', 
           style: GoogleFonts.jetBrainsMono(color: boneWhite, fontSize: 13, letterSpacing: 1)),
         iconTheme: const IconThemeData(color: boneWhite, size: 20),
         systemOverlayStyle: SystemUiOverlayStyle.light,
@@ -50,11 +48,6 @@ class CreatorStatsScreen extends ConsumerWidget {
           message: error.toString(),
         ),
         data: (stats) {
-          final monthlyData = List.generate(
-            stats.monthlyActivity.length,
-            (index) => FlSpot(index.toDouble(), stats.monthlyActivity[index].toDouble()),
-          );
-
           return RefreshIndicator(
             color: mossGreen,
             onRefresh: () async => ref.refresh(creatorStatsProvider(userId).future),
@@ -64,7 +57,7 @@ class CreatorStatsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _SectionHeader(title: 'DATA_OVERVIEW'),
+                  const _SectionHeader(title: 'DATA OVERVIEW'),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -76,12 +69,12 @@ class CreatorStatsScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 40),
-                  const _SectionHeader(title: 'ENGAGEMENT_WAVEFORM'),
+                  const _SectionHeader(title: 'ACTIVITY LOG'),
                   const SizedBox(height: 24),
-                  _ActivityChart(monthlyData: monthlyData),
+                  _ActivityLogSummary(monthlyActivity: stats.monthlyActivity),
                   const SizedBox(height: 40),
                   const _TerminalLogs(
-                    message: 'La actividad mensual usa tus registros de bitácora recientes. La señal se estabilizará con mayor volumen de datos.',
+                    message: 'La telemetría visual avanzada ha sido migrada al Observatorio de Tendencias externo para optimizar el rendimiento del sistema.',
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -168,57 +161,41 @@ class _StatTerminalCard extends StatelessWidget {
   }
 }
 
-class _ActivityChart extends StatelessWidget {
-  const _ActivityChart({required this.monthlyData});
-  final List<FlSpot> monthlyData;
+class _ActivityLogSummary extends StatelessWidget {
+  const _ActivityLogSummary({required this.monthlyActivity});
+  final List<int> monthlyActivity;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
-      padding: const EdgeInsets.fromLTRB(10, 20, 20, 10),
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.5),
         border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
       ),
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: true,
-            getDrawingHorizontalLine: (value) => FlLine(color: Colors.black.withValues(alpha: 0.05), strokeWidth: 1),
-            getDrawingVerticalLine: (value) => FlLine(color: Colors.black.withValues(alpha: 0.05), strokeWidth: 1),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'REGISTRO RECIENTE:',
+            style: GoogleFonts.jetBrainsMono(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black45),
           ),
-          titlesData: const FlTitlesData(
-            show: true,
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 22,
-                interval: 1,
-              ),
+          const SizedBox(height: 12),
+          ...monthlyActivity.reversed.take(4).map((activity) => Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              children: [
+                const Icon(Icons.check_circle_outline, size: 12, color: Color(0xFF4B5320)),
+                const SizedBox(width: 12),
+                Text(
+                  'INTERACCIONES DETECTADAS: ${activity.toString().padLeft(3, '0')}',
+                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: Colors.black87),
+                ),
+              ],
             ),
-          ),
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            LineChartBarData(
-              spots: monthlyData,
-              isCurved: true,
-              curveSmoothness: 0.35,
-              color: const Color(0xFF4B5320),
-              barWidth: 2,
-              isStrokeCapRound: true,
-              dotData: const FlDotData(show: false),
-              belowBarData: BarAreaData(
-                show: true,
-                color: const Color(0xFF4B5320).withValues(alpha: 0.08),
-              ),
-            ),
-          ],
-        ),
+          )),
+        ],
       ),
     );
   }

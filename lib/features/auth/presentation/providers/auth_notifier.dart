@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feeltrip_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:feeltrip_app/features/auth/domain/entities/auth_user.dart';
+import 'package:feeltrip_app/core/error/failures.dart';
 import 'package:feeltrip_app/core/di/providers.dart';
+import 'package:feeltrip_app/services/storage_service.dart';
 
 
 class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
@@ -26,36 +29,46 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
     super.dispose();
   }
 
-  Future<void> signInWithEmailAndPassword(String email, String password) async {
+  Future<void> _handleAuthResult(Future<Either<Failure, AuthUser?>> authCall) async {
     state = const AsyncValue.loading();
-    final result = await _authRepository.signInWithEmailAndPassword(email, password);
+    final result = await authCall;
     result.fold(
       (failure) => state = AsyncValue.error(failure, StackTrace.current),
       (user) => state = AsyncValue.data(user),
     );
+  }
+
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    await _handleAuthResult(_authRepository.signInWithEmailAndPassword(email, password));
   }
 
   Future<void> signInWithGoogle() async {
-    state = const AsyncValue.loading();
-    final result = await _authRepository.signInWithGoogle();
-    result.fold(
-      (failure) => state = AsyncValue.error(failure, StackTrace.current),
-      (user) => state = AsyncValue.data(user),
-    );
+    await _handleAuthResult(_authRepository.signInWithGoogle());
   }
 
   Future<void> signInWithFacebook() async {
-    state = const AsyncValue.loading();
-    final result = await _authRepository.signInWithFacebook();
-    result.fold(
-      (failure) => state = AsyncValue.error(failure, StackTrace.current),
-      (user) => state = AsyncValue.data(user),
-    );
+    await _handleAuthResult(_authRepository.signInWithFacebook());
   }
 
   Future<void> signOut() async {
     await _authRepository.signOut();
+    await StorageService.clearAllData();
     // Stream will handle state = null
+  }
+
+  Future<void> deleteAccount() async {
+    state = const AsyncValue.loading();
+    final result = await _authRepository.deleteAccount();
+    await result.fold(
+      (failure) async {
+        state = AsyncValue.error(failure, StackTrace.current);
+        throw failure;
+      },
+      (_) async {
+        await StorageService.clearAllData();
+        state = const AsyncValue.data(null);
+      },
+    );
   }
 }
 

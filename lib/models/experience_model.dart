@@ -14,6 +14,8 @@ class TravelerStory {
     this.likedBy = const [],
     this.reaction = '',
     this.agencyId,
+    this.latitude,
+    this.longitude,
   });
 
   factory TravelerStory.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,8 @@ class TravelerStory {
       likedBy: List<String>.from(json['likedBy'] as Iterable<dynamic>? ?? []),
       reaction: json['reaction'] as String? ?? '',
       agencyId: json['agencyId'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       createdAt: json['createdAt'] is Timestamp
           ? (json['createdAt'] as Timestamp).toDate()
           : DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
@@ -55,6 +59,8 @@ class TravelerStory {
   final String reaction;
   final String? agencyId;
   final DateTime createdAt;
+  final double? latitude;
+  final double? longitude;
 
   Map<String, dynamic> toJson() {
     return {
@@ -69,8 +75,14 @@ class TravelerStory {
       'likedBy': likedBy,
       'reaction': reaction,
       'agencyId': agencyId,
+      'latitude': latitude,
+      'longitude': longitude,
       'createdAt': Timestamp.fromDate(createdAt),
     };
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return toJson();
   }
 }
 

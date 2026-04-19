@@ -12,6 +12,17 @@ class AgencyService {
     });
   }
 
+  /// Obtiene agencias filtradas por especialidad/arquetipo
+  Stream<List<TravelAgency>> getAgenciesByArchetype(String archetype) {
+    Query query = _firestore.collection('agencies');
+    if (archetype != 'TODOS') {
+      query = query.where('specialties', arrayContains: archetype.toLowerCase());
+    }
+    return query.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => TravelAgency.fromFirestore(doc)).toList();
+    });
+  }
+
   /// Obtiene los leads (prospectos) para una agencia específica.
   Stream<List<Map<String, dynamic>>> getLeadsStream(String agencyId) {
     return _firestore.collection('agency_leads')
@@ -45,6 +56,35 @@ class AgencyService {
     }
   }
 
+  /// Registra una reseña para una agencia.
+  Future<void> addReview({
+    required String agencyId,
+    required String userId,
+    required String userName,
+    required String userAvatar,
+    required double rating,
+    required String comment,
+  }) async {
+    try {
+      await _firestore
+          .collection('agencies')
+          .doc(agencyId)
+          .collection('reviews')
+          .add({
+        'userId': userId,
+        'userName': userName,
+        'userAvatar': userAvatar,
+        'rating': rating,
+        'comment': comment,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      AppLogger.i('AgencyService: Reseña agregada con éxito');
+    } catch (e) {
+      AppLogger.e('AgencyService: Error al agregar reseña: $e');
+      rethrow;
+    }
+  }
+
   /// Obtiene una agencia por su ID.
   Future<TravelAgency?> getAgencyById(String agencyId) async {
     try {
@@ -60,10 +100,24 @@ class AgencyService {
   }
 
   /// Seguir a una agencia.
-  Future<void> followAgency(String agencyId) async {
+  Future<void> followAgency(String agencyId, String userId) async {
     try {
-      // Placeholder para implementar la lógica de seguimiento en Firebase
-      AppLogger.i('AgencyService: Solicitud para seguir a la agencia $agencyId');
+      final docRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('followed_agencies')
+          .doc(agencyId);
+
+      final doc = await docRef.get();
+      if (doc.exists) {
+        await docRef.delete();
+        await _firestore.collection('agencies').doc(agencyId).update({'followers': FieldValue.increment(-1)});
+        AppLogger.i('AgencyService: Dejaste de seguir a $agencyId');
+      } else {
+        await docRef.set({'followedAt': FieldValue.serverTimestamp()});
+        await _firestore.collection('agencies').doc(agencyId).update({'followers': FieldValue.increment(1)});
+        AppLogger.i('AgencyService: Ahora sigues a $agencyId');
+      }
     } catch (e) {
       AppLogger.e('AgencyService: Error al seguir agencia: $e');
     }

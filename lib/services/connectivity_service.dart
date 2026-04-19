@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:feeltrip_app/services/voice_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,24 +14,53 @@ class ConnectivityService {
   bool _wasOffline = false;
 
   /// Inicia el monitoreo del estado de red.
-  void monitorConnection() {
-    // CORRECCIÓN: En la versión 5.0.2 se recibe un solo ConnectivityResult, no una lista.
-    _connectivity.onConnectivityChanged
-        .listen((ConnectivityResult result) {
-      final voice = _ref.read(voiceServiceProvider);
+  Future<void> monitorConnection() async {
+    // Esperamos un momento a que el sistema operativo estabilice los servicios de red para la app
+    await Future.delayed(const Duration(seconds: 3));
+    
+    final initialResults = await _connectivity.checkConnectivity();
+    await _handleResult(initialResults.first, isInitial: true);
 
-      // Verificamos si el resultado es 'none'
-      if (result == ConnectivityResult.none) {
-        AppLogger.w('Conexión perdida');
-        voice.speak(
-            'Atención Cedrik, se ha perdido la conexión a internet. Activando modo local.');
-        _wasOffline = true;
-      } else if (_wasOffline) {
-        // Si antes estábamos offline y ahora el resultado no es 'none', hemos vuelto.
-        AppLogger.i('Conexión restablecida');
-        voice.speak('Conexión restablecida. Sincronizando datos de FeelTrip.');
-        _wasOffline = false;
+    _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> results) {
+      if (results.isNotEmpty) {
+        _handleResult(results.first);
       }
     });
+  }
+
+  Future<void> _handleResult(ConnectivityResult result, {bool isInitial = false}) async {
+    final voice = _ref.read(voiceServiceProvider);
+    
+    if (result == ConnectivityResult.none) {
+      // Doble verificación: ¿Realmente no hay internet o es un error del plugin?
+      final hasRealInternet = await _confirmRealInternet();
+      
+      if (!hasRealInternet && !_wasOffline) {
+        AppLogger.w('Conexión perdida real confirmada');
+        if (!isInitial) {
+           voice.speak('Atención Cedrik, señal satelital perdida. Entrando en protocolo de cache local.');
+        }
+        _wasOffline = true;
+      }
+    } else {
+      if (_wasOffline) {
+        AppLogger.i('Conexión restablecida');
+        voice.speak('Señal recuperada. Sincronizando con la red FeelTrip.');
+        _wasOffline = false;
+      }
+    }
+  }
+
+  /// Verifica si realmente hay acceso a internet intentando una resolución DNS simple.
+  Future<bool> _confirmRealInternet() async {
+    try {
+      final result = await Future.any([
+        InternetAddress.lookup('google.com'),
+        Future.delayed(const Duration(seconds: 2), () => <InternetAddress>[]),
+      ]);
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 }

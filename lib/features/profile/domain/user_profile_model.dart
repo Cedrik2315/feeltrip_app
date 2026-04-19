@@ -63,6 +63,13 @@ class UserProfile {
   final Map<String, double> emotionalStats;
   @HiveField(9)
   final List<BadgeModel> badges;
+  @HiveField(10)
+  final bool isPremiumTrial;
+  @HiveField(11)
+  final DateTime? trialExpiresAt;
+
+  @HiveField(12)
+  final String? archetype;
 
   const UserProfile({
     required this.uid,
@@ -75,6 +82,9 @@ class UserProfile {
     required this.daysActive,
     required this.emotionalStats,
     required this.badges,
+    this.isPremiumTrial = false,
+    this.trialExpiresAt,
+    this.archetype,
   });
 
   factory UserProfile.empty(String uid, String username) {
@@ -90,6 +100,8 @@ class UserProfile {
         'Calma': 0.2, 'Adrenalina': 0.2, 'Asombro': 0.2, 'Euforia': 0.2, 'Nostalgia': 0.2,
       },
       badges: [],
+      isPremiumTrial: false,
+      archetype: null,
     );
   }
 
@@ -102,6 +114,7 @@ class UserProfile {
     int? daysActive,
     Map<String, double>? emotionalStats,
     List<BadgeModel>? badges,
+    String? archetype,
   }) {
     return UserProfile(
       uid: uid,
@@ -114,6 +127,9 @@ class UserProfile {
       emotionalStats: emotionalStats ?? this.emotionalStats,
       badges: badges ?? this.badges,
       profileImageUrl: profileImageUrl,
+      isPremiumTrial: isPremiumTrial ?? this.isPremiumTrial,
+      trialExpiresAt: trialExpiresAt ?? this.trialExpiresAt,
+      archetype: archetype ?? this.archetype,
     );
   }
 }

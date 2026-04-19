@@ -19,7 +19,7 @@ class EmotionalResultsScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text(
-          'ANÁLISIS_EMOCIONAL.sys',
+          'ANÁLISIS EMOCIONAL.sys',
           style: GoogleFonts.jetBrainsMono(
             fontSize: 14,
             fontWeight: FontWeight.bold,
@@ -37,7 +37,7 @@ class EmotionalResultsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. INDICADOR DE SENTIMIENTO GLOBAL
-            _buildSectionHeader('SENTIMIENTO_GLOBAL'),
+            _buildSectionHeader('SENTIMIENTO GLOBAL'),
             const SizedBox(height: 24),
             Center(
               child: Column(
@@ -76,7 +76,7 @@ class EmotionalResultsScreen extends StatelessWidget {
             const SizedBox(height: 48),
 
             // 2. NUBE DE EMOCIONES DOMINANTES
-            _buildSectionHeader('EMOCIONES_DETECTADAS'),
+            _buildSectionHeader('EMOCIONES DETECTADAS'),
             const SizedBox(height: 16),
             ...analysis.dominantEmotions.map((emotion) => Card(
               elevation: 0,
@@ -94,7 +94,7 @@ class EmotionalResultsScreen extends StatelessWidget {
             const SizedBox(height: 48),
 
             // 3. MOSAICO DE TAGS (Chip Layout)
-            _buildSectionHeader('TEMAS_CLAVE'),
+            _buildSectionHeader('TEMAS CLAVE'),
             const SizedBox(height: 16),
             Wrap(
               spacing: 10,

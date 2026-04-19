@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:feeltrip_app/config/firebase_options.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
@@ -18,11 +18,11 @@ class FirebaseConfig {
       final initTask = Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       ).timeout(
-        const Duration(seconds: 5),
+        const Duration(seconds: 15),
         onTimeout: () {
           throw TimeoutException(
             'Firebase timeout',
-            const Duration(seconds: 5),
+            const Duration(seconds: 15),
           );
         },
       );

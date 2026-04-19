@@ -4,7 +4,7 @@ import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'package:feeltrip_app/features/diario/domain/models/momento_model.dart';
 import 'package:feeltrip_app/models/syncable_model.dart';
 import 'package:feeltrip_app/services/isar_service.dart';
-import 'package:feeltrip_app/core/di/providers.dart'; // Importa el archivo donde syncServiceProvider estÃ¡ definido
+import 'package:feeltrip_app/core/di/providers.dart'; // Importa el archivo donde syncServiceProvider está definido
 import 'package:feeltrip_app/services/sync_service.dart';
 import 'package:feeltrip_app/models/momento_model.dart';
 
@@ -57,7 +57,7 @@ class MomentoNotifier extends StateNotifier<AsyncValue<List<Momento>>> {
     try {
       await _syncService.syncPendingMomentos(userId);
     } catch (e) {
-      AppLogger.e('Error general durante la sincronizaciÃƒÂ³n: $e');
+      AppLogger.e('Error general durante la sincronización: $e');
     } finally {
       final data = await _isarService.getMomentos();
       final filtered = data

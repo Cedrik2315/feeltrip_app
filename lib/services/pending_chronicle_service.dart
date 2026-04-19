@@ -3,18 +3,23 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:feeltrip_app/models/expedition_data.dart';
 import 'package:feeltrip_app/services/chronicle_repository.dart';
 import 'package:feeltrip_app/services/route_repository.dart';
+import 'package:feeltrip_app/services/notification_service.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
 
 /// [Sello FeelTrip]: Servicio que escucha la reconexión y genera crónicas pendientes.
 class PendingChronicleService {
   final RouteRepository _routeRepo;
   final ChronicleRepository _chronicleRepo;
+  final NotificationService _notificationService;
   StreamSubscription<dynamic>? _sub;
 
   PendingChronicleService({
     required RouteRepository routeRepo,
     required ChronicleRepository chronicleRepo,
+    NotificationService? notificationService,
   })  : _routeRepo = routeRepo,
-        _chronicleRepo = chronicleRepo;
+        _chronicleRepo = chronicleRepo,
+        _notificationService = notificationService ?? NotificationService();
 
   void init() {
     _sub = Connectivity().onConnectivityChanged.listen((dynamic result) async {
@@ -64,6 +69,19 @@ class PendingChronicleService {
           userId: route.explorerName ?? '',
         );
         await _routeRepo.linkChronicle(route.id, chronicle.id);
+
+        // ── Push nativo: crónica generada tras reconexión ──────────
+        final userId = route.explorerName ?? '';
+        if (userId.isNotEmpty) {
+          unawaited(
+            _notificationService.notifyChronicleReady(
+              userId: userId,
+              chronicleTitle: chronicle.title,
+              chronicleId: chronicle.id,
+            ),
+          );
+          AppLogger.i('PendingChronicleService: Notificación push enviada para crónica "${chronicle.title}"');
+        }
       } catch (_) {
         // Falla silenciosa — reintenta en el próximo evento de red
       }

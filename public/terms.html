@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Términos y Condiciones — FeelTrip</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #c8a96e;
+      --accent-dim: rgba(200, 169, 110, 0.15);
+      --text: #e8e4dc;
+      --text-muted: #7a7870;
+      --text-dim: #4a4845;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.8;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 80% 0%, rgba(200,169,110,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 20% 100%, rgba(200,169,110,0.03) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 60px 40px 80px;
+      border-bottom: 1px solid var(--border);
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .hero-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    h1 em { font-style: italic; color: var(--accent); }
+
+    .meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .meta-item span { color: var(--text); font-weight: 500; }
+
+    .toc {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toc-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 8px;
+    }
+
+    .toc-list a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 8px 0;
+      transition: color 0.2s;
+    }
+
+    .toc-list a:hover { color: var(--accent); }
+
+    .toc-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      min-width: 20px;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    .section {
+      margin-bottom: 72px;
+      padding-bottom: 72px;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .section:last-child { border-bottom: none; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 28px;
+      line-height: 1.3;
+    }
+
+    h3 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 32px 0 12px;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .rule-list {
+      list-style: none;
+      display: grid;
+      gap: 2px;
+      margin: 20px 0;
+    }
+
+    .rule-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      transition: border-color 0.2s;
+    }
+
+    .rule-item:first-child { border-radius: 8px 8px 0 0; }
+    .rule-item:last-child { border-radius: 0 0 8px 8px; }
+    .rule-item:only-child { border-radius: 8px; }
+    .rule-item:hover { border-color: var(--accent); }
+
+    .rule-dot {
+      width: 6px;
+      height: 6px;
+      min-width: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-top: 8px;
+    }
+
+    .highlight {
+      border-left: 2px solid var(--accent);
+      padding: 20px 24px;
+      background: var(--accent-dim);
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+    }
+
+    .highlight p { font-size: 0.88rem; margin: 0; color: var(--text); }
+    .highlight strong { color: var(--accent); }
+
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin: 24px 0;
+    }
+
+    .tier-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 28px;
+    }
+
+    .tier-card:first-child { border-radius: 8px 0 0 8px; }
+    .tier-card:last-child { border-radius: 0 8px 8px 0; }
+
+    .tier-badge {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .tier-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .tier-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tier-features li {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .tier-features li::before {
+      content: '—';
+      color: var(--accent);
+      font-size: 0.7rem;
+      margin-top: 2px;
+    }
+
+    .contact-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      margin-top: 24px;
+    }
+
+    .contact-box a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .contact-box a:hover { text-decoration: underline; }
+
+    .legal-links {
+      display: flex;
+      gap: 24px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .legal-links a {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .legal-links a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px;
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .footer-note {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      header, .toc, main, footer { padding-left: 24px; padding-right: 24px; }
+      .tier-grid { grid-template-columns: 1fr; }
+      .tier-card:first-child { border-radius: 8px 8px 0 0; }
+      .tier-card:last-child { border-radius: 0 0 8px 8px; }
+      .meta { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <span class="brand-name">FeelTrip</span>
+    </div>
+    <p class="hero-label">Documento Legal</p>
+    <h1>Términos y <em>Condiciones</em></h1>
+    <div class="meta">
+      <div class="meta-item">Última actualización: <span>15 de Abril, 2026</span></div>
+      <div class="meta-item">Jurisdicción: <span>República de Chile</span></div>
+      <div class="meta-item">Versión: <span>1.0</span></div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <p class="toc-title">Contenido</p>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="toc-num">01</span> Aceptación de Términos</a></li>
+      <li><a href="#s2"><span class="toc-num">02</span> Descripción del Servicio</a></li>
+      <li><a href="#s3"><span class="toc-num">03</span> Planes y Suscripciones</a></li>
+      <li><a href="#s4"><span class="toc-num">04</span> Conducta del Usuario</a></li>
+      <li><a href="#s5"><span class="toc-num">05</span> Propiedad Intelectual</a></li>
+      <li><a href="#s6"><span class="toc-num">06</span> Limitación de Responsabilidad</a></li>
+      <li><a href="#s7"><span class="toc-num">07</span> Eliminación de Cuenta</a></li>
+      <li><a href="#s8"><span class="toc-num">08</span> Modificaciones</a></li>
+      <li><a href="#s9"><span class="toc-num">09</span> Contacto</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <section class="section" id="s1">
+      <span class="section-num">01 — Aceptación</span>
+      <h2>Aceptación de Términos</h2>
+      <p>Al descargar, instalar o utilizar la aplicación móvil <strong style="color:var(--text)">FeelTrip</strong>, el usuario acepta quedar vinculado por los presentes Términos y Condiciones de Uso. Si no está de acuerdo con alguno de estos términos, debe abstenerse de utilizar la aplicación.</p>
+      <p>Estos términos constituyen un acuerdo legal entre usted y FeelTrip, con domicilio en Santiago, República de Chile, y se rigen por la legislación chilena vigente, incluyendo la <strong style="color:var(--text)">Ley N° 19.496</strong> sobre Protección de los Derechos de los Consumidores.</p>
+      <div class="highlight">
+        <p>La edad mínima para utilizar FeelTrip es de <strong>13 años</strong>. Usuarios menores de 18 años deben contar con autorización de sus tutores legales.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s2">
+      <span class="section-num">02 — Descripción del Servicio</span>
+      <h2>¿Qué es FeelTrip?</h2>
+      <p>FeelTrip es un ecosistema digital de exploración que combina tecnología de inteligencia artificial, geolocalización y registro biométrico para transformar las experiencias de viaje en crónicas literarias personalizadas.</p>
+
+      <h3>Servicios Principales</h3>
+      <ul class="rule-list">
+        <li class="rule-item"><div class="rule-dot"></div>Grabación de expediciones GPS con telemetría en tiempo real.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Generación de Crónicas IA mediante modelos de lenguaje avanzados.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Scout Agent: asistente agéntico con acceso a vuelos, clima y calendario.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Test de Arquetipos y misiones personalizadas ("Protocolo Sombra").</li>
+        <li class="rule-item"><div class="rule-dot"></div>Cápsulas del Tiempo asíncronas con detección por proximidad GPS.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Co-Pilotaje Sensorial con frecuencias binaurales personalizadas.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Marketplace de experiencias y agencias turísticas de nicho.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Feed social de historias de exploración.</li>
+      </ul>
+
+      <p>FeelTrip se reserva el derecho de modificar, suspender o descontinuar cualquier funcionalidad de la aplicación en cualquier momento, con o sin previo aviso.</p>
+    </section>
+
+    <section class="section" id="s3">
+      <span class="section-num">03 — Planes y Suscripciones</span>
+      <h2>Modelo de Acceso</h2>
+      <p>FeelTrip opera bajo un modelo freemium con dos niveles de acceso:</p>
+
+      <div class="tier-grid">
+        <div class="tier-card">
+          <span class="tier-badge">Plan Gratuito</span>
+          <div class="tier-name">Explorer</div>
+          <ul class="tier-features">
+            <li>Registro de expediciones GPS</li>
+            <li>Generación de crónicas básicas</li>
+            <li>Feed social y comentarios</li>
+            <li>Test de Arquetipos</li>
+            <li>Anuncios de AdMob activos</li>
+          </ul>
+        </div>
+        <div class="tier-card">
+          <span class="tier-badge">Plan Premium</span>
+          <div class="tier-name">FeelTrip Pro</div>
+          <ul class="tier-features">
+            <li>Sin anuncios publicitarios</li>
+            <li>Scout Agent completo</li>
+            <li>Crónicas IA avanzadas (5 tonos)</li>
+            <li>Co-Pilotaje Sensorial completo</li>
+            <li>Cápsulas del Tiempo ilimitadas</li>
+            <li>Sincronización Wear OS</li>
+            <li>Soundtrack Sync (Spotify)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Facturación y Reembolsos</h3>
+      <p>Las suscripciones Pro se gestionan a través de Google Play Store. Los cargos se realizan al confirmar la compra y se renuevan automáticamente al final de cada período. Los reembolsos se rigen por la política de reembolso de Google Play Store y la Ley N° 19.496 de Chile.</p>
+
+      <div class="highlight">
+        <p>FeelTrip puede otorgar acceso Pro de forma gratuita a través de programas de referidos, partnerships con hoteles boutique u otras promociones especiales, según los términos de cada programa.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s4">
+      <span class="section-num">04 — Conducta del Usuario</span>
+      <h2>Uso Aceptable</h2>
+      <p>Al utilizar FeelTrip, el usuario se compromete a:</p>
+
+      <ul class="rule-list">
+        <li class="rule-item"><div class="rule-dot"></div>Proporcionar información veraz y actualizada en su perfil.</li>
+        <li class="rule-item"><div class="rule-dot"></div>No publicar contenido ofensivo, discriminatorio, violento o ilegal en el feed social.</li>
+        <li class="rule-item"><div class="rule-dot"></div>No utilizar la aplicación para actividades fraudulentas o que perjudiquen a terceros.</li>
+        <li class="rule-item"><div class="rule-dot"></div>No intentar acceder a datos de otros usuarios ni vulnerar la seguridad de la plataforma.</li>
+        <li class="rule-item"><div class="rule-dot"></div>No hacer uso indebido del Scout Agent para generar contenido dañino o engañoso.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Respetar los derechos de propiedad intelectual de otros usuarios y de FeelTrip.</li>
+      </ul>
+
+      <p>FeelTrip se reserva el derecho de suspender o eliminar cuentas que violen estas condiciones, sin necesidad de previo aviso y sin derecho a reembolso.</p>
+    </section>
+
+    <section class="section" id="s5">
+      <span class="section-num">05 — Propiedad Intelectual</span>
+      <h2>Contenido y Derechos</h2>
+
+      <h3>Contenido del Usuario</h3>
+      <p>El usuario conserva la propiedad de todo el contenido que genera dentro de FeelTrip (fotografías, textos, rutas GPS, crónicas). Al publicar contenido en el feed social, el usuario otorga a FeelTrip una licencia no exclusiva, mundial y gratuita para mostrar dicho contenido dentro de la plataforma.</p>
+
+      <h3>Contenido de FeelTrip</h3>
+      <p>El diseño, código, marcas, logotipos, algoritmos y funcionalidades de FeelTrip son propiedad exclusiva de FeelTrip y están protegidos por la legislación chilena e internacional de propiedad intelectual. Queda prohibida su reproducción, distribución o modificación sin autorización expresa.</p>
+
+      <h3>Crónicas generadas por IA</h3>
+      <p>Las Crónicas generadas por el sistema de IA de FeelTrip a partir del contenido del usuario son consideradas obra derivada y pertenecen al usuario que las generó. FeelTrip puede utilizarlas de forma anonimizada para mejorar sus modelos internos, según lo establecido en la Política de Privacidad.</p>
+    </section>
+
+    <section class="section" id="s6">
+      <span class="section-num">06 — Limitación de Responsabilidad</span>
+      <h2>Exención de Garantías</h2>
+      <p>FeelTrip se provee "tal como está" y "según disponibilidad". No garantizamos que el servicio sea ininterrumpido, libre de errores o que los resultados obtenidos sean precisos o confiables.</p>
+
+      <ul class="rule-list">
+        <li class="rule-item"><div class="rule-dot"></div>FeelTrip no es responsable por decisiones de viaje tomadas en base a las recomendaciones del Scout Agent.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Los precios de vuelos mostrados por la integración con Amadeus son referenciales y pueden variar.</li>
+        <li class="rule-item"><div class="rule-dot"></div>La precisión del GPS depende del dispositivo y las condiciones del entorno.</li>
+        <li class="rule-item"><div class="rule-dot"></div>FeelTrip no garantiza la disponibilidad de los servicios de terceros (Google, Spotify, Amadeus).</li>
+        <li class="rule-item"><div class="rule-dot"></div>La telemetría biométrica es de carácter informativo y no constituye asesoramiento médico.</li>
+      </ul>
+
+      <p>En ningún caso FeelTrip será responsable por daños indirectos, incidentales o consecuentes derivados del uso o imposibilidad de uso de la aplicación.</p>
+    </section>
+
+    <section class="section" id="s7">
+      <span class="section-num">07 — Eliminación de Cuenta</span>
+      <h2>Derecho a la Cancelación</h2>
+      <p>El usuario puede eliminar su cuenta en cualquier momento desde la sección <strong style="color:var(--text)">Configuración → Eliminar mi cuenta</strong> dentro de la aplicación.</p>
+
+      <h3>¿Qué ocurre al eliminar la cuenta?</h3>
+      <ul class="rule-list">
+        <li class="rule-item"><div class="rule-dot"></div>Se eliminan permanentemente todos los datos personales de Firestore, incluyendo perfil, crónicas, momentos, expediciones y subcolecciones asociadas.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Se revocan las credenciales de Firebase Authentication.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Se eliminan los datos almacenados localmente en el dispositivo.</li>
+        <li class="rule-item"><div class="rule-dot"></div>Las publicaciones en el feed social serán anonimizadas o eliminadas.</li>
+        <li class="rule-item"><div class="rule-dot"></div>La suscripción activa debe cancelarse manualmente desde Google Play Store para evitar cargos futuros.</li>
+      </ul>
+
+      <div class="highlight">
+        <p>Esta acción es <strong>irreversible</strong>. FeelTrip no podrá recuperar datos eliminados bajo solicitud de cancelación.</p>
+      </div>
+
+      <p>También puede solicitar la eliminación de su cuenta contactando a nuestro equipo de soporte si experimenta dificultades técnicas para hacerlo desde la app.</p>
+    </section>
+
+    <section class="section" id="s8">
+      <span class="section-num">08 — Modificaciones</span>
+      <h2>Cambios en los Términos</h2>
+      <p>FeelTrip se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios serán notificados mediante una actualización de la fecha de "Última actualización" en la parte superior de este documento y, cuando sean significativos, mediante notificación dentro de la aplicación.</p>
+      <p>El uso continuado de FeelTrip tras la publicación de cambios constituye la aceptación de los nuevos términos.</p>
+    </section>
+
+    <section class="section" id="s9">
+      <span class="section-num">09 — Contacto</span>
+      <h2>¿Tienes preguntas?</h2>
+      <p>Para consultas legales, ejercicio de derechos ARCO, reportes de abuso o soporte técnico:</p>
+
+      <div class="contact-box">
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Soporte y consultas legales</p>
+        <a href="mailto:soporte@feeltrip.app">soporte@feeltrip.app</a>
+        <div class="legal-links">
+          <a href="/privacy-policy.html">Política de Privacidad</a>
+          <a href="https://feeltrip-app.web.app">feeltrip-app.web.app</a>
+        </div>
+      </div>
+
+      <p style="margin-top: 24px;">Domicilio legal: Santiago, República de Chile. Todos los conflictos derivados del uso de esta aplicación se someterán a los tribunales ordinarios de justicia chilenos.</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <span class="footer-brand">FeelTrip — Viaja para recordar</span>
+    <span class="footer-note">© 2026 FeelTrip. Todos los derechos reservados. Santiago, Chile.</span>
+  </footer>
+
+</body>
+</html>

@@ -8,7 +8,8 @@ import 'package:feeltrip_app/features/profile/presentation/profile_controller.da
 import 'package:feeltrip_app/services/isar_service.dart';
 import 'package:feeltrip_app/services/revenuecat_service.dart';
 import 'package:feeltrip_app/services/sync_service.dart';
-import 'package:feeltrip_app/services/deep_link_service.dart'; // Importado de la raíz
+import 'package:feeltrip_app/services/deep_link_service.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -18,33 +19,44 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-/// Provider for the Chronicle API Key, initialized as an empty string and overridden in main.
-final chronicleApiKeyProvider = Provider<String>((ref) => throw UnimplementedError());
+import 'data/services/admob_service.dart';
+import 'package:feeltrip_app/theme/app_theme.dart';
+
+
+/// Provider global para la API Key de Google AI (Gemini/Chronicle).
+final googleAiApiKeyProvider = Provider<String>((ref) => throw UnimplementedError());
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicialización paralela para mejorar el tiempo de carga
+  // 1. Carga de entorno y servicios básicos en paralelo
   await Future.wait([
     _loadEnvironmentAndOptionalServices(),
     _configureDeviceOrientation(),
   ]);
 
+  // 2. Inicialización de Firebase
   final firebaseReady = await FirebaseConfig.initialize();
   
   if (firebaseReady) {
     await _configureFirebaseAppCheck();
     await _configureCrashReporting();
+    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
   } else {
     debugPrint('FeelTrip: Firebase no disponible; modo degradado activo.');
   }
 
+  // Inicializar AdMob
+  await AdMobService.initialize();
+
+  // 3. Servicios locales (Isar y Sync)
   await _initializeLocalServices();
+
 
   final app = ProviderScope(
     overrides: [
-      chronicleApiKeyProvider.overrideWithValue(
-        dotenv.env['CHRONICLE_API_KEY'] ?? '',
+      googleAiApiKeyProvider.overrideWithValue(
+        dotenv.env['GOOGLE_AI_API_KEY'] ?? '',
       ),
     ],
     child: const FeelTripApp(),
@@ -53,7 +65,7 @@ Future<void> main() async {
   await _runWithOptionalSentry(app);
 }
 
-// --- Métodos de Configuración del Sistema ---
+// --- Métodos de Configuración ---
 
 Future<void> _loadEnvironmentAndOptionalServices() async {
   try {
@@ -71,11 +83,14 @@ Future<void> _configureDeviceOrientation() {
   ]);
 }
 
-Future<void> _configureFirebaseAppCheck() {
-  return FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaV3Provider(
-      dotenv.env['RECAPTCHA_SITE_KEY'] ?? 'recaptcha-v3-site-key',
-    ),
+Future<void> _configureFirebaseAppCheck() async {
+  const bool useDebugProvider = bool.fromEnvironment('USE_DEBUG_APPCHECK', defaultValue: false);
+  
+  await FirebaseAppCheck.instance.activate(
+    // ignore: deprecated_member_use
+    androidProvider: (kDebugMode || useDebugProvider) ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+    // ignore: deprecated_member_use
+    appleProvider: (kDebugMode || useDebugProvider) ? AppleProvider.debug : AppleProvider.deviceCheck,
   );
 }
 
@@ -107,7 +122,7 @@ Future<void> _runWithOptionalSentry(Widget app) async {
   );
 }
 
-// --- Componente Principal de la Aplicación ---
+// --- Componente Principal ---
 
 class FeelTripApp extends ConsumerStatefulWidget {
   const FeelTripApp({super.key});
@@ -124,11 +139,9 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp> with WidgetsBindingOb
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    // Monitorización de servicios
     ref.read(connectivityServiceProvider).monitorConnection();
     _bindNotificationNavigation();
 
-    // INTEGRACIÓN: Inicialización de Deep Links post-frame
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final router = ref.read(routerProvider);
       final deepLinkService = ref.read(deepLinkServiceProvider);
@@ -154,6 +167,9 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp> with WidgetsBindingOb
           case 'booking_confirm':
             router.go('/bookings');
             break;
+          case 'chronicle_ready':
+            router.go('/diary');
+            break;
           default:
             router.go('/notifications');
         }
@@ -172,7 +188,6 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp> with WidgetsBindingOb
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
 
-    // Listener de conectividad para refrescar perfil y sincronizar
     ref.listen(connectivityProvider, (previous, next) {
       next.whenData((result) {
         if (result == ConnectivityResult.mobile || result == ConnectivityResult.wifi) {
@@ -180,6 +195,11 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp> with WidgetsBindingOb
           if (user != null) {
             ref.read(profileControllerProvider.notifier).refreshProfile();
             ref.read(syncServiceProvider).syncUserEntries(user.id);
+            
+            FirebaseAnalytics.instance.logEvent(
+              name: 'sync_on_connectivity_recovered',
+              parameters: {'user_id': user.id},
+            );
           }
         }
       });
@@ -189,31 +209,7 @@ class _FeelTripAppState extends ConsumerState<FeelTripApp> with WidgetsBindingOb
       title: 'FeelTrip - Viaja para recordar',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      theme: _buildAppTheme(),
-    );
-  }
-
-  ThemeData _buildAppTheme() {
-    final brandTeal = Colors.teal[800]!;
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(seedColor: brandTeal, primary: brandTeal),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.grey[50],
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15), 
-          borderSide: BorderSide(color: brandTeal, width: 1.5)
-        ),
-      ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: brandTeal,
-        centerTitle: true,
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      theme: AppTheme.darkTheme,
     );
   }
 }

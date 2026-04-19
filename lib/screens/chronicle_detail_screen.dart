@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:feeltrip_app/models/chronicle_model.dart';
+import 'package:feeltrip_app/presentation/providers/subscription_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ChronicleDetailScreen extends StatelessWidget {
+class ChronicleDetailScreen extends ConsumerWidget {
   const ChronicleDetailScreen({super.key, required this.chronicle});
   final ChronicleModel chronicle;
 
@@ -29,10 +32,14 @@ class ChronicleDetailScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final data = chronicle.expeditionData;
     final expNum = chronicle.expeditionNumber.toString().padLeft(3, '0');
     final dateStr = _formatDate(chronicle.generatedAt);
+    
+    // Obtener código de referido del usuario
+    final sub = ref.watch(subscriptionProvider).valueOrNull;
+    final refCode = sub?.referralCode ?? '';
 
     return Scaffold(
       backgroundColor: paperBase,
@@ -44,6 +51,19 @@ class ChronicleDetailScreen extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.share_rounded, size: 18, color: dustySilt),
+            tooltip: 'Compartir en redes',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              final cta = refCode.isNotEmpty 
+                ? '\n🎁 Usa mi invitación $refCode para probar FeelTrip Pro.' 
+                : '';
+              Share.share(
+                '🏔️ Lee mi última expedición: "${chronicle.title}"\n\n${chronicle.fullText}$cta\n\n#FeelTrip',
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.copy_rounded, size: 18, color: dustySilt),
             onPressed: () => _copyToClipboard(context),
@@ -167,8 +187,35 @@ class ChronicleDetailScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // Badge de Tono/Mood
-              _MoodBadge(label: data.tone.displayName),
+              // Badge de Tono/Mood y Soundtrack
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _MoodBadge(label: data.tone.displayName),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1DB954).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFF1DB954).withValues(alpha: 0.5)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.library_music_rounded, size: 14, color: Color(0xFF1DB954)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'BANDA SONORA SYNC',
+                          style: GoogleFonts.jetBrainsMono(
+                            fontSize: 9,
+                            color: const Color(0xFF1DB954),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),

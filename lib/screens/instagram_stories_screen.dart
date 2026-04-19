@@ -1,6 +1,5 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:async';
-
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,10 +16,12 @@ class InstagramStoriesScreen extends ConsumerStatefulWidget {
   const InstagramStoriesScreen({super.key});
 
   @override
-  ConsumerState<InstagramStoriesScreen> createState() => _InstagramStoriesScreenState();
+  ConsumerState<InstagramStoriesScreen> createState() =>
+      _InstagramStoriesScreenState();
 }
 
-class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen> {
+class _InstagramStoriesScreenState
+    extends ConsumerState<InstagramStoriesScreen> {
   final PageController _pageController = PageController();
   Timer? _timer;
   int _currentIndex = 0;
@@ -57,8 +58,9 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
 
   Future<void> _createStory() async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 75);
-    
+    final image =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 75);
+
     if (image == null) return;
 
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -74,9 +76,9 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
             userId: uid,
             imageFile: File(image.path),
           );
-      
+
       if (mounted) {
-        _showStatus('LOG: EXPEDICIÃ“N_VISUAL_CARGADA');
+        _showStatus('LOG: EXPEDICIÓN VISUAL CARGADA');
       }
     } catch (error, stackTrace) {
       if (mounted) ErrorHandler.handleError(context, error, stackTrace);
@@ -94,7 +96,9 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
       child: Scaffold(
         backgroundColor: carbon,
         body: storiesAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator(color: boneWhite, strokeWidth: 1)),
+          loading: () => const Center(
+              child:
+                  CircularProgressIndicator(color: boneWhite, strokeWidth: 1)),
           error: (error, _) => _buildErrorState(error.toString()),
           data: (stories) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -117,7 +121,8 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
                   },
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTapDown: (details) => _handleTap(details, stories.length),
+                      onTapDown: (details) =>
+                          _handleTap(details, stories.length),
                       child: _StorySlide(story: stories[index]),
                     );
                   },
@@ -131,7 +136,8 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
                   top: MediaQuery.of(context).padding.top + 16,
                   right: 8,
                   child: IconButton(
-                    icon: const Icon(Icons.close_rounded, color: boneWhite, size: 28),
+                    icon: const Icon(Icons.close_rounded,
+                        color: boneWhite, size: 28),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -141,7 +147,8 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
                   Container(
                     color: Colors.black54,
                     child: const Center(
-                      child: CircularProgressIndicator(color: boneWhite, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                          color: boneWhite, strokeWidth: 2),
                     ),
                   ),
               ],
@@ -187,9 +194,12 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(2),
                       child: LinearProgressIndicator(
-                        value: index < _currentIndex ? 1.0 : (index == _currentIndex ? null : 0.0),
+                        value: index < _currentIndex
+                            ? 1.0
+                            : (index == _currentIndex ? null : 0.0),
                         backgroundColor: boneWhite.withValues(alpha: .2),
-                        valueColor: const AlwaysStoppedAnimation<Color>(boneWhite),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(boneWhite),
                         minHeight: 2,
                       ),
                     ),
@@ -201,13 +211,12 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'LIVE_FEED_SYS',
+                'LIVE FEED SYS',
                 style: GoogleFonts.jetBrainsMono(
-                  fontSize: 10,
-                  color: boneWhite.withValues(alpha: .5),
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2
-                ),
+                    fontSize: 10,
+                    color: boneWhite.withValues(alpha: .5),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2),
               ),
             ),
           ],
@@ -220,11 +229,13 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
     final width = MediaQuery.of(context).size.width;
     if (details.globalPosition.dx < width / 3) {
       if (_currentIndex > 0) {
-        _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+        _pageController.previousPage(
+            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
       }
     } else {
       if (_currentIndex < totalStories - 1) {
-        _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+        _pageController.nextPage(
+            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
       } else {
         Navigator.pop(context);
       }
@@ -236,11 +247,13 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.camera_enhance_outlined, color: boneWhite.withValues(alpha: .2), size: 48),
+          Icon(Icons.camera_enhance_outlined,
+              color: boneWhite.withValues(alpha: .2), size: 48),
           const SizedBox(height: 16),
           Text(
-            'SIN_HISTORIAS_DISPONIBLES',
-            style: GoogleFonts.jetBrainsMono(color: boneWhite.withValues(alpha: .4), fontSize: 12),
+            'SIN HISTORIAS DISPONIBLES',
+            style: GoogleFonts.jetBrainsMono(
+                color: boneWhite.withValues(alpha: .4), fontSize: 12),
           ),
         ],
       ),
@@ -249,8 +262,9 @@ class _InstagramStoriesScreenState extends ConsumerState<InstagramStoriesScreen>
 
   Widget _buildErrorState(String error) {
     return Center(
-      child: Text('// ERROR_STORY_FEED: $error', 
-        style: GoogleFonts.jetBrainsMono(color: Colors.red.shade900, fontSize: 11)),
+      child: Text('// ERROR_STORY_FEED: $error',
+          style: GoogleFonts.jetBrainsMono(
+              color: Colors.red.shade900, fontSize: 11)),
     );
   }
 
@@ -278,12 +292,12 @@ class _StorySlide extends StatelessWidget {
       height: double.infinity,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
-        return const Center(child: CircularProgressIndicator(color: Color(0xFFF5F5DC), strokeWidth: 1));
+        return const Center(
+            child: CircularProgressIndicator(
+                color: Color(0xFFF5F5DC), strokeWidth: 1));
       },
-      errorBuilder: (context, _, __) => const Center(child: Icon(Icons.broken_image_outlined, color: Colors.white24)),
+      errorBuilder: (context, _, __) => const Center(
+          child: Icon(Icons.broken_image_outlined, color: Colors.white24)),
     );
   }
 }
-
-
-

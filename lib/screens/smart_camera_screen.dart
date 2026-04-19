@@ -232,10 +232,10 @@ class _SmartCameraScreenState extends ConsumerState<SmartCameraScreen> {
     });
   }
 
-  Widget _buildCircleButton({required IconData icon, required VoidCallback onPressed}) {
+  Widget _buildCircleButton({required dynamic icon, required VoidCallback onPressed}) {
     return Container(
       decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.black45),
-      child: IconButton(onPressed: onPressed, icon: FaIcon(icon, color: Colors.white, size: 18)),
+      child: IconButton(onPressed: onPressed, icon: FaIcon(icon as FaIconData, color: Colors.white, size: 18)),
     );
   }
 

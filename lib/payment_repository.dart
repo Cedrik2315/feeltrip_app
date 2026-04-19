@@ -1,6 +1,7 @@
-﻿import 'package:cloud_functions/cloud_functions.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:dartz/dartz.dart';
 import 'package:feeltrip_app/core/error/failures.dart';
+import 'package:feeltrip_app/models/payment_item.dart'; // Añadido
 
 class PaymentRequest {
   const PaymentRequest({
@@ -67,6 +68,12 @@ abstract class IPaymentRepository {
   Future<Either<Failure, PaymentSession>> createCheckoutSession(
     PaymentRequest request,
   );
+
+  /// Crea una preferencia de pago y devuelve el ID o la URL de checkout
+  Future<Map<String, String>> createPreference(PaymentItem item);
+
+  /// Procesa el resultado que devuelve el SDK o las Back URLs
+  Future<void> handlePaymentResult(String status, String externalReference);
 }
 
 class PaymentRepository implements IPaymentRepository {
@@ -96,5 +103,57 @@ class PaymentRepository implements IPaymentRepository {
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
+  }
+
+  @override
+  Future<Map<String, String>> createPreference(PaymentItem item) async {
+    try {
+      // Llamamos a la Cloud Function que creamos antes
+      final result = await _functions
+          .httpsCallable('createMpPreference')
+          .call<Map<String, dynamic>>(item.toJson());
+
+      // Retornamos el preferenceId e initPoint
+      final data = result.data;
+      return {
+        'id': data['id'] as String,
+        'initPoint': data['initPoint'] as String,
+      };
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception('Error al generar el pago: ${e.message}');
+    } catch (e) {
+      throw Exception('Error inesperado en la pasarela de pagos.');
+    }
+  }
+
+  @override
+  Future<void> handlePaymentResult(String status, String externalReference) async {
+    switch (status) {
+      case 'approved':
+        // Aquí podrías disparar una sincronización manual o mostrar éxito
+        print('Pago aprobado para el usuario: $externalReference');
+        break;
+      case 'pending':
+        print('Pago en proceso/pendiente');
+        break;
+      default:
+        throw Exception('El pago no fue completado.');
+    }
+  }
+
+  /// Crea una preferencia de pago específica para el libro impreso
+  /// Llama a la Cloud Function 'createMercadoPagoPreference' con purpose: 'book'
+  Future<Either<Failure, PaymentSession>> createBookPayment({
+    required String userId,
+    required String fullName,
+    required double amount,
+  }) async {
+    return createCheckoutSession(PaymentRequest(
+      amount: amount,
+      title: 'Libro de Expediciones FeelTrip',
+      purpose: 'book',
+      currency: 'CLP',
+      bookingId: 'book_$userId',
+    ));
   }
 }

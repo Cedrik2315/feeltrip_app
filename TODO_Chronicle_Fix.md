@@ -1,13 +1,25 @@
-# TODO: Fix chronicle_detail_screen.dart - COMPLETED ✅
+# IMPLEMENTACIÓN ESTRATEGIA CONVERSIÓN MES 3-4 + AdMob [BLACKBOXAI]
+Estado: 🚀 EN PROGRESO
 
-## Plan ejecutado:
-- [x] 1. Create TODO.md (done)
-- [x] 2. Fix parse errors (missing ), undefined child, extra ; around lines 208-239)
-- [x] 3. Add errorBuilder to Image.network
-- [x] 4. Fix Snackbar text to 'Crónica copiada al portapapeles'
-- [x] 5. Safe tone access (direct since String label)
-- [x] 6. Linter fixes (withValues for opacity, indents)
-- [x] 7. Run flutter analyze -- 0 issues found!
-- [x] 8. dart format applied
-- [x] 9. Updated TODO
-- [x] 10. Task complete
+## ✅ PASOS COMPLETADOS
+- [ ]
+
+## 🔄 PASOS PENDIENTES (Orden de ejecución)
+1. [ ] Crear lib/data/services/admob_service.dart (nuevo servicio)
+2. [ ] Crear lib/presentation/providers/admob_provider.dart (StateNotifierProvider)
+3. [ ] Editar lib/services/notification_service.dart (+3 métodos al final)
+4. [ ] Editar lib/data/services/subscription_service.dart (insert en activateTrialIfEligible)
+5. [ ] Editar lib/data/services/referral_service.dart (insert en _rewardReferrer)
+6. [ ] Editar lib/main.dart (+initialize AdMob)
+7. [ ] Editar lib/screens/home_screen.dart (Scaffold + persistentFooter banner)
+8. [ ] Editar lib/services/route_provider.dart (intersticial en finishRoute)
+9. [ ] Verificar flutter analyze (0 errors)
+10.[ ] Test: run app → complete route → verificar logs/notifs/ads
+
+## 📋 NOTAS
+- No modificar lógica existente
+- Solo usuarios Free (level == SubscriptionLevel.free)
+- IDs AdMob de test (reemplazar prod)
+- notifyBonusExpiringSoon del task NO usado aún → pendiente si needed
+
+Última actualización: BLACKBOXAI

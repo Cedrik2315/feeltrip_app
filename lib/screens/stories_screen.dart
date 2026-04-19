@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -266,7 +266,7 @@ class _EmptyState extends StatelessWidget {
       color: const Color(0xFF111111),
       child: const Center(
         child: Text(
-          'AUN_NO_HAY_HISTORIAS_PUBLICADAS',
+          'AUN NO HAY HISTORIAS PUBLICADAS',
           style: TextStyle(color: Colors.white70, letterSpacing: 1.2),
         ),
       ),
@@ -287,7 +287,7 @@ class _ErrorState extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            'ERROR_LOADING_STORIES: $message',
+            'ERROR LOADING STORIES: $message',
             style: const TextStyle(color: Colors.white70),
             textAlign: TextAlign.center,
           ),

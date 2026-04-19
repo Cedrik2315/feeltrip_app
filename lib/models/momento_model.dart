@@ -30,7 +30,9 @@ class MomentoModel extends HiveObject {
     this.errorMessage,
     this.retryCount = 0,
     this.lastAttempt,
-  }): syncStatusName = syncStatus.name; 
+    DateTime? updatedAt,
+  }): syncStatusName = syncStatus.name,
+      updatedAt = updatedAt ?? createdAt;
 
   factory MomentoModel.fromJson(Map<String, dynamic> json) => MomentoModel(
         userId: json['userId'] as String? ?? '',
@@ -52,6 +54,9 @@ class MomentoModel extends HiveObject {
         retryCount: json['retryCount'] as int? ?? 0,
         lastAttempt: json['lastAttempt'] != null
             ? DateTime.parse(json['lastAttempt'] as String)
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'] as String)
             : null,
       );
 
@@ -78,6 +83,9 @@ class MomentoModel extends HiveObject {
       retryCount: data['retryCount'] as int? ?? 0,
       lastAttempt: data['lastAttempt'] != null
           ? (data['lastAttempt'] as Timestamp).toDate()
+          : null,
+      updatedAt: data['updatedAt'] != null
+          ? (data['updatedAt'] as Timestamp).toDate()
           : null,
     );
   }
@@ -124,6 +132,9 @@ class MomentoModel extends HiveObject {
 
   @HiveField(12)
   DateTime? lastAttempt;
+
+  @HiveField(13)
+  DateTime updatedAt;
 
   // Getter/setter de conveniencia para LatLng (no persiste en Hive)
   LatLng? get location {
@@ -207,6 +218,7 @@ class MomentoModel extends HiveObject {
     String? errorMessage,
     int? retryCount,
     DateTime? lastAttempt,
+    DateTime? updatedAt,
   }) {
     final copy = MomentoModel(
       userId: userId ?? this.userId,
@@ -221,6 +233,7 @@ class MomentoModel extends HiveObject {
       errorMessage: errorMessage ?? this.errorMessage,
       retryCount: retryCount ?? this.retryCount,
       lastAttempt: lastAttempt ?? this.lastAttempt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
     copy.syncStatus = syncStatus ?? this.syncStatus;
     return copy;
@@ -241,6 +254,7 @@ class MomentoModel extends HiveObject {
         'errorMessage': errorMessage,
         'retryCount': retryCount,
         'lastAttempt': lastAttempt?.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
       };
 
   Map<String, dynamic> toFirestore() => {
@@ -257,5 +271,6 @@ class MomentoModel extends HiveObject {
         'errorMessage': errorMessage,
         'retryCount': retryCount,
         'lastAttempt': lastAttempt != null ? Timestamp.fromDate(lastAttempt!) : null,
+        'updatedAt': Timestamp.fromDate(updatedAt),
       };
 }

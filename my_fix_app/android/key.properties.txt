@@ -1,0 +1,5 @@
+storePassword=231504
+keyPassword=231504
+keyAlias=upload
+storeFile=c:/Users/monch/upload-keystore.jks
+

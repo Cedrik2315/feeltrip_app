@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feeltrip_app/models/expedition_data.dart';
 import 'package:feeltrip_app/models/gps_models.dart';
 import 'package:feeltrip_app/services/chronicle_repository_impl.dart';
 import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:feeltrip_app/models/chronicle_model.dart';
+import 'package:feeltrip_app/core/di/providers.dart';
 
 /// Estado de la generación de la crónica
 final finishChronicleProvider = StateNotifierProvider<ChronicleGeneratorNotifier, AsyncValue<ChronicleModel?>>((ref) {
@@ -46,6 +48,15 @@ class ChronicleGeneratorNotifier extends StateNotifier<AsyncValue<ChronicleModel
       final chronicle = await ref.read(chronicleRepositoryProvider).generateAndSave(
         data: data,
         userId: userId,
+      );
+
+      // 4. PUSH NATIVO: Crónica lista
+      unawaited(
+        ref.read(notificationServiceProvider).notifyChronicleReady(
+          userId: userId,
+          chronicleTitle: chronicle.title,
+          chronicleId: chronicle.id,
+        ),
       );
 
       state = AsyncValue.data(chronicle);

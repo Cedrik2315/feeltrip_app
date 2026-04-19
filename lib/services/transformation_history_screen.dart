@@ -7,7 +7,7 @@ import 'package:feeltrip_app/core/di/providers.dart';
 import 'package:feeltrip_app/services/isar_service.dart';
 import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:feeltrip_app/models/itinerary_model.dart';
-import 'package:feeltrip_app/services/gemini_service.dart';
+
 
 final transformationHistoryProvider =
     FutureProvider.autoDispose<List<ItineraryModel>>((ref) async {

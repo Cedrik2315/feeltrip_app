@@ -45,6 +45,25 @@ class ChronicleModel extends HiveObject with SyncableModel {
     );
   }
 
+  ChronicleModel copyWith({
+    String? imageUrl,
+    String? visualMetaphor,
+    SyncStatus? syncStatus,
+  }) {
+    return ChronicleModel(
+      id: id,
+      userId: userId,
+      title: title,
+      paragraphs: paragraphs,
+      expeditionDataJson: expeditionDataJson,
+      generatedAt: generatedAt,
+      expeditionNumber: expeditionNumber,
+      imageUrl: imageUrl ?? this.imageUrl,
+      visualMetaphor: visualMetaphor ?? this.visualMetaphor,
+      syncStatus: syncStatus ?? this.syncStatus,
+    );
+  }
+
   @HiveField(0)
   final String id;
 

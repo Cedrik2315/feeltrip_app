@@ -14,14 +14,15 @@ import '../models/proposal_model.dart';
 import '../models/syncable_model.dart';
 import '../models/diary_entry_model.dart';
 import 'package:feeltrip_app/features/profile/domain/user_profile_model.dart';
+import '../core/local_storage/app_schemas.dart';
 
 class IsarService {
   IsarService._internal();
-  factory IsarService() => _instance;
-  static final IsarService _instance = IsarService._internal();
+  static IsarService? _instance;
+  factory IsarService() => _instance ??= IsarService._internal();
 
   bool _isInitialized = false;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
   late Isar _isar;
 
   static const String _boxName = 'momentos';
@@ -77,7 +78,15 @@ class IsarService {
       
       final dir = await getApplicationDocumentsDirectory();
       _isar = await Isar.open(
-        [DiaryEntrySchema],
+        [
+          DiaryEntrySchema, 
+          MomentoDbSchema, 
+          ChronicleDbSchema, 
+          ProposalDbSchema, 
+          ItineraryDbSchema, 
+          BookingDbSchema,
+          AiCacheDbSchema
+        ],
         directory: dir.path,
       );
 
@@ -124,33 +133,174 @@ class IsarService {
   }
 
   Future<void> putMomento(MomentoModel momento) async {
+    // 1. Hive (Legacy para retrocompatibilidad inmediata)
     if (momento.syncStatus == SyncStatus.local) {
       momento.syncStatus = SyncStatus.pending;
       momento.lastAttempt = DateTime.now();
     }
-
-    final existingKey = momento.key;
-    final storageKey = existingKey ?? momento.firestoreId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final storageKey = momento.key ?? momento.firestoreId ?? DateTime.now().millisecondsSinceEpoch.toString();
     await box.put(storageKey, momento);
-    AppLogger.d('Momento saved locally: ${momento.firestoreId ?? storageKey}');
+
+    // 2. Isar (Nueva infraestructura escalable)
+    final db = MomentoDb()
+      ..firestoreId = momento.firestoreId
+      ..userId = momento.userId
+      ..title = momento.title
+      ..description = momento.description
+      ..emotionTags = momento.emotionTags
+      ..latitude = momento.locationLat
+      ..longitude = momento.locationLng
+      ..imageUrls = momento.imageUrls
+      ..createdAt = momento.createdAt
+      ..syncStatus = momento.syncStatus.name
+      ..errorMessage = momento.errorMessage
+      ..retryCount = momento.retryCount
+      ..lastAttempt = momento.lastAttempt
+      ..updatedAt = momento.updatedAt;
+
+    await _isar.writeTxn(() => _isar.momentoDbs.put(db));
+    AppLogger.d('Momento saved in both Hive and Isar (dual-write)');
+  }
+
+  // --- IA CACHE METHODS ---
+
+  Future<void> putAiResponse(String promptHash, String response) async {
+    final expiresAt = DateTime.now().add(const Duration(days: 30));
+    final db = AiCacheDb()
+      ..promptHash = promptHash
+      ..response = response
+      ..createdAt = DateTime.now()
+      ..expiresAt = expiresAt;
+
+    await _isar.writeTxn(() => _isar.aiCacheDbs.put(db));
+  }
+
+  Future<String?> getAiResponse(String promptHash) async {
+    final entry = await _isar.aiCacheDbs.where().promptHashEqualTo(promptHash).findFirst();
+    if (entry != null && entry.expiresAt.isAfter(DateTime.now())) {
+      return entry.response;
+    }
+    return null;
+  }
+
+  Future<void> putChronicle(ChronicleModel chronicle) async {
+    // Save in Hive
+    await chroniclesBox.put(chronicle.id, chronicle);
+    
+    // Save in Isar
+    final db = ChronicleDb()
+      ..localId = chronicle.id
+      ..userId = chronicle.userId
+      ..title = chronicle.title
+      ..paragraphs = chronicle.paragraphs
+      ..expeditionDataJson = chronicle.expeditionDataJson.toString()
+      ..generatedAt = chronicle.generatedAt
+      ..expeditionNumber = chronicle.expeditionNumber
+      ..imageUrl = chronicle.imageUrl
+      ..visualMetaphor = chronicle.visualMetaphor
+      ..syncStatus = chronicle.syncStatus.name;
+
+    await _isar.writeTxn(() => _isar.chronicleDbs.put(db));
+  }
+
+  Future<List<MomentoModel>> getMomentos({
+    String? userId,
+    SyncStatus? syncStatus,
+  }) async {
+    // Usamos Isar para búsquedas rápidas si es posible
+    final query = _isar.momentoDbs.where();
+    List<MomentoDb> results;
+    
+    if (userId != null && syncStatus != null) {
+      results = await query.filter()
+          .userIdEqualTo(userId)
+          .syncStatusEqualTo(syncStatus.name)
+          .findAll();
+    } else if (userId != null) {
+      results = await query.filter().userIdEqualTo(userId).findAll();
+    } else {
+      results = await query.findAll();
+    }
+
+    return results.map((db) => MomentoModel(
+      userId: db.userId,
+      title: db.title,
+      description: db.description,
+      emotionTags: db.emotionTags,
+      locationLat: db.latitude,
+      locationLng: db.longitude,
+      imageUrls: db.imageUrls,
+      createdAt: db.createdAt,
+      syncStatus: SyncStatus.values.byName(db.syncStatus),
+      firestoreId: db.firestoreId,
+      errorMessage: db.errorMessage,
+      retryCount: db.retryCount,
+      lastAttempt: db.lastAttempt,
+      updatedAt: db.updatedAt,
+    )).toList();
   }
 
   Future<void> putProposal(ProposalModel proposal) async {
+    // 1. Hive
     if (proposal.syncStatus == SyncStatus.local) {
       proposal.syncStatus = SyncStatus.pending;
       proposal.lastAttempt = DateTime.now();
     }
     await proposalsBox.put(proposal.id, proposal);
-    AppLogger.d('Proposal saved locally: ${proposal.id}');
+
+    // 2. Isar
+    final db = ProposalDb()
+      ..firestoreId = proposal.id
+      ..userId = proposal.userId
+      ..title = 'Propuesta IA' // Placeholder o extraer de content
+      ..description = proposal.content
+      ..destination = '' 
+      ..budget = 0.0
+      ..startDate = proposal.createdAt
+      ..endDate = proposal.createdAt
+      ..syncStatus = proposal.syncStatus.name;
+
+    await _isar.writeTxn(() => _isar.proposalDbs.put(db));
+    AppLogger.d('Proposal saved in dual-write (Hive/Isar)');
   }
 
   Future<void> putItinerary(ItineraryModel itinerary) async {
+    // 1. Hive
     if (itinerary.syncStatus == SyncStatus.local) {
       itinerary.syncStatus = SyncStatus.pending;
       itinerary.lastAttempt = DateTime.now();
     }
     await itinerariesBox.put(itinerary.id, itinerary);
-    AppLogger.d('Itinerary saved locally: ${itinerary.id}');
+
+    // 2. Isar
+    final db = ItineraryDb()
+      ..firestoreId = itinerary.id
+      ..userId = itinerary.userId
+      ..title = 'Itinerario Generado'
+      ..proposalId = itinerary.proposalId
+      ..contentJson = itinerary.content
+      ..syncStatus = itinerary.syncStatus.name;
+
+    await _isar.writeTxn(() => _isar.itineraryDbs.put(db));
+    AppLogger.d('Itinerary saved in dual-write (Hive/Isar)');
+  }
+
+  Future<void> saveBooking(BookingModel booking) async {
+    // 1. Hive
+    final key = booking.key ?? booking.id;
+    await bookingsBox.put(key, booking.toJson());
+
+    // 2. Isar
+    final db = BookingDb()
+      ..firestoreId = booking.id
+      ..userId = booking.userId
+      ..experienceId = booking.experienceId
+      ..status = booking.status.name
+      ..amount = booking.amount
+      ..date = booking.createdAt;
+
+    await _isar.writeTxn(() => _isar.bookingDbs.put(db));
+    AppLogger.d('Booking saved in dual-write (Hive/Isar)');
   }
 
   Future<List<T>> getDataByBoxName<T>(
@@ -208,13 +358,6 @@ class IsarService {
     return list;
   }
 
-  Future<List<MomentoModel>> getMomentos({
-    String? userId,
-    SyncStatus? syncStatus,
-  }) async {
-    return _getEntries(targetBox: box, userId: userId, syncStatus: syncStatus);
-  }
-
   Future<List<MomentoModel>> getPendingSync(String userId) async {
     return _getEntries(targetBox: box, userId: userId, onlyPending: true);
   }
@@ -247,13 +390,33 @@ class IsarService {
         (item) => item?.firestoreId == doc.id,
         orElse: () => null,
       );
+
+      // RESOLUCIÓN DE CONFLICTOS: 
+      // Si el local tiene cambios pendientes, comprobamos cuál es más reciente.
       if (localMomento != null && localMomento.syncStatus.needsSync) {
-        continue;
+        if (localMomento.updatedAt.isAfter(remoteMomento.updatedAt)) {
+          AppLogger.d('Conflicto detectado: Manteniendo versión local más reciente.');
+          continue; 
+        } else {
+          AppLogger.w('Conflicto detectado: Cloud es más reciente. Sobrescribiendo local.');
+        }
       }
+
       remoteMomento.syncStatus = SyncStatus.synced;
       remoteMomento.errorMessage = null;
       remoteMomento.lastAttempt = DateTime.now();
       await box.put(doc.id, remoteMomento);
+      
+      // Sincronizar también en Isar
+      final isarDb = await _isar.momentoDbs.where().firestoreIdEqualTo(doc.id).findFirst() ?? MomentoDb();
+      isarDb
+        ..firestoreId = doc.id
+        ..userId = remoteMomento.userId
+        ..title = remoteMomento.title
+        ..description = remoteMomento.description
+        ..updatedAt = remoteMomento.updatedAt
+        ..syncStatus = 'synced';
+      await _isar.writeTxn(() => _isar.momentoDbs.put(isarDb));
     }
     final staleKeys = box.keys.where((key) {
       final momento = box.get(key);
@@ -463,11 +626,6 @@ class IsarService {
     return rawBookings.map((json) => BookingModel.fromJson(json)).toList();
   }
 
-  Future<void> saveBooking(BookingModel booking) async {
-    final key = booking.key ?? booking.id;
-    await bookingsBox.put(key, booking.toJson());
-    AppLogger.d('Booking saved: ${booking.id}');
-  }
 
   Future<void> deleteMomento(dynamic key) async {
     final momento = box.get(key);

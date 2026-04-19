@@ -5,9 +5,7 @@ class RouteNames {
   static const String register = '/register';
   static const String authGate = '/auth-gate';
   static const String home = '/home';
-  static const String cart = '/cart';
   static const String premium = '/premium';
-  static const String checkout = '/checkout';
   static const String profile = '/profile';
   static const String editProfile = '/edit-profile';
   static const String feed = '/feed';

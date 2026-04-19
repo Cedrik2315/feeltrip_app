@@ -53,8 +53,8 @@ class AffiliateWidget extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     HapticFeedback.lightImpact();
-                    AnalyticsService.logAffiliateClick(option.name, destination);
-                    AffiliateOptionsService.openAffiliateLink(option.url);
+                    AnalyticsService().logAffiliateClick(option.name, destination);
+                    AffiliateOptionsService.openAffiliateLink(context, option.url);
                   },
                   borderRadius: BorderRadius.zero, // Estilo industrial
                   child: Container(

@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "title": "Test FeelTrip Integration",
+      "quantity": 1,
+      "unit_price": 100,
+      "currency_id": "CLP"
+    }
+  ],
+  "back_urls": {
+    "success": "feeltrip://payments/success",
+    "failure": "feeltrip://payments/failure",
+    "pending": "feeltrip://payments/pending"
+  },
+  "auto_return": "approved",
+  "external_reference": "test_booking_123"
+}

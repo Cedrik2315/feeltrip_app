@@ -103,7 +103,7 @@ class _ChronicleGeneratorScreenState
           icon: const Icon(Icons.close, color: carbonBlack, size: 20),
           onPressed: () => context.pop(),
         ),
-        title: Text('NUEVA_ENTRADA', 
+        title: Text('NUEVA ENTRADA', 
           style: GoogleFonts.jetBrainsMono(fontSize: 12, letterSpacing: 2, color: carbonBlack)),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
@@ -257,7 +257,7 @@ class _GenerateButton extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           isLoading 
-            ? Text('IA_PROCESANDO_PAISAJE...', style: GoogleFonts.jetBrainsMono(fontSize: 11, fontStyle: FontStyle.italic))
+            ? Text('IA PROCESANDO PAISAJE...', style: GoogleFonts.jetBrainsMono(fontSize: 11, fontStyle: FontStyle.italic))
             : Text('>> TRANSCRIBIR_CRÓNICA', 
                 style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
         ],

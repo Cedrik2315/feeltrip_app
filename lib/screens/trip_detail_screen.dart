@@ -1,51 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-// --- MODELO & PROVIDER (Simulados) ---
-class Trip {
-  Trip({
-    required this.id,
-    required this.title,
-    required this.destination,
-    required this.description,
-    required this.price,
-    required this.duration,
-    required this.rating,
-    required this.imageUrl,
-    this.difficulty = 'Moderada',
-    this.maxGroupSize = 12,
-  });
-  final String id;
-  final String title;
-  final String destination;
-  final String description;
-  final double price;
-  final int duration;
-  final double rating;
-  final String imageUrl;
-  final String difficulty;
-  final int maxGroupSize;
-}
+import 'package:go_router/go_router.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../models/trip_model.dart';
+import '../services/trip_service.dart';
 
 final tripDetailProvider = FutureProvider.family<Trip, String>((ref, id) async {
-  await Future.delayed(const Duration(milliseconds: 800));
-  return Trip(
-    id: id,
-    title: 'Aventura en el Cerro La Campana',
-    destination: 'Olmué / Quillota',
-    description: 'Explora la reserva de la biosfera en una caminata guiada por senderos rodeados de palmas chilenas milenarias. Una experiencia diseñada para desconectar de la ciudad y reconectar con la biodiversidad del valle central.',
-    price: 45000.0,
-    duration: 1,
-    rating: 4.8,
-    imageUrl: 'https://images.unsplash.com/photo-1596324268112-78a3c89d90d8?q=80&w=1200',
-  );
+  final service = ref.read(tripServiceProvider);
+  final trip = await service.getTripById(id);
+  if (trip == null) throw Exception('El viaje no existe.');
+  return trip;
 });
 
 // --- UI REFINADA ---
 class TripDetailScreen extends ConsumerStatefulWidget {
-  const TripDetailScreen({super.key, required this.tripId});
+  const TripDetailScreen({required this.tripId, super.key});
   final String tripId;
 
   @override
@@ -63,7 +33,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
     return tripAsync.when(
       loading: () => Scaffold(body: Center(child: CircularProgressIndicator(color: brandColor))),
-      error: (error, _) => _buildErrorState(),
+      error: (error, _) => _buildErrorState(error.toString()),
       data: (trip) => Scaffold(
         backgroundColor: Colors.white,
         body: CustomScrollView(
@@ -84,7 +54,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       pinned: true,
       stretch: true,
       backgroundColor: brandColor,
-      leading: _buildCircleButton(Icons.arrow_back, () => Navigator.pop(context)),
+      leading: _buildCircleButton(Icons.arrow_back, () => context.pop()),
       actions: [
         _buildCircleButton(
           _isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -98,7 +68,10 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(trip.imageUrl, fit: BoxFit.cover),
+            Hero(
+              tag: 'trip-image-${trip.id}',
+              child: Image.network(trip.imageUrl, fit: BoxFit.cover),
+            ),
             const DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -166,7 +139,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             const SizedBox(height: 12),
             Text(trip.description, style: TextStyle(fontSize: 16, height: 1.6, color: Colors.grey[800])),
             const SizedBox(height: 32),
-            _buildMapPreview(),
+            _buildMapPreview(trip),
             const SizedBox(height: 120),
           ],
         ),
@@ -206,7 +179,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     );
   }
 
-  Widget _buildMapPreview() {
+  Widget _buildMapPreview(Trip trip) {
+    final lat = trip.location?.latitude ?? -32.99;
+    final lng = trip.location?.longitude ?? -71.18;
+    final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -216,8 +193,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
           height: 180,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            image: const DecorationImage(
-              image: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=-32.99,-71.18&zoom=13&size=600x300&key=YOUR_KEY_STUB'),
+            image: DecorationImage(
+              image: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&zoom=13&size=600x300&key=$apiKey'),
               fit: BoxFit.cover,
             ),
           ),
@@ -247,16 +224,21 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
           const SizedBox(width: 24),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {
-                HapticFeedback.heavyImpact();
-                // Lógica de Checkout
-              },
+              onPressed: () => context.push('/bookings'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: brandColor,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
               ),
-              child: Text('RESERVAR AHORA', style: GoogleFonts.jetBrainsMono(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text(
+                'RESERVAR AHORA',
+                style: GoogleFonts.jetBrainsMono(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
             ),
           ),
         ],
@@ -264,10 +246,10 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     );
   }
 
-  Widget _buildErrorState() {
+  Widget _buildErrorState(String message) {
     return Scaffold(
       body: Center(
-        child: Text('No pudimos conectar con la montaña.', style: GoogleFonts.playfairDisplay(fontSize: 18)),
+        child: Text(message, style: GoogleFonts.playfairDisplay(fontSize: 18)),
       ),
     );
   }

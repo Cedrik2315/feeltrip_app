@@ -62,7 +62,7 @@ class _CommentsScreenState extends ConsumerState<CommentsScreen> {
         backgroundColor: charcoal,
         elevation: 0,
         centerTitle: false,
-        title: Text('BITÁCORA_COMUNIDAD', 
+        title: Text('BITÁCORA COMUNIDAD', 
           style: GoogleFonts.jetBrainsMono(fontSize: 13, color: boneWhite, letterSpacing: 1)),
         iconTheme: const IconThemeData(color: boneWhite, size: 20),
         systemOverlayStyle: SystemUiOverlayStyle.light,
@@ -291,7 +291,7 @@ class CommentInput extends ConsumerWidget {
               controller: controller,
               style: GoogleFonts.jetBrainsMono(color: Colors.white, fontSize: 13),
               decoration: InputDecoration(
-                hintText: 'ESCRIBIR_COMENTARIO...',
+                hintText: 'ESCRIBIR COMENTARIO...',
                 hintStyle: GoogleFonts.jetBrainsMono(color: Colors.white.withValues(alpha: 0.3), fontSize: 12),
                 border: InputBorder.none,
               ),
@@ -386,7 +386,7 @@ class CenterEmptyComments extends StatelessWidget {
         children: [
           Icon(Icons.auto_stories_rounded, size: 40, color: Colors.grey.shade400),
           const SizedBox(height: 20),
-          Text('HISTORIAL_VACÍO', 
+          Text('HISTORIAL VACÍO', 
             style: GoogleFonts.jetBrainsMono(color: Colors.grey.shade400, letterSpacing: 2, fontSize: 12)),
         ],
       ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:feeltrip_app/core/security/security_utils.dart';
 
 class WeatherService {
   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5';
@@ -51,6 +52,7 @@ class WeatherService {
   /// Get forecast for a city name
   Future<List<Map<String, dynamic>>> getForecast(String city) async {
     final apiKey = dotenv.env['OPENWEATHER_API_KEY'];
+    final sCity = SecurityUtils.sanitizeInput(city);
     if (apiKey == null || apiKey.isEmpty) {
       return [];
     }
@@ -58,7 +60,7 @@ class WeatherService {
     try {
       final response = await http.get(
         Uri.parse(
-            '$_baseUrl/forecast?q=$city&units=metric&lang=es&appid=$apiKey'),
+            '$_baseUrl/forecast?q=$sCity&units=metric&lang=es&appid=$apiKey'),
       );
 
       if (response.statusCode == 200) {

@@ -24,9 +24,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         setState(() => _initialized = true);
         _controller.play();
         _controller.setLooping(false);
+      }).catchError((_) {
+        // Fallback robusto en caso de error de asset
+        if (mounted) setState(() => _showAction = true);
       });
 
     _controller.addListener(_videoListener);
+
+    // Timeout fallback (4 seg max)
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted && !_showAction) {
+        setState(() => _showAction = true);
+      }
+    });
   }
 
   void _videoListener() {
@@ -107,7 +117,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     
                     // Botón con borde estilizado
                     OutlinedButton(
-                      onPressed: () => context.go('/home'),
+                      onPressed: () => context.go('/'),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: terminalColor, width: 1),
                         padding: const EdgeInsets.symmetric(vertical: 22),
@@ -125,7 +135,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 20),
+                    
+                    TextButton(
+                      onPressed: () => context.push('/manifesto'),
+                      child: Text(
+                        'NUESTRA MISIÓN',
+                        style: GoogleFonts.jetBrainsMono(
+                          color: terminalColor.withValues(alpha: 0.4),
+                          fontSize: 10,
+                          letterSpacing: 1.5,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),

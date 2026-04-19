@@ -1,16 +1,16 @@
-// lib/services/chronicle_service.dart
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:hive/hive.dart';
-import '../models/chronicle_model.dart';
-import '../models/expedition_data.dart';
-import '../core/logger/app_logger.dart';
+import 'package:feeltrip_app/models/chronicle_model.dart';
+import 'package:feeltrip_app/models/expedition_data.dart';
+import 'package:feeltrip_app/core/logger/app_logger.dart';
+import 'package:feeltrip_app/services/isar_service.dart';
 
 class ChronicleService {
   final String apiKey;
+  final GenerativeModel? customModel;
   late final GenerativeModel _model;
 
-  ChronicleService({required this.apiKey}) {
-    _model = GenerativeModel(
+  ChronicleService({required this.apiKey, this.customModel}) {
+    _model = customModel ?? GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: apiKey,
     );
@@ -21,14 +21,20 @@ class ChronicleService {
     required ExpeditionData data,
     required String userId,
     required int expeditionNumber,
+    String archetype = 'Aventurero', // Arquetipo por defecto
   }) async {
-    if (apiKey.isEmpty) {
-      AppLogger.e('ChronicleService: API Key no configurada para crónicas.');
-      throw Exception('Servicio de IA no disponible.');
-    }
-
+    // ... mismo código de generación ...
     final prompt = """
     Actúa como un cronista de viajes literario y mentor existencialista de FeelTrip.
+    Tu estilo narrativo DEBE adaptarse al arquetipo del explorador: $archetype.
+    
+    INSTRUCCIONES DE ESTILO POR ARQUETIPO:
+    - Aventurero: Usa verbos de acción, lenguaje visceral, enfoque en el desafío y la superación física.
+    - Contemplativo: Usa lenguaje poético, metáforas sobre la luz y el silencio, enfoque en la belleza y la paz.
+    - Conector: Enfócate en los encuentros, la calidez humana, la pertenencia y las historias compartidas.
+    - Aprendiz: Usa un tono curioso, datos culturales sutiles y reflexiones sobre el saber del lugar.
+    - Transformado: Enfócate en el cambio interno, el simbolismo de la mariposa y el dejar atrás la vieja versión.
+
     Redacta una crónica de transformación personal para el explorador ${data.explorerName} 
     sobre su expedición #${expeditionNumber.toString().padLeft(3, '0')} a ${data.placeName}, ${data.region}.
     
@@ -41,9 +47,9 @@ class ChronicleService {
 
     ESTRUCTURA DE LA RESPUESTA:
     1. El primer renglón DEBE ser un título evocador y místico.
-    2. El resto debe ser un relato profundo en primera persona.
-    3. Divide el texto en 3 o 4 párrafos claros.
-    4. No uses formato Markdown (ni asteriscos, ni negritas), solo texto plano en español.
+    2. El segundo renglón DEBE ser una 'Metáfora Visual' breve (3-5 palabras en inglés) para buscar una imagen, enmarcada entre corchetes así: [METAPHOR: keyword1 keyword2].
+    3. El resto debe ser un relato profundo en primera persona dividido en 3 o 4 párrafos.
+    4. No uses formato Markdown, solo texto plano en español.
     """;
 
     try {
@@ -52,53 +58,44 @@ class ChronicleService {
       final text = response.text ?? '';
 
       if (text.isEmpty) throw Exception('La IA devolvió un cuerpo vacío.');
-
-      // Procesamos la respuesta para separar título de párrafos
+      // Sugerencia: El parseo manual de líneas es frágil si Gemini cambia el formato ligeramente.
       final lines = text.split('\n').where((l) => l.trim().isNotEmpty).toList();
       final title = lines.isNotEmpty ? lines.first : 'Crónica de la Expedición';
-      final paragraphs = lines.length > 1 ? lines.sublist(1) : [text];
+      
+      String? visualMetaphor;
+      String? finalTitle = title;
+      List<String> paragraphs = [];
 
-    return ChronicleModel.create(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      userId: userId,
-      title: title,
-      paragraphs: paragraphs,
-      expeditionData: data,
-      generatedAt: DateTime.now(),
-      expeditionNumber: expeditionNumber,
-    );
+      for (var i = 0; i < lines.length; i++) {
+        final line = lines[i];
+        if (line.contains('[METAPHOR:')) {
+          visualMetaphor = line.split(':').last.replaceAll(']', '').trim();
+          continue;
+        }
+        if (i == 0) continue; 
+        paragraphs.add(line);
+      }
+
+      if (paragraphs.isEmpty) paragraphs = [text];
+
+      return ChronicleModel.create(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: userId,
+        title: finalTitle,
+        paragraphs: paragraphs,
+        expeditionData: data,
+        generatedAt: DateTime.now(),
+        expeditionNumber: expeditionNumber,
+        visualMetaphor: visualMetaphor,
+      );
     } catch (e) {
       AppLogger.e('Error generando crónica con Gemini: $e');
       rethrow;
     }
   }
 
-  Future<void> saveChronicle({
-    required String id,
-    required String userId,
-    required String title,
-    required List<String> paragraphs,
-    required ExpeditionData expeditionData, // Recibimos el objeto
-    required DateTime generatedAt,
-    int? expeditionNumber,
-    String? imageUrl,
-    String? visualMetaphor,
-  }) async {
-    final box = await Hive.openBox<ChronicleModel>('chronicles');
-
-    // CAMBIO CLAVE: Usamos el Factory .create que encapsula la conversión a JSON
-    final newChronicle = ChronicleModel.create(
-      id: id,
-      userId: userId,
-      title: title,
-      paragraphs: paragraphs,
-      expeditionData: expeditionData,
-      generatedAt: generatedAt,
-      expeditionNumber: expeditionNumber,
-      imageUrl: imageUrl,
-      visualMetaphor: visualMetaphor,
-    );
-
-    await box.put(id, newChronicle);
+  Future<void> saveChronicle(ChronicleModel chronicle) async {
+    // Usamos el IsarService centralizado para persistencia unificada
+    await IsarService().putChronicle(chronicle);
   }
 }

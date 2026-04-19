@@ -62,7 +62,8 @@ class RevenueCatService {
     }
 
     try {
-      final customerInfo = await Purchases.purchasePackage(package);
+      final result = await Purchases.purchase(PurchaseParams.package(package));
+      final customerInfo = result.customerInfo;
       AppLogger.i(
         'Purchase success. Active entitlements: ${customerInfo.entitlements.active.keys}',
       );

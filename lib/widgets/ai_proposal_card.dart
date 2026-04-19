@@ -47,8 +47,8 @@ class _AiProposalCardState extends State<AiProposalCard> {
 
   @override
   Widget build(BuildContext context) {
-    const Color boneWhite = Color(0xFFF5F5DC);
-    const Color accentOrange = Color(0xFFFF8F00);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     // Altura dinámica con feedback visual
     final double cardHeight = _showLogistica ? 350 : 260;
@@ -62,19 +62,25 @@ class _AiProposalCardState extends State<AiProposalCard> {
           curve: Curves.easeOut,
           height: cardHeight,
           decoration: BoxDecoration(
-            color: Colors.black,
-            // Quitamos el redondeado excesivo para el estilo brutalista
-            border: Border.all(color: Colors.white10, width: 1),
+            color: colorScheme.surface,
+            border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.tertiary.withValues(alpha: 0.05),
+                blurRadius: 20,
+              )
+            ],
           ),
           child: _isLoading 
             ? _buildLoader() 
-            : _buildContent(boneWhite, accentOrange),
+            : _buildContent(context),
         ),
       ),
     );
   }
 
-  Widget _buildContent(Color boneWhite, Color accentOrange) {
+  Widget _buildContent(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -83,7 +89,7 @@ class _AiProposalCardState extends State<AiProposalCard> {
           shaderCallback: (rect) => LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.black.withValues(alpha: 0.2), Colors.black],
+            colors: [colorScheme.surface.withValues(alpha: 0.2), colorScheme.surface],
           ).createShader(rect),
           blendMode: BlendMode.darken,
           child: Image.network(
@@ -99,11 +105,11 @@ class _AiProposalCardState extends State<AiProposalCard> {
           left: 0,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            color: accentOrange,
+            color: colorScheme.tertiary,
             child: Text(
               '${widget.moodEmoji} ${widget.moodBadge.toUpperCase()}',
               style: GoogleFonts.jetBrainsMono(
-                color: Colors.black,
+                color: colorScheme.onTertiary,
                 fontWeight: FontWeight.bold,
                 fontSize: 10,
               ),
@@ -122,7 +128,7 @@ class _AiProposalCardState extends State<AiProposalCard> {
 Text(
               (widget.agency.name ?? '').toUpperCase(),
               style: GoogleFonts.playfairDisplay(
-                color: boneWhite,
+                color: colorScheme.onSurface,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -140,7 +146,7 @@ _buildSpecialties(widget.agency.specialties ?? []),
           child: IconButton(
             icon: Icon(
               _showLogistica ? Icons.keyboard_arrow_down : Icons.analytics_outlined,
-              color: boneWhite,
+              color: colorScheme.onSurface,
             ),
             onPressed: () {
               HapticFeedback.mediumImpact();
@@ -150,12 +156,13 @@ _buildSpecialties(widget.agency.specialties ?? []),
         ),
 
         // Panel de Logística Expandido
-        if (_showLogistica) _buildLogisticsPanel(boneWhite),
+        if (_showLogistica) _buildLogisticsPanel(context),
       ],
     );
   }
 
-  Widget _buildLogisticsPanel(Color boneWhite) {
+  Widget _buildLogisticsPanel(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Positioned(
       bottom: 0,
       left: 0,
@@ -164,17 +171,17 @@ _buildSpecialties(widget.agency.specialties ?? []),
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
-          border: Border(top: BorderSide(color: boneWhite.withValues(alpha: 0.1))),
+          color: colorScheme.surface.withValues(alpha: 0.95),
+          border: Border(top: BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.1))),
         ),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-_logisticsItem('CLIMA', weather?['temp']?.toString() ?? '?', Icons.thermostat),
-                _logisticsItem('MONEDA', (countryInfo?['currencies'] as Map?)?.keys.firstOrNull?.toString() ?? '?', Icons.payments),
-                _logisticsItem('CAPITAL', (countryInfo?['capital'] as List?)?.firstOrNull?.toString() ?? '?', Icons.location_city),
+                _logisticsItem(context, 'CLIMA', weather?['temp']?.toString() ?? '?', Icons.thermostat),
+                _logisticsItem(context, 'MONEDA', (countryInfo?['currencies'] as Map?)?.keys.firstOrNull?.toString() ?? '?', Icons.payments),
+                _logisticsItem(context, 'CAPITAL', (countryInfo?['capital'] as List?)?.firstOrNull?.toString() ?? '?', Icons.location_city),
               ],
             ),
             const Spacer(),
@@ -184,12 +191,12 @@ _logisticsItem('CLIMA', weather?['temp']?.toString() ?? '?', Icons.thermostat),
               height: 35,
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: boneWhite.withValues(alpha: 0.5)),
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  side: BorderSide(color: colorScheme.primary),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: widget.onAdditionalTap,
                 child: Text('VER RUTA COMPLETA', 
-                  style: GoogleFonts.jetBrainsMono(color: boneWhite, fontSize: 10)),
+                  style: GoogleFonts.jetBrainsMono(color: colorScheme.primary, fontSize: 10, fontWeight: FontWeight.bold)),
               ),
             )
           ],
@@ -198,14 +205,15 @@ _logisticsItem('CLIMA', weather?['temp']?.toString() ?? '?', Icons.thermostat),
     );
   }
 
-  Widget _logisticsItem(String label, String value, IconData icon) {
+  Widget _logisticsItem(BuildContext context, String label, String value, IconData icon) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: GoogleFonts.jetBrainsMono(fontSize: 8, color: Colors.white38)),
         Row(
           children: [
-            Icon(icon, size: 12, color: const Color(0xFFFF8F00)),
+            Icon(icon, size: 12, color: colorScheme.tertiary),
             const SizedBox(width: 4),
             Text(value, style: GoogleFonts.jetBrainsMono(fontSize: 12, color: Colors.white)),
           ],

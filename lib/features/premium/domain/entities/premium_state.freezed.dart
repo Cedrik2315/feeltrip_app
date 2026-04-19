@@ -22,7 +22,9 @@ PremiumState _$PremiumStateFromJson(Map<String, dynamic> json) {
 mixin _$PremiumState {
   bool get isLoading => throw _privateConstructorUsedError;
   bool get isPremium => throw _privateConstructorUsedError;
+  @JsonKey(includeToJson: false, includeFromJson: false)
   List<Offering> get offerings => throw _privateConstructorUsedError;
+  @JsonKey(includeToJson: false, includeFromJson: false)
   Package? get activePackage => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
@@ -41,11 +43,11 @@ abstract class $PremiumStateCopyWith<$Res> {
   $Res call(
       {bool isLoading,
       bool isPremium,
+      @JsonKey(includeToJson: false, includeFromJson: false)
       List<Offering> offerings,
+      @JsonKey(includeToJson: false, includeFromJson: false)
       Package? activePackage,
       String? errorMessage});
-
-  $PackageCopyWith<$Res>? get activePackage;
 }
 
 /// @nodoc
@@ -90,18 +92,6 @@ class _$PremiumStateCopyWithImpl<$Res, $Val extends PremiumState>
               as String?,
     ) as $Val);
   }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $PackageCopyWith<$Res>? get activePackage {
-    if (_value.activePackage == null) {
-      return null;
-    }
-
-    return $PackageCopyWith<$Res>(_value.activePackage!, (value) {
-      return _then(_value.copyWith(activePackage: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
@@ -115,12 +105,11 @@ abstract class _$$PremiumStateImplCopyWith<$Res>
   $Res call(
       {bool isLoading,
       bool isPremium,
+      @JsonKey(includeToJson: false, includeFromJson: false)
       List<Offering> offerings,
+      @JsonKey(includeToJson: false, includeFromJson: false)
       Package? activePackage,
       String? errorMessage});
-
-  @override
-  $PackageCopyWith<$Res>? get activePackage;
 }
 
 /// @nodoc
@@ -171,7 +160,9 @@ class _$PremiumStateImpl implements _PremiumState {
   const _$PremiumStateImpl(
       {this.isLoading = false,
       this.isPremium = false,
+      @JsonKey(includeToJson: false, includeFromJson: false)
       final List<Offering> offerings = const [],
+      @JsonKey(includeToJson: false, includeFromJson: false)
       this.activePackage = null,
       this.errorMessage})
       : _offerings = offerings;
@@ -187,7 +178,7 @@ class _$PremiumStateImpl implements _PremiumState {
   final bool isPremium;
   final List<Offering> _offerings;
   @override
-  @JsonKey()
+  @JsonKey(includeToJson: false, includeFromJson: false)
   List<Offering> get offerings {
     if (_offerings is EqualUnmodifiableListView) return _offerings;
     // ignore: implicit_dynamic_type
@@ -195,7 +186,7 @@ class _$PremiumStateImpl implements _PremiumState {
   }
 
   @override
-  @JsonKey()
+  @JsonKey(includeToJson: false, includeFromJson: false)
   final Package? activePackage;
   @override
   final String? errorMessage;
@@ -250,7 +241,9 @@ abstract class _PremiumState implements PremiumState {
   const factory _PremiumState(
       {final bool isLoading,
       final bool isPremium,
+      @JsonKey(includeToJson: false, includeFromJson: false)
       final List<Offering> offerings,
+      @JsonKey(includeToJson: false, includeFromJson: false)
       final Package? activePackage,
       final String? errorMessage}) = _$PremiumStateImpl;
 
@@ -262,8 +255,10 @@ abstract class _PremiumState implements PremiumState {
   @override
   bool get isPremium;
   @override
+  @JsonKey(includeToJson: false, includeFromJson: false)
   List<Offering> get offerings;
   @override
+  @JsonKey(includeToJson: false, includeFromJson: false)
   Package? get activePackage;
   @override
   String? get errorMessage;

@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'package:feeltrip_app/models/gps_models.dart';
 import 'package:feeltrip_app/models/expedition_data.dart';
+import 'package:feeltrip_app/presentation/providers/subscription_provider.dart';
+import 'package:feeltrip_app/presentation/providers/admob_provider.dart';
 import 'package:feeltrip_app/services/chronicle_repository_impl.dart';
 import 'package:feeltrip_app/services/route_repository.dart';
 import 'package:feeltrip_app/services/gps_service.dart';
+import 'package:feeltrip_app/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:feeltrip_app/domain/entities/user_subscription.dart';
 
 enum RoutePhase { idle, tracking, paused, completing, done }
 
@@ -146,12 +150,28 @@ class RouteNotifier extends AsyncNotifier<RouteState> {
       elevationGainM: finishedRoute.elevationGainMeters,
     );
 
+    // ── Suscripción: incrementar contador y activar trial si aplica ──────
+    final userId = ref.read(authNotifierProvider).value?.id;
+    if (userId != null) {
+      final subService = ref.read(subscriptionServiceProvider);
+      await subService.incrementRouteCount(userId);
+      await subService.activateTrialIfEligible(userId);
+
+      // Mostrar AdMob interstitial para usuarios Free (cada 3 rutas aprox)
+      final subscription = ref.read(subscriptionProvider).valueOrNull;
+      if (subscription != null && subscription.level == SubscriptionLevel.free) {
+        await ref.read(adMobProvider).showInterstitial(isUserFree: true);
+      }
+
+    }
+
     try {
       await ref.read(chronicleGeneratorProvider.notifier).generate(data);
+
     } catch (e) {
       AppLogger.w('RouteNotifier: Error generando crónica (posible offline). Quedará pendiente.');
     }
-    
+
     state = AsyncData(current.copyWith(phase: RoutePhase.done));
     AppLogger.i('RouteNotifier: Expedición finalizada y crónica enviada a IA');
   }

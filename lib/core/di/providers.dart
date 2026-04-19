@@ -22,7 +22,14 @@ import 'package:feeltrip_app/services/restaurant_service.dart';
 import 'package:feeltrip_app/services/sync_service.dart';
 import 'package:feeltrip_app/services/isar_service.dart';
 import 'package:feeltrip_app/services/emotional_engine_service.dart';
+import 'package:feeltrip_app/services/agent_service.dart';
 import 'package:feeltrip_app/services/location_suggestions_repository.dart';
+import 'package:feeltrip_app/services/chronicle_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:feeltrip_app/services/unsplash_service.dart';
+import 'package:feeltrip_app/services/algolia_search_service.dart';
+import 'package:feeltrip_app/services/historical_context_service.dart';
+import 'package:feeltrip_app/services/gemini_service.dart';
 
 final routerProvider = Provider<GoRouter>((ref) => createAppRouter(ref));
 
@@ -52,15 +59,18 @@ final commentProvider =
 final agencyServiceProvider = Provider((ref) => AgencyService());
 
 final firebaseAuthProvider = Provider((ref) => FirebaseAuth.instance);
-final googleSignInProvider =
-    Provider<GoogleSignIn>((ref) => GoogleSignIn.instance);
+/// Provider para el cliente de Google Sign-In.
+/// Asegúrate de que no haya una clase local llamada GoogleSignIn ocultando esta.
+final googleSignInProvider = Provider<GoogleSignIn>((ref) {
+return GoogleSignIn();
+});
 final facebookAuthProvider = Provider((ref) => FacebookAuth.instance);
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   return AuthRepositoryImpl(
     ref.watch(firebaseAuthProvider),
-    ref.watch(googleSignInProvider),
     ref.watch(facebookAuthProvider),
+    ref.watch(googleSignInProvider),
   );
 });
 
@@ -76,11 +86,30 @@ final homeRepositoryProvider = Provider((ref) => HomeRepository());
 final syncServiceProvider = Provider<SyncService>((ref) {
   return SyncService();
 });
-
 final emotionalEngineProvider = Provider((ref) => EmotionalEngineService());
+final agentServiceProvider = Provider((ref) => AgentService());
 
 final locationSuggestionsRepositoryProvider =
     Provider((ref) => LocationSuggestionsRepository());
 
 /// Provider para acceder directamente a Isar
 final isarProvider = Provider<Isar>((ref) => ref.watch(isarServiceProvider).isar);
+
+final chronicleServiceProvider = Provider<ChronicleService>((ref) {
+  final apiKey = dotenv.env['GOOGLE_AI_API_KEY'] ?? '';
+  return ChronicleService(apiKey: apiKey);
+});
+
+final unsplashServiceProvider = Provider((ref) => UnsplashService());
+
+final algoliaServiceProvider = Provider((ref) => AlgoliaSearchService());
+
+final historicalContextServiceProvider = Provider<HistoricalContextService>((ref) {
+  final apiKey = dotenv.env['GOOGLE_AI_API_KEY'] ?? '';
+  return HistoricalContextService(apiKey: apiKey);
+});
+
+final geminiServiceProvider = Provider<GeminiService>((ref) {
+  final apiKey = dotenv.env['GOOGLE_AI_API_KEY'] ?? '';
+  return GeminiService(apiKey: apiKey);
+});

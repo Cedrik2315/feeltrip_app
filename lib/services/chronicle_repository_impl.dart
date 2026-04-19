@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:feeltrip_app/domain/services/feature_flag_service.dart';
+import 'package:feeltrip_app/presentation/providers/subscription_provider.dart';
 import 'package:feeltrip_app/services/chronicle_service.dart';
 import 'package:feeltrip_app/services/chronicle_repository.dart';
 import 'package:feeltrip_app/models/expedition_data.dart';
@@ -63,9 +65,24 @@ class ChronicleGeneratorNotifier extends AsyncNotifier<ChronicleModel?> {
       final repo = ref.read(chronicleRepositoryProvider);
       final authState = ref.read(authNotifierProvider);
       final userId = authState.value?.id ?? 'guest_user';
-      
+
+      // ── Feature flag: límite de crónicas para usuarios Free ────────────
+      final subscription = ref.read(subscriptionProvider).value;
+      final level = subscription?.level;
+      if (level != null) {
+        // Usamos el tamaño de la lista local como aproximación del mes actual.
+        // En Fase 2 esto se reemplazará por un campo de servidor por mes.
+        final existingCount = repo.getAll().length;
+        if (!FeatureFlagService.canGenerateCronica(level, existingCount)) {
+          throw Exception(
+            'Límite de crónicas alcanzado. Actualiza tu plan para continuar.',
+          );
+        }
+      }
+      // ───────────────────────────────────────────────────
+
       final chronicle = await repo.generateAndSave(data: data, userId: userId);
-      
+
       // Refrescamos la lista local inmediatamente
       ref.read(chronicleListProvider.notifier).refresh();
       return chronicle;

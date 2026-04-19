@@ -68,7 +68,7 @@ class DemoAgenciesScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF1A1A1A), // FeelTrip Charcoal
         elevation: 0,
         title: Text(
-          'PROPOSAL_LAB.sys',
+          'PROPOSAL LAB.sys',
           style: GoogleFonts.jetBrainsMono(
             fontSize: 14, 
             color: const Color(0xFFF5F5DC),

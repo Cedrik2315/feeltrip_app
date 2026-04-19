@@ -1,45 +1,39 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'isar_service.dart';
 import 'package:feeltrip_app/core/logger/app_logger.dart';
 
 class AiCacheService {
-  final _firestore = FirebaseFirestore.instance;
-  final String _collection = 'ai_responses_cache';
+  final IsarService _isar = IsarService();
 
   /// Genera una llave única basada en el prompt para el cache.
   String _generateKey(String prompt) {
     return sha256.convert(utf8.encode(prompt.trim().toLowerCase())).toString();
   }
 
-  /// Intenta obtener una respuesta cacheada para un prompt.
+  /// Intenta obtener una respuesta cacheada localmente.
   Future<String?> getCachedResponse(String prompt) async {
     final key = _generateKey(prompt);
     try {
-      final doc = await _firestore.collection(_collection).doc(key).get();
-      if (doc.exists) {
-        AppLogger.i('AiCacheService: Cache hit para el prompt.');
-        return doc.data()?['response'] as String?;
+      final cached = await _isar.getAiResponse(key);
+      if (cached != null) {
+        AppLogger.i('AiCacheService: Cache HIT local.');
+        return cached;
       }
     } catch (e) {
-      AppLogger.e('AiCacheService: Error al leer cache: $e');
+      AppLogger.e('AiCacheService: Error al leer cache local: $e');
     }
     return null;
   }
 
-  /// Guarda una respuesta en el cache de Firestore.
+  /// Guarda una respuesta en el cache local de Isar.
   Future<void> cacheResponse(String prompt, String response) async {
     final key = _generateKey(prompt);
     try {
-      await _firestore.collection(_collection).doc(key).set({
-        'prompt': prompt,
-        'response': response,
-        'createdAt': FieldValue.serverTimestamp(),
-        'ttl': DateTime.now().add(const Duration(days: 7)).millisecondsSinceEpoch, // Expira en 7 días
-      });
-      AppLogger.i('AiCacheService: Respuesta cacheada con éxito.');
+      await _isar.putAiResponse(key, response);
+      AppLogger.i('AiCacheService: Respuesta guardada en cache local (30 días de TTL).');
     } catch (e) {
-      AppLogger.e('AiCacheService: Error al guardar en cache: $e');
+      AppLogger.e('AiCacheService: Error al guardar en cache local: $e');
     }
   }
 }

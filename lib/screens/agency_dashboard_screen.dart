@@ -1,89 +1,178 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feeltrip_app/core/di/providers.dart';
-import 'package:google_fonts/google_fonts.dart'; // Importante para las fuentes sugeridas
+import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+
+// ── Paleta ──────────────────────────────────────────────────────
+const Color _carbon = Color(0xFF1A1A1A);
+const Color _boneWhite = Color(0xFFF5F5DC);
+const Color _terminalGreen = Color(0xFF00FF41);
+const Color _orange = Color(0xFFFF8F00);
 
 class AgencyDashboardScreen extends ConsumerWidget {
   const AgencyDashboardScreen({super.key, required this.agencyId});
   final String agencyId;
-
-  // Colores de la paleta FeelTrip
-  static const Color charcoal = Color(0xFF1A1A1A);
-  static const Color boneWhite = Color(0xFFF5F2ED);
-  static const Color mossGreen = Color(0xFF4A5D4E);
-  static const Color oxidizedEarth = Color(0xFFB35A38);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final agencyService = ref.watch(agencyServiceProvider);
 
     return Scaffold(
-      backgroundColor: boneWhite, // Fondo tipo papel
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: charcoal,
+        backgroundColor: Colors.black,
         elevation: 0,
-        centerTitle: false,
-        title: Text(
-          'LOG_FILE: AGENCY_DASHBOARD',
-          style: GoogleFonts.jetBrainsMono(
-            color: boneWhite,
-            fontSize: 14,
-            letterSpacing: 1.2,
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: _boneWhite),
+          onPressed: () => context.pop(),
         ),
+        title: Text('AGENCIA // COMANDO',
+            style: GoogleFonts.jetBrainsMono(color: _boneWhite, fontSize: 12, letterSpacing: 2, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, color: _boneWhite, size: 20),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: agencyService.getLeadsStream(agencyId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: mossGreen));
+            return const Center(child: CircularProgressIndicator(color: _terminalGreen, strokeWidth: 1));
           }
 
           final leads = snapshot.data ?? <Map<String, dynamic>>[];
+          final newLeads = leads.where((l) => (l['status'] as String?) == 'new').length;
+          final converted = leads.where((l) => (l['status'] as String?) == 'converted').length;
+          final convRate = leads.isEmpty ? 0 : ((converted / leads.length) * 100).round();
 
           return CustomScrollView(
             slivers: [
-              // Header con métricas estilizadas como "Terminal"
+              // ── Métricas KPI ────────────────────────────────
               SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                  decoration: const BoxDecoration(
-                    color: charcoal,
-                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
-                  ),
-                  child: _buildMetricsHeader(leads),
-                ),
-              ),
-              
-              // Título con estética editorial
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 32, 16, 8),
-                sliver: SliverToBoxAdapter(
-                  child: Text(
-                    'Correspondencia y Prospectos',
-                    style: GoogleFonts.ebGaramond(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
-                      color: charcoal,
-                      fontStyle: FontStyle.italic,
-                    ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('TELEMETRÍA DE CONVERSIÓN',
+                          style: GoogleFonts.jetBrainsMono(color: _terminalGreen, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          _kpi('${leads.length}', 'LEADS\nTOTALES', _boneWhite),
+                          const SizedBox(width: 12),
+                          _kpi('$newLeads', 'NUEVOS\nHOY', _orange),
+                          const SizedBox(width: 12),
+                          _kpi('$convRate%', 'TASA\nCONVERSIÓN', _terminalGreen),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
 
-              // Lista de Prospectos
-              SliverPadding(
-                padding: const EdgeInsets.all(16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final lead = leads[index];
-                      return _buildLeadCard(lead);
-                    },
-                    childCount: leads.length,
+              // ── White-Label Panel ────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('MODO WHITE-LABEL',
+                          style: GoogleFonts.jetBrainsMono(color: _terminalGreen, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.03),
+                          border: Border.all(color: _terminalGreen.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.business_outlined, color: _terminalGreen, size: 32),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('TU MARCA, NUESTRA TECNOLOGÍA',
+                                      style: GoogleFonts.jetBrainsMono(color: _boneWhite, fontSize: 11, fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 4),
+                                  Text('Personaliza interfaz, logo y paleta para tus clientes.',
+                                      style: GoogleFonts.ebGaramond(color: _boneWhite.withValues(alpha: 0.6), fontSize: 14)),
+                                ],
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: _carbon,
+                                    content: Text('BRANDING // En desarrollo para v1.1', style: GoogleFonts.jetBrainsMono(color: _terminalGreen, fontSize: 11)),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                              child: const Icon(Icons.arrow_forward_ios, color: _terminalGreen, size: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+
+              // ── Acciones rápidas ─────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('ACCIONES RÁPIDAS',
+                          style: GoogleFonts.jetBrainsMono(color: _terminalGreen, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          _actionBtn(context, 'NUEVO GRUPO', Icons.group_add_outlined, () {}),
+                          const SizedBox(width: 12),
+                          _actionBtn(context, 'EXPORTAR CSV', Icons.download_outlined, () {}),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // ── Lista de Prospectos ──────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                  child: Text('PROSPECTOS ACTIVOS',
+                      style: GoogleFonts.jetBrainsMono(color: _terminalGreen, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                ),
+              ),
+
+              leads.isEmpty
+                ? SliverToBoxAdapter(child: _buildEmptyLeads())
+                : SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => _buildLeadCard(leads[index]),
+                        childCount: leads.length,
+                      ),
+                    ),
+                  ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 40)),
             ],
           );
         },
@@ -91,75 +180,101 @@ class AgencyDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetricsHeader(List<Map<String, dynamic>> leads) {
-    final int total = leads.length;
-    final int news = leads.where((l) => (l['status'] as String?) == 'new').length;
-
-    return Row(
-      children: [
-        _metricTile('TOTAL_LEADS', total.toString().padLeft(3, '0')),
-        const SizedBox(width: 24),
-        _metricTile('NEW_STATUS', news.toString().padLeft(3, '0'), color: oxidizedEarth),
-      ],
+  Widget _kpi(String value, String label, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.03),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(value, style: GoogleFonts.jetBrainsMono(color: color, fontSize: 24, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(label, style: GoogleFonts.jetBrainsMono(color: _boneWhite.withValues(alpha: 0.4), fontSize: 8)),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _metricTile(String label, String value, {Color color = boneWhite}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '> $label',
-          style: GoogleFonts.jetBrainsMono(color: mossGreen, fontSize: 10, fontWeight: FontWeight.bold),
+  Widget _actionBtn(BuildContext context, String label, IconData icon, VoidCallback onTap) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () { HapticFeedback.lightImpact(); onTap(); },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            border: Border.all(color: _boneWhite.withValues(alpha: 0.15)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: _boneWhite, size: 16),
+              const SizedBox(width: 8),
+              Text(label, style: GoogleFonts.jetBrainsMono(color: _boneWhite, fontSize: 10, fontWeight: FontWeight.bold)),
+            ],
+          ),
         ),
-        Text(
-          value,
-          style: GoogleFonts.jetBrainsMono(color: color, fontSize: 32, fontWeight: FontWeight.w500),
-        ),
-      ],
+      ),
     );
   }
 
   Widget _buildLeadCard(Map<String, dynamic> lead) {
-    final String userId = lead['userId'] as String? ?? 'UNKNOWN_USR';
-    final String message = lead['message'] as String? ?? 'No narrative provided.';
+    final String userId = lead['userId'] as String? ?? 'ID_DESCONOCIDO';
+    final String message = lead['message'] as String? ?? 'Sin narrativa disponible.';
     final String status = (lead['status'] as String? ?? 'new').toUpperCase();
+    final Color statusColor = status == 'NEW' ? _orange : (status == 'CONVERTED' ? _terminalGreen : _boneWhite);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: const BoxDecoration(
-        border: Border(left: BorderSide(color: oxidizedEarth, width: 2)),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.02),
+        border: Border(left: BorderSide(color: statusColor, width: 2)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'ID: $userId',
-                  style: GoogleFonts.jetBrainsMono(fontSize: 11, color: Colors.grey[600]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('ID: ${userId.substring(0, userId.length.clamp(0, 8))}...',
+                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: _boneWhite.withValues(alpha: 0.4))),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                 ),
-                Text(
-                  '[$status]',
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: 10, 
-                    color: status == 'NEW' ? oxidizedEarth : mossGreen,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: GoogleFonts.ebGaramond(fontSize: 18, height: 1.3, color: charcoal),
-            ),
-            const Divider(height: 24, thickness: 0.5, color: Colors.black12),
-          ],
-        ),
+                child: Text(status, style: GoogleFonts.jetBrainsMono(fontSize: 8, color: statusColor, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(message, style: GoogleFonts.ebGaramond(fontSize: 16, height: 1.4, color: _boneWhite.withValues(alpha: 0.8)), maxLines: 3, overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyLeads() {
+    return Container(
+      margin: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(border: Border.all(color: _boneWhite.withValues(alpha: 0.08))),
+      child: Column(
+        children: [
+          const Icon(Icons.radar, color: _terminalGreen, size: 48),
+          const SizedBox(height: 16),
+          Text('ESCANEANDO RED...', style: GoogleFonts.jetBrainsMono(color: _boneWhite, fontSize: 13, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text('Aún no hay prospectos. Comparte tu enlace de agencia para empezar a capturar leads.',
+              style: GoogleFonts.ebGaramond(color: _boneWhite.withValues(alpha: 0.5), fontSize: 15, height: 1.5),
+              textAlign: TextAlign.center),
+        ],
       ),
     );
   }

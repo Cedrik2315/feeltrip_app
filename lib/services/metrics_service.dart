@@ -1,4 +1,4 @@
-﻿import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/logger/app_logger.dart';
 
@@ -93,5 +93,12 @@ class MetricsService {
 
   static void logSubscriptionSuccess() {
     FirebaseAnalytics.instance.logEvent(name: 'subscription_success');
+  }
+
+  static void logChronicleGenerated(String archetype) {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'chronicle_generated',
+      parameters: {'archetype': archetype},
+    );
   }
 }

@@ -3,6 +3,10 @@ import 'package:flutter/services.dart'; // Para HapticFeedback
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:feeltrip_app/user_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:feeltrip_app/features/profile/presentation/profile_controller.dart';
+import 'package:feeltrip_app/features/profile/domain/user_profile_model.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -15,6 +19,8 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(userPreferencesProvider);
     final notifier = ref.read(userPreferencesProvider.notifier);
+    final profile = ref.watch(profileControllerProvider).value;
+    final user = FirebaseAuth.instance.currentUser;
 
     final isDark = prefs.darkMode;
     final bgColor = isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
@@ -37,7 +43,7 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
-          _buildHeader(isDark),
+          _buildHeader(isDark, user, profile, ref),
           
           _SectionTitle(title: 'EXPERIENCIA VISUAL', darkMode: isDark),
           _CustomSwitchTile(
@@ -99,7 +105,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(bool isDark) {
+  Widget _buildHeader(bool isDark, User? user, UserProfile? profile, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       decoration: BoxDecoration(
@@ -107,23 +113,53 @@ class SettingsScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          const CircleAvatar(
-            radius: 40,
-            backgroundColor: accentAmber,
-            child: Icon(Icons.person_outline, size: 40, color: Colors.white),
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: accentAmber,
+                backgroundImage: (profile?.profileImageUrl != null && profile!.profileImageUrl!.isNotEmpty)
+                    ? NetworkImage(profile.profileImageUrl!)
+                    : null,
+                child: (profile?.profileImageUrl == null || profile!.profileImageUrl!.isEmpty)
+                    ? const Icon(Icons.person_outline, size: 40, color: Colors.white)
+                    : null,
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () async {
+                    final picker = ImagePicker();
+                    final image = await picker.pickImage(source: ImageSource.gallery);
+                    if (image != null) {
+                      // Simulación de subida o integrar con Storage
+                      ScaffoldMessenger.of(ref.context).showSnackBar(
+                        const SnackBar(content: Text('Subiendo fotografía...')),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(color: accentAmber, shape: BoxShape.circle),
+                    child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Text(
-            'Explorador FeelTrip',
+            profile?.username ?? user?.email?.split('@')[0].toUpperCase() ?? 'Explorador FeelTrip',
             style: GoogleFonts.playfairDisplay(
               fontSize: 22, 
               color: Colors.white, 
               fontWeight: FontWeight.bold
             ),
           ),
-          const Text(
-            'ID: FT-2026-XQ',
-            style: TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 1.5),
+          Text(
+            'ID: ${user?.uid.substring(0, 8).toUpperCase() ?? 'FT-2026-XQ'}',
+            style: const TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 1.5),
           ),
         ],
       ),
@@ -153,28 +189,50 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   void _showLanguagePicker(BuildContext context, WidgetRef ref) {
+    final isDark = ref.read(userPreferencesProvider).darkMode;
     showModalBottomSheet(
       context: context,
-      backgroundColor: ref.read(userPreferencesProvider).darkMode ? Colors.grey[900] : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'SELECCIONAR IDIOMA',
+                style: GoogleFonts.jetBrainsMono(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                ),
+              ),
+            ),
             ListTile(
-              title: const Text('Español (Chile)'),
+              title: Text('Español (Chile)', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              leading: const Text('🇨🇱'),
               onTap: () {
                 ref.read(userPreferencesProvider.notifier).setLanguage('es');
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('English'),
+              title: Text('English (Global)', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              leading: const Text('🇺🇸'),
               onTap: () {
                 ref.read(userPreferencesProvider.notifier).setLanguage('en');
                 Navigator.pop(context);
               },
             ),
+            ListTile(
+              title: Text('Português (Brasil)', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              leading: const Text('🇧🇷'),
+              onTap: () {
+                ref.read(userPreferencesProvider.notifier).setLanguage('pt');
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),

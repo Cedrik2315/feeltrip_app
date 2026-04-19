@@ -73,13 +73,16 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       daysActive: fields[7] as int,
       emotionalStats: (fields[8] as Map).cast<String, double>(),
       badges: (fields[9] as List).cast<BadgeModel>(),
+      isPremiumTrial: fields[10] as bool,
+      trialExpiresAt: fields[11] as DateTime?,
+      archetype: fields[12] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProfile obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.uid)
       ..writeByte(1)
@@ -99,7 +102,13 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       ..writeByte(8)
       ..write(obj.emotionalStats)
       ..writeByte(9)
-      ..write(obj.badges);
+      ..write(obj.badges)
+      ..writeByte(10)
+      ..write(obj.isPremiumTrial)
+      ..writeByte(11)
+      ..write(obj.trialExpiresAt)
+      ..writeByte(12)
+      ..write(obj.archetype);
   }
 
   @override

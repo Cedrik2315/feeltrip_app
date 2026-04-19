@@ -16,10 +16,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
   bool _isSubmitting = false;
 
-  // Colores FeelTrip
-  static const Color boneWhite = Color(0xFFF5F5DC);
-  static const Color mossGreen = Color(0xFF4B5320);
-  static const Color carbon = Color(0xFF1A1A1A);
+  // Colores FeelTrip eliminados para usar el tema global
 
   @override
   void dispose() {
@@ -29,14 +26,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Scaffold(
-      backgroundColor: boneWhite,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: carbon, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -50,11 +49,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  'ACCESO_RECUPERACIÓN',
+                  'ACCESO RECUPERACIÓN',
                   style: GoogleFonts.jetBrainsMono(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: mossGreen,
+                    color: colorScheme.primary,
                     letterSpacing: 1.5,
                   ),
                 ),
@@ -64,7 +63,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   style: GoogleFonts.ebGaramond(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
-                    color: carbon,
+                    color: colorScheme.onSurface,
                     height: 1.1,
                   ),
                 ),
@@ -72,7 +71,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 Text(
                   'Ingresa tu correo electrónico y te enviaremos las instrucciones para re-encriptar tu cuenta y volver a tus expediciones.',
                   style: GoogleFonts.inter(
-                    color: carbon.withValues(alpha: .6),
+                    color: colorScheme.onSurface.withValues(alpha: .6),
                     fontSize: 15,
                     height: 1.5,
                   ),
@@ -80,7 +79,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 const SizedBox(height: 48),
                 _buildEmailField(),
                 const SizedBox(height: 40),
-                _buildSubmitButton(),
+                _buildSubmitButton(context),
               ],
             ),
           ),
@@ -90,44 +89,47 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Widget _buildEmailField() {
+    final colorScheme = Theme.of(context).colorScheme;
     return TextFormField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
-      style: GoogleFonts.inter(color: carbon),
+      style: GoogleFonts.inter(color: colorScheme.onSurface),
       validator: _validateEmail,
       decoration: InputDecoration(
-        labelText: 'CORREO_ELECTRÓNICO',
-        labelStyle: GoogleFonts.jetBrainsMono(fontSize: 10, fontWeight: FontWeight.bold, color: carbon.withValues(alpha: .4)),
+        labelText: 'CORREO ELECTRÓNICO',
+        labelStyle: GoogleFonts.jetBrainsMono(fontSize: 10, fontWeight: FontWeight.bold, color: colorScheme.onSurface.withValues(alpha: .4)),
         hintText: 'usuario@feeltrip.sys',
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        prefixIcon: const Icon(Icons.alternate_email_rounded, color: carbon, size: 20),
-        enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black12)),
-        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: mossGreen, width: 2)),
+        prefixIcon: Icon(Icons.alternate_email_rounded, color: colorScheme.onSurface, size: 20),
+        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.1))),
+        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: colorScheme.primary, width: 2)),
         errorStyle: GoogleFonts.jetBrainsMono(fontSize: 10),
       ),
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildSubmitButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SizedBox(
       width: double.infinity,
       height: 58,
       child: ElevatedButton(
         onPressed: _isSubmitting ? null : _submit,
         style: ElevatedButton.styleFrom(
-          backgroundColor: carbon,
-          foregroundColor: boneWhite,
-          elevation: 0,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          backgroundColor: colorScheme.primary,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shadowColor: colorScheme.primary.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: _isSubmitting
             ? const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(color: boneWhite, strokeWidth: 2),
+                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
               )
             : Text(
-                'ENVIAR_ENLACE',
+                'ENVIAR ENLACE',
                 style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.bold),
               ),
       ),
@@ -135,10 +137,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'DATO_REQUERIDO';
+    if (value == null || value.isEmpty) return 'DATO REQUERIDO';
     final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegExp.hasMatch(value.trim())) {
-      return 'FORMATO_INVÁLIDO';
+      return 'FORMATO INVÁLIDO';
     }
     return null;
   }
@@ -157,7 +159,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       _showCustomSnackBar(
         context, 
         'LOG: Correo de recuperación enviado con éxito.', 
-        mossGreen
+        Theme.of(context).colorScheme.primary
       );
       
       Navigator.of(context).pop();
@@ -179,7 +181,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       SnackBar(
         content: Text(
           message,
-          style: GoogleFonts.jetBrainsMono(fontSize: 11, color: boneWhite),
+          style: GoogleFonts.jetBrainsMono(fontSize: 11, color: Colors.white),
         ),
         backgroundColor: color,
         behavior: SnackBarBehavior.floating,

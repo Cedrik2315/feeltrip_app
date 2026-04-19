@@ -30,6 +30,13 @@ class StorageService {
   static String? getUserName() =>
       Hive.box<dynamic>(_boxName).get('userName') as String?;
 
+  /// Limpia todos los datos almacenados localmente en Hive.
+  static Future<void> clearAllData() async {
+    final box = Hive.box<dynamic>(_boxName);
+    await box.clear();
+    AppLogger.i('StorageService: Datos locales purgados exitosamente.');
+  }
+
   // Subir foto de perfil
   static Future<String?> uploadProfilePhoto(File file) async {
     try {

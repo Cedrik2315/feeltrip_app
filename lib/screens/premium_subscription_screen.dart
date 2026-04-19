@@ -55,7 +55,7 @@ class _PremiumSubscriptionScreenState
       backgroundColor: carbonBlack,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('FEELTRIP_PREMIUM', 
+        title: Text('FEELTRIP PREMIUM', 
           style: GoogleFonts.jetBrainsMono(color: rustyEarth, fontSize: 14, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -248,7 +248,7 @@ class _PremiumSubscriptionScreenState
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     color: rustyEarth,
                     child: Center(
-                      child: Text('ACTIVAR_SUSCRIPCIÓN', 
+                      child: Text('ACTIVAR SUSCRIPCIÓN', 
                         style: GoogleFonts.jetBrainsMono(color: carbonBlack, fontWeight: FontWeight.bold, fontSize: 12)),
                     ),
                   ),
@@ -264,7 +264,7 @@ class _PremiumSubscriptionScreenState
   Widget _buildRestoreButton() {
     return TextButton(
       onPressed: () => ref.read(premiumNotifierProvider.notifier).restorePurchases(),
-      child: Text('RESTORE_PREVIOUS_PURCHASES', 
+      child: Text('RESTORE PREVIOUS PURCHASES', 
         style: GoogleFonts.jetBrainsMono(color: boneWhite.withValues(alpha: 0.3), fontSize: 10)),
     );
   }

@@ -62,9 +62,21 @@ class DeepLinkService {
     final currentUserId = authState.value?.id ?? 'guest';
     AppLogger.d('DeepLinkService: Procesando deep link "$uri" para usuario: $currentUserId');
     
+    final host = uri.host;
     final pathSegments = uri.pathSegments;
-    if (pathSegments.isEmpty) return;
 
+    // Caso 1: Custom Scheme (feeltrip://payments/success?...)
+    if (uri.scheme == 'feeltrip') {
+      if (host == 'payments' || host == 'payment') {
+        final status = pathSegments.isNotEmpty ? pathSegments[0] : 'success';
+        final bookingId = uri.queryParameters['bookingId'];
+        _processPaymentResult(router, status, bookingId);
+        return;
+      }
+    }
+
+    // Caso 2: HTTPS (https://feeltrip.app/type/id)
+    if (pathSegments.isEmpty) return;
     final type = pathSegments[0];
     final id = pathSegments.length > 1 ? pathSegments[1] : null;
 
@@ -72,8 +84,22 @@ class DeepLinkService {
       router.push('/comments/$id');
     } else if (type == 'agency' && id != null) {
       router.push('/agency/$id');
+    } else if (type == 'payments' || type == 'payment') {
+      final status = pathSegments.length > 1 ? pathSegments[1] : 'success';
+      final bookingId = uri.queryParameters['bookingId'] ?? id;
+      _processPaymentResult(router, status, bookingId);
     } else {
       AppLogger.w('DeepLinkService: Ruta no reconocida o no mapeada: $type');
+    }
+  }
+
+  void _processPaymentResult(GoRouter router, String status, String? bookingId) {
+    if (status == 'success' || status == 'approved') {
+      router.go('/home'); // Usamos .go para resetear el stack si es necesario
+      AppLogger.i('DeepLinkService: Pago exitoso detectado para booking: $bookingId');
+    } else {
+      router.go('/home');
+      AppLogger.w('DeepLinkService: Pago fallido o pendiente detectado: $status');
     }
   }
 

@@ -21,4 +21,5 @@ abstract class IAuthRepository {
   Future<void> deleteUser();
   bool get isSignedIn;
   AuthUser? get currentUser;
+  Future<Either<Failure, void>> deleteAccount();
 }
