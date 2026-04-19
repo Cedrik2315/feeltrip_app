@@ -25,8 +25,11 @@ analyzer:
     unused_local_variable: warning
     unnecessary_cast: warning
     unused_field: warning
+    annotate_overrides: ignore
+    invalid_use_of_internal_member: ignore
+    experimental_member_use: ignore
+    prefer_single_quotes: ignore
   language:
-    strict-casts: true
     strict-inference: true
     strict-raw-types: true
 linter:

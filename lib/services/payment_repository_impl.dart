@@ -4,15 +4,12 @@ import 'package:feeltrip_app/core/logger/app_logger.dart';
 import 'package:feeltrip_app/services/metrics_service.dart' hide metricsServiceProvider;
 import 'package:feeltrip_app/services/revenuecat_service.dart';
 import 'package:feeltrip_app/services/booking_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
-import '../core/di/providers.dart';
 
-final paymentRepositoryProvider = Provider<PaymentRepository>((ref) => PaymentRepository(
-  metrics: ref.read(metricsServiceProvider),
-  revenueCat: ref.read(revenueCatServiceProvider),
-  bookingService: ref.read(bookingServiceProvider),
-));
+import 'package:purchases_flutter/purchases_flutter.dart';
+
+
+
+
 
 class PaymentRepository {
   PaymentRepository({
@@ -66,9 +63,11 @@ class PaymentRepository {
     try {
       AppLogger.i('PaymentRepository: Iniciando compra RevenueCat: ${package.identifier}');
       
-      final success = await _revenueCat.purchasePackage(package);
+      final customerInfo = await _revenueCat.purchasePackage(package);
+      // Verificamos si el entitlement 'premium' existe y está activo
+      final isPremiumActive = customerInfo.entitlements.active['premium']?.isActive ?? false;
       
-      if (success == true) {
+if (isPremiumActive) {
         MetricsService.logSubscriptionSuccess();
         return const Right(true);
       }
@@ -79,4 +78,3 @@ class PaymentRepository {
     }
   }
 }
-

@@ -43,7 +43,7 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
-          _buildHeader(isDark, user, profile, ref),
+          _buildHeader(context, isDark, user, profile, ref),
           
           _SectionTitle(title: 'EXPERIENCIA VISUAL', darkMode: isDark),
           _CustomSwitchTile(
@@ -105,7 +105,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(bool isDark, User? user, UserProfile? profile, WidgetRef ref) {
+  Widget _buildHeader(BuildContext context, bool isDark, User? user, UserProfile? profile, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       decoration: BoxDecoration(
@@ -130,11 +130,12 @@ class SettingsScreen extends ConsumerWidget {
                 right: 0,
                 child: GestureDetector(
                   onTap: () async {
+                    final messenger = ScaffoldMessenger.of(ref.context);
                     final picker = ImagePicker();
                     final image = await picker.pickImage(source: ImageSource.gallery);
                     if (image != null) {
                       // Simulación de subida o integrar con Storage
-                      ScaffoldMessenger.of(ref.context).showSnackBar(
+                      messenger.showSnackBar(
                         const SnackBar(content: Text('Subiendo fotografía...')),
                       );
                     }

@@ -5,6 +5,27 @@
 # IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
 # invoked from the command line by running `flutter analyze`.
 
+analyzer:
+  exclude:
+    - build/**
+    - .dart_tool/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated_plugin_registrant.dart"
+  errors:
+    # @JsonKey on freezed factory constructor params is a valid pattern
+    invalid_annotation_target: ignore
+    # Isar-generated files use experimental index APIs — suppress warning
+    experimental_member_use: ignore
+    # Suppress other common noise
+    missing_required_param: error
+    missing_return: error
+    prefer_const_constructors: ignore
+    dead_null_aware_expression: ignore
+    unused_import: warning
+    unused_field: warning
+    annotate_overrides: ignore
+
 # The following line activates a set of recommended lints for Flutter apps,
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml

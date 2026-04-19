@@ -1,9 +1,13 @@
+
 allprojects {
     repositories {
         google()
         mavenCentral()
     }
 }
+
+extra["kotlin_version"] = "2.2.0"
+
 
 val newBuildDir: Directory =
     rootProject.layout.buildDirectory
@@ -17,6 +21,22 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+subprojects {
+    val fixNamespace = {
+        if (project.hasProperty("android")) {
+            val android = project.extensions.findByName("android") as? com.android.build.gradle.BaseExtension
+            if (android != null && android.namespace == null) {
+                android.namespace = "com.feeltrip.app.generated.${project.name.replace("-", "_")}"
+            }
+        }
+    }
+    if (project.state.executed) {
+        fixNamespace()
+    } else {
+        project.afterEvaluate { fixNamespace() }
+    }
 }
 
 tasks.register<Delete>("clean") {

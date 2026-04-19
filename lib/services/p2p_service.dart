@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'dart:convert';
-import 'package:nearby_connections/nearby_connections.dart';
+import 'nearby_connections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/logger/app_logger.dart';
 import 'package:permission_handler/permission_handler.dart';
